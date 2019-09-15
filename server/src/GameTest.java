@@ -39,17 +39,11 @@ public class GameTest extends TestCase {
     public static void main(String[] args) {
         TestSuite suite = new TestSuite();
 
-        if (args.length != 0) {
-            // Run specific tests as indicated from the
-            // command line
-            for (int i = 0; i < args.length; i++) {
-                suite.addTest(new GameTest(args[i]));
-            }
-        } else {
-            // Dynamically discover all of them, or use
-            // user-defined suite
-            suite.addTest(GameTest.suite());
-        }
+        if (args.length != 0)
+            for (String arg : args) suite.addTest(new GameTest(arg)); // Run specific tests as indicated from the command line
+        else
+            suite.addTest(GameTest.suite()); // Dynamically discover all of them, or use user-defined suite
+
         junit.textui.TestRunner.run(suite);
     }
 }

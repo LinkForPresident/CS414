@@ -62,6 +62,6 @@ public class Game {
         else System.out.println("Invalid move attempted for player "+player+" moving piece "+board[row1][col1]+" from ("+col1+","+row1+") to ("+col2+","+row2+").");
     }
 
-    public static void main(String arg[]){
+    public static void main(String[] arg){
     }
 }
