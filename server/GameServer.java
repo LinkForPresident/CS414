@@ -22,7 +22,7 @@ public class GameServer{
 
     GameServer(){
         try{
-            ServerSocket serverListener = new ServerSocket(PORT_NUMBER); // Set up server to listen at PORT_NUMBER.
+            serverListener = new ServerSocket(PORT_NUMBER); // Set up server to listen at PORT_NUMBER.
             System.out.println("GameServer listening.");
 
             while (true) {
