@@ -57,7 +57,7 @@ public class Game {
             board[row1][col1] = "__";
             print_board();
             if(turn.equals("red")) turn = "blue";
-            if(turn.equals("blue")) turn = "red";
+            else turn = "red";
         }
         else System.out.println("Invalid move attempted for player "+player+" moving piece "+board[row1][col1]+" from ("+col1+","+row1+") to ("+col2+","+row2+").");
     }
