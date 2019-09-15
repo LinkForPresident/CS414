@@ -27,7 +27,11 @@ public class GameServer{
                     String path;
                     try{
                         path = request.split(" ")[1]; // get name of HTML page requested.
-                    }catch(NullPointerException e){
+                    }catch(ArrayIndexOutOfBoundsException e){
+                        path = "/index.html";
+                    }
+                    System.out.println(path);
+                    if(path.equals("/")){
                         path = "/index.html";
                     }
                     File file = new File(RELATIVE_PATH + path);
