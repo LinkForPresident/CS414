@@ -46,22 +46,20 @@ public class Game {
     }
 
     void print_board(){
-        for(int i=0; i<9; i++){
-            System.out.println(Arrays.toString(board[i]));
-        }
+        for(int i=0; i<9; i++) System.out.println(Arrays.toString(board[i]));
     }
 
     void makeMove(String player, int col1, int row1, int col2, int row2){
         Move move = new Move(this, player, row1, col1, row2, col2);
         if(move.isValidMove()){
-            System.out.println("Made valid move for player "+player+" moving piece " + board[row1][col1] + " from ("+col1+","+row1+") to ("+col2+","+row2+").");
+            System.out.println("Made valid move for player "+player+" moving piece "+board[row1][col1]+" from ("+col1+","+row1+") to ("+col2+","+row2+").");
             board[row2][col2] = board[row1][col1];
             board[row1][col1] = "__";
             print_board();
             if(turn.equals("red")) turn = "blue";
             if(turn.equals("blue")) turn = "red";
         }
-        else System.out.println("INVALID MOVE");
+        else System.out.println("Invalid move attempted for player "+player+" moving piece "+board[row1][col1]+" from ("+col1+","+row1+") to ("+col2+","+row2+").");
     }
 
     public static void main(String arg[]){

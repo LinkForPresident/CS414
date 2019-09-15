@@ -5,7 +5,7 @@ public class GameTest extends TestCase {
     private Game testGame;
 
     public void setUp(){
-        testGame = new Game("Bob","Sally");
+        testGame = new Game("Bob", "Sally");
     }
 
     public void testGamePieces(){
@@ -21,10 +21,10 @@ public class GameTest extends TestCase {
 
     public void testMakeMove(){
         testGame.print_board();
-        testGame.makeMove("Bob",6,8,5,8);
-        testGame.makeMove("Sally",0, 2, 0, 5);
-        testGame.makeMove("Sally",0, 2, 0, 3);
-        testGame.makeMove("Sally",0, 2, 0, 4);
+        testGame.makeMove("Bob", 6,8,5,8);
+        testGame.makeMove("Sally", 0, 2, 0, 5);
+        testGame.makeMove("Sally", 0, 2, 0, 3);
+        testGame.makeMove("Sally", 0, 2, 0, 4);
     }
 
 
