@@ -1,5 +1,6 @@
 import java.net.*;
 import java.io.*;
+import java.lang.*;
 
 public class GameServer{
 
@@ -23,7 +24,12 @@ public class GameServer{
 
                     String request = bufferedReader.readLine();
                     System.out.println(request);
-                    String path = request.split(" ")[1]; // get name of HTML page requested.
+                    String path;
+                    try{
+                        path = request.split(" ")[1]; // get name of HTML page requested.
+                    }catch(NullPointerException e){
+                        path = "/index.html";
+                    }
                     File file = new File(RELATIVE_PATH + path);
 
                     if(!file.exists()){
