@@ -19,8 +19,12 @@ public class GameTest extends TestCase {
         assert(testGame.turn.equals("blue"));
     }
 
-    public void testMakeLegalMove(){
-        testGame.makeMove("Bob",8,6,8,4);
+    public void testMakeMove(){
+        testGame.print_board();
+        testGame.makeMove("Bob",6,8,5,8);
+        testGame.makeMove("Sally",0, 2, 0, 5);
+        testGame.makeMove("Sally",0, 2, 0, 3);
+        testGame.makeMove("Sally",0, 2, 0, 4);
     }
 
 

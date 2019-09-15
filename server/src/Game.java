@@ -17,8 +17,6 @@ public class Game {
         for(int i=0; i<9; i++){
             for(int j=0; j<7; j++){
                 board[i][j] = "__";
-                //if(is_water(i,j)) board[i][j] = "ww";
-                //if(is_trap(i,j)) board[i][j] = "tt";
             }
         }
 
@@ -43,27 +41,6 @@ public class Game {
         board[8][3] = "bd"; //blue team den
     }
 
-    private boolean is_water(int row, int col){
-        return (row == 3 || row == 4 || row == 5) && (col == 1 || col == 2 || col == 4 || col == 5);
-    }
-
-    private boolean is_trap(int row, int col){
-        return (((row == 0 || row == 8) && (col == 2 || col == 4)) || ((row == 1 || row == 7) && (col == 3)));
-    }
-
-    boolean is_friendly_unit(int row, int col){
-        char friendly = turn.charAt(0); //b if turn is blue, r if turn is red
-        return board[row][col].charAt(0) == friendly;
-    }
-
-    boolean is_enemy_unit(int row, int col){
-        char friendly = turn.charAt(0);
-        char enemy = ' ';
-        if(friendly == 'b') enemy = 'r';
-        if(friendly == 'r') enemy = 'b';
-        return board[row][col].charAt(0) == enemy;
-    }
-
     String[][] get_board(){
         return board;
     }
@@ -74,9 +51,17 @@ public class Game {
         }
     }
 
-    void makeMove(String player, int x1, int y1, int x2, int y2){
-        Move move = new Move(this, player, x1, y1, x2, y2);
-        System.out.println(move.isValidMove());
+    void makeMove(String player, int col1, int row1, int col2, int row2){
+        Move move = new Move(this, player, row1, col1, row2, col2);
+        if(move.isValidMove()){
+            System.out.println("Made valid move for player "+player+" moving piece " + board[row1][col1] + " from ("+col1+","+row1+") to ("+col2+","+row2+").");
+            board[row2][col2] = board[row1][col1];
+            board[row1][col1] = "__";
+            print_board();
+            if(turn.equals("red")) turn = "blue";
+            if(turn.equals("blue")) turn = "red";
+        }
+        else System.out.println("INVALID MOVE");
     }
 
     public static void main(String arg[]){
