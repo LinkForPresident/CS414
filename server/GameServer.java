@@ -8,13 +8,19 @@ public class GameServer{
     static final String header = "HTTP/1.0 200 OK\nContent-Type: text/html\n\n";
 
     public static void main(String[] args){
+
         try (ServerSocket serverListener = new ServerSocket(PORT_NUMBER)) { // Set up server to listen at PORT_NUMBER.
+
             System.out.println("GameServer listening.");
+
             while (true) {
+
                 try (Socket clientSocket = serverListener.accept()){ // accept a connection from a client, fork socket for this connection.
+
                     PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true); // sends data to client.
                     InputStream socketInputStream = clientSocket.getInputStream(); // gets data from client.
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socketInputStream)); // stores data from client.
+
                     String request = bufferedReader.readLine();
                     System.out.println(request);
                     String path = request.split(" ")[1]; // get name of HTML page requested.
@@ -34,10 +40,16 @@ public class GameServer{
                     }
 
                     out.println(response); // send response to client.
+
                     bufferedReader.close();
                     out.close();
+
                 }catch(IOException e){}
+
             }
+
         }catch(IOException e){}
+
     }
+
 }
