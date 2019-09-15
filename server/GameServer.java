@@ -33,7 +33,7 @@ public class GameServer{
                     handleRequest();
                     tearDownConnection();
                 }
-                catch(IOException | ArrayIndexOutOfBoundsException e){
+                catch(IOException | ArrayIndexOutOfBoundsException | NullPointerException e){
                 }
             }
         }
@@ -47,7 +47,7 @@ public class GameServer{
         outputStream = new PrintWriter(clientSocket.getOutputStream(), true); // sends data to client.
     }
 
-    void parseRequest() throws IOException, ArrayIndexOutOfBoundsException{
+    void parseRequest() throws IOException, ArrayIndexOutOfBoundsException, NullPointerException{
         request = bufferedReader.readLine();
         method = DEFAULT_METHOD;
         path = DEFAULT_PAGE;
