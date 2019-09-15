@@ -20,7 +20,6 @@ public class GameServer{
     String method;
     String path;
 
-
     GameServer(){
         try{
             ServerSocket serverListener = new ServerSocket(PORT_NUMBER); // Set up server to listen at PORT_NUMBER.
@@ -44,8 +43,8 @@ public class GameServer{
 
     void setUpConnection() throws IOException{
         inputStream = clientSocket.getInputStream(); // gets data from client.
-        outputStream = new PrintWriter(clientSocket.getOutputStream(), true); // sends data to client.
         bufferedReader = new BufferedReader(new InputStreamReader(inputStream)); // stores data from client.
+        outputStream = new PrintWriter(clientSocket.getOutputStream(), true); // sends data to client.
     }
 
     void parseRequest() throws IOException, ArrayIndexOutOfBoundsException{
@@ -80,7 +79,7 @@ public class GameServer{
         }
 
         FileReader fileReader = new FileReader(file);
-        BufferedReader fileBuffer = new BufferedReader(fileReader); // read the file into a buffer (reused).
+        BufferedReader fileBuffer = new BufferedReader(fileReader); // read the file into a buffer.
         String response = HEADER; // append header to response.
         String line;
 
@@ -98,7 +97,6 @@ public class GameServer{
     }
 
     public static void main(String[] args){
-
         GameServer gameServer = new GameServer();
         return;
     }
