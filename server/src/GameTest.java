@@ -1,3 +1,5 @@
+package src;
+
 import junit.framework.*;
 
 public class GameTest extends TestCase {
@@ -20,11 +22,14 @@ public class GameTest extends TestCase {
     }
 
     public void testMakeMove(){
-        game.print_board();
-        game.makeMove("Bob", 6,8,5,8);
-        game.makeMove("Sally", 0, 2, 0, 5);
-        game.makeMove("Sally", 0, 2, 0, 3);
-        game.makeMove("Sally", 0, 3, 0, 4);
+        game.printBoard();
+        game.sendInput("Bob", 5, 8);
+        game.sendInput("Bob", 6, 8);
+        game.sendInput("Bob", 5, 8);
+        game.sendInput("Bob", 4, 8);
+        game.sendInput("Sally", 0, 2);
+        game.sendInput("Bob", 4, 8);
+        game.sendInput("Sally", 0, 1);
     }
 
 

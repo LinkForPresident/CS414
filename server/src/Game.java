@@ -1,3 +1,5 @@
+package src;
+
 import java.util.Arrays;
 import java.lang.*;
 
@@ -7,6 +9,7 @@ public class Game {
     public String player_2;
     public String turn;
     public String[][] board = new String[9][7];
+    public Move move = new Move(this);
 
     public Game(String p1_name, String p2_name){
 
@@ -41,25 +44,46 @@ public class Game {
         board[8][3] = "bd"; //blue team den
     }
 
-    String[][] get_board(){
-        return board;
-    }
-
-    void print_board(){
+    void printBoard(){
         for(int i=0; i<9; i++) System.out.println(Arrays.toString(board[i]));
     }
 
-    void makeMove(String player, int col1, int row1, int col2, int row2){
-        Move move = new Move(this, player, row1, col1, row2, col2);
-        if(move.isValidMove()){
-            System.out.println("Made valid move for player "+player+" moving piece "+board[row1][col1]+" from ("+col1+","+row1+") to ("+col2+","+row2+").");
-            board[row2][col2] = board[row1][col1];
-            board[row1][col1] = "__";
-            print_board();
-            if(turn.equals("red")) turn = "blue";
-            else turn = "red";
+    void sendInput(String player, int col, int row){
+        if(isTurn(player)){
+            if(move.selected_col == -1 && move.selected_row == -1){ // if the first half of the move hasn't been submitted
+                if(move.isFriendlyUnit(row, col)){
+                    move.selected_col = col;
+                    move.selected_row = row;
+                }
+            } else if(move.selected_col == col && move.selected_row == row){ // if the second half of the move is the same as the first half (re-selecting the same tile)
+                move.selected_col = -1;
+                move.selected_row = -1;
+            } else if(move.validTiles[row][col] == "*"){ // if row, col is a valid tile to move to
+                makeMove(row, col);
+            }
+            move.updateValidTiles();
         }
-        else System.out.println("Invalid move attempted for player "+player+" moving piece "+board[row1][col1]+" from ("+col1+","+row1+") to ("+col2+","+row2+").");
+    }
+
+    private void makeMove(int row, int col){
+
+        board[row][col] = board[move.selected_row][move.selected_col];
+        board[move.selected_row][move.selected_col] = "__";
+
+        if(turn.equals("blue")) turn = "red";
+        else turn = "blue";
+
+        move.selected_row = -1;
+        move.selected_col = -1;
+        move.updateValidTiles();
+
+        System.out.println("");
+        printBoard();
+    }
+
+    private boolean isTurn(String player){
+        // returns true if it is the turn of the player submitting the move, else returns false.
+        return (turn.equals("blue") && player.equals(player_1)) || (turn.equals("red") && player.equals(player_2));
     }
 
     public static void main(String[] arg){
