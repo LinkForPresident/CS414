@@ -40,6 +40,7 @@ class Move {
     }
 
     private void handleUpdate(int row, int col) {
+        // checks tile conditions and puts a "*" in the corresponding location of validTiles if the tile can be moved to from location (selectedRow, selectedCol)
         if (!isFriendlyUnit(row, col)) { // if there is no friendly unit occupying the tile
             if (!isWater(row, col) || isRat(selectedRow, selectedCol)) { // if there is no water (unless the unit being moved is a rat)
                 if((isEnemyUnit(row, col) && canCaptureUnit(row, col)) || !isEnemyUnit(row, col)) // if there is an enemy unit that the unit being moved can capture, or there is no enemy
@@ -92,17 +93,4 @@ class Move {
         // returns true if the tile at row, col contains a trap, else returns false.
         return (((row == 0 || row == 8) && (col == 2 || col == 4)) || ((row == 1 || row == 7) && (col == 3)));
     }
-
-    /*
-    public boolean isValidMove(){
-        // returns true if the move being attempted is valid
-        if(isTurn(player) && isFriendlyUnit(row1, col1)){
-            if(moveIsOneTileAway() && (!isWater(row2, col2) || isRat(row1, col1))) {
-                    return true;
-            }
-            if(isLionOrTiger(row1,col1)) return handleLionTigerMovement();
-        }
-        return false;
-    }
-     */
 }

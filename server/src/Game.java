@@ -45,16 +45,16 @@ public class Game {
     }
 
     void printBoard(){
+        // prints out the board in a readable fashion
         for(int i=0; i<9; i++) System.out.println(Arrays.toString(board[i]));
     }
 
     void sendInput(String player, int col, int row){
+        // send input to the game in the format (player sending move, column selected, row selected)
         if(isTurn(player)){
-            if(move.selectedCol == -1 && move.selectedRow == -1){ // if the first half of the move hasn't been submitted
-                if(move.isFriendlyUnit(row, col)){
-                    move.selectedCol = col;
-                    move.selectedRow = row;
-                }
+            if(move.isFriendlyUnit(row, col)){ // if the player is selecting one of their own tiles
+                move.selectedCol = col;
+                move.selectedRow = row;
             } else if(move.selectedCol == col && move.selectedRow == row){ // if the second half of the move is the same as the first half (re-selecting the same tile)
                 move.selectedCol = -1;
                 move.selectedRow = -1;
@@ -66,7 +66,7 @@ public class Game {
     }
 
     private void makeMove(int row, int col){
-
+        // once a valid move has been constructed, make it.
         board[row][col] = board[move.selectedRow][move.selectedCol];
         board[move.selectedRow][move.selectedCol] = "__";
 
