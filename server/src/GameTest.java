@@ -29,7 +29,16 @@ public class GameTest extends TestCase {
         game.sendInput("Bob", 4, 8);
         game.sendInput("Sally", 0, 2);
         game.sendInput("Bob", 4, 8);
-        game.sendInput("Sally", 0, 1);
+        game.sendInput("Sally", 0, 3);
+        game.sendInput("Bob", 0,6);
+        game.sendInput("Bob",0,5);
+        game.sendInput("Sally", 0,3);
+        game.sendInput("Sally", 0, 4);
+        game.sendInput("Bob",0,5);
+        game.sendInput("Bob", 1,5);
+        game.sendInput("Bob", 0, 6);
+        game.sendInput("Sally", 0,4);
+        game.sendInput("Sally", 1,4);
     }
 
 

@@ -50,15 +50,15 @@ public class Game {
 
     void sendInput(String player, int col, int row){
         if(isTurn(player)){
-            if(move.selected_col == -1 && move.selected_row == -1){ // if the first half of the move hasn't been submitted
+            if(move.selectedCol == -1 && move.selectedRow == -1){ // if the first half of the move hasn't been submitted
                 if(move.isFriendlyUnit(row, col)){
-                    move.selected_col = col;
-                    move.selected_row = row;
+                    move.selectedCol = col;
+                    move.selectedRow = row;
                 }
-            } else if(move.selected_col == col && move.selected_row == row){ // if the second half of the move is the same as the first half (re-selecting the same tile)
-                move.selected_col = -1;
-                move.selected_row = -1;
-            } else if(move.validTiles[row][col] == "*"){ // if row, col is a valid tile to move to
+            } else if(move.selectedCol == col && move.selectedRow == row){ // if the second half of the move is the same as the first half (re-selecting the same tile)
+                move.selectedCol = -1;
+                move.selectedRow = -1;
+            } else if(move.validTiles[row][col].equals("*")){ // if row, col is a valid tile to move to
                 makeMove(row, col);
             }
             move.updateValidTiles();
@@ -67,14 +67,14 @@ public class Game {
 
     private void makeMove(int row, int col){
 
-        board[row][col] = board[move.selected_row][move.selected_col];
-        board[move.selected_row][move.selected_col] = "__";
+        board[row][col] = board[move.selectedRow][move.selectedCol];
+        board[move.selectedRow][move.selectedCol] = "__";
 
         if(turn.equals("blue")) turn = "red";
         else turn = "blue";
 
-        move.selected_row = -1;
-        move.selected_col = -1;
+        move.selectedRow = -1;
+        move.selectedCol = -1;
         move.updateValidTiles();
 
         System.out.println("");

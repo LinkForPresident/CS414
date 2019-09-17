@@ -5,10 +5,9 @@ import java.util.Arrays;
 class Move {
 
     private Game game;
-    int selected_row = -1;
-    int selected_col = -1;
+    int selectedRow = -1;
+    int selectedCol = -1;
     String[][] validTiles = new String[9][7];
-
 
     Move(Game current_game){
         game = current_game;
@@ -24,11 +23,11 @@ class Move {
     }
 
     void updateValidTiles(){
-        if(selected_row != -1 && selected_col != -1) {
-            if(selected_col <= 5) validTiles[selected_row][selected_col + 1] = "*";
-            if(selected_col >= 1) validTiles[selected_row][selected_col - 1] = "*";
-            if(selected_row <= 7) validTiles[selected_row + 1][selected_col] = "*";
-            if(selected_row >= 1) validTiles[selected_row - 1][selected_col] = "*";
+        if(selectedRow != -1 && selectedCol != -1) {
+            if(selectedCol <= 5) handleUpdate(selectedRow, selectedCol+1);
+            if(selectedCol >= 1) handleUpdate(selectedRow, selectedCol-1);
+            if(selectedRow <= 7) handleUpdate(selectedRow+1, selectedCol);
+            if(selectedRow >= 1) handleUpdate(selectedRow-1, selectedCol);
         } else {
             for(int i=0; i<9; i++){
                 for(int j=0; j<7; j++){
@@ -36,6 +35,22 @@ class Move {
                 }
             }
         }
+        System.out.println("");
+        printValidTiles();
+    }
+
+    private void handleUpdate(int row, int col) {
+        if (!isFriendlyUnit(row, col)) { // if there is no friendly unit occupying the tile
+            if (!isWater(row, col) || isRat(selectedRow, selectedCol)) { // if there is no water (unless the unit being moved is a rat)
+                if((isEnemyUnit(row, col) && canCaptureUnit(row, col)) || !isEnemyUnit(row, col)) // if there is an enemy unit that the unit being moved can capture, or there is no enemy
+                    validTiles[row][col] = "*";
+            } else if (isLionOrTiger(selectedRow, selectedCol)) { // if the unit being moved is a lion or tiger
+                handleLionTigerMovement();
+            }
+        }
+    }
+
+    private void handleLionTigerMovement(){
     }
 
     boolean isFriendlyUnit(int row, int col){
@@ -53,30 +68,19 @@ class Move {
         return game.board[row][col].charAt(0) == enemy;
     }
 
-    /*
-    public boolean isValidMove(){
-        // returns true if the move being attempted is valid
-        if(isTurn(player) && isFriendlyUnit(row1, col1)){
-            if(moveIsOneTileAway() && (!isWater(row2, col2) || isRat(row1, col1))) {
-                    return true;
-            }
-            if(isLionOrTiger(row1,col1)) return handleLionTigerMovement();
-        }
-        return false;
-    }
-
-    private boolean handleLionTigerMovement(){
-        return true;
+    private boolean canCaptureUnit(int row, int col){
+        // returns true if the piece at row, col has a lesser or equal power to the piece at selectedRow, SelectedCol
+        return (game.board[selectedRow][selectedCol].charAt(1) >= game.board[row][col].charAt(1)) && !isWater(selectedRow, selectedCol);
     }
 
     private boolean isLionOrTiger(int row, int col){
         // returns true if the piece at row, col is a lion or a tiger, else returns false.
-        return game.board[row1][col1].charAt(1) == '7' || game.board[row1][col1].charAt(1) == '6';
+        return game.board[row][col].charAt(1) == '7' || game.board[row][col].charAt(1) == '6';
     }
 
     private boolean isRat(int row, int col){
         // returns true if the piece at row, col is a rat, else returns false.
-        return game.board[row1][col1].charAt(1) == '1';
+        return game.board[row][col].charAt(1) == '1';
     }
 
     private boolean isWater(int row, int col){
@@ -87,6 +91,18 @@ class Move {
     private boolean isTrap(int row, int col){
         // returns true if the tile at row, col contains a trap, else returns false.
         return (((row == 0 || row == 8) && (col == 2 || col == 4)) || ((row == 1 || row == 7) && (col == 3)));
+    }
+
+    /*
+    public boolean isValidMove(){
+        // returns true if the move being attempted is valid
+        if(isTurn(player) && isFriendlyUnit(row1, col1)){
+            if(moveIsOneTileAway() && (!isWater(row2, col2) || isRat(row1, col1))) {
+                    return true;
+            }
+            if(isLionOrTiger(row1,col1)) return handleLionTigerMovement();
+        }
+        return false;
     }
      */
 }
