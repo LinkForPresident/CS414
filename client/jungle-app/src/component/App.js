@@ -26,17 +26,17 @@ class Header extends React.Component {
 
     render() {
         return (
-            <div className='navigation'>
+            <div className='menu navigation-menu'>
                 <Tabs>
                     <TabList>
-                        <Tab>Game</Tab>
                         <Tab>Home</Tab>
+                        <Tab>Game</Tab>
                         <Tab>Invite</Tab>
                         <Tab>Login</Tab>
                         <Tab>User</Tab>
                     </TabList>
-                    <TabPanel><Game/></TabPanel>
                     <TabPanel><Home/></TabPanel>
+                    <TabPanel><Game/></TabPanel>
                     <TabPanel><Invite/></TabPanel>
                     <TabPanel><Login/></TabPanel>
                     <TabPanel><User/></TabPanel>
