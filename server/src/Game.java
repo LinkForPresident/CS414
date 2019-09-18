@@ -5,16 +5,16 @@ import java.lang.*;
 
 public class Game {
 
-    public String player_1;
-    public String player_2;
+    public String playerOne;
+    public String playerTwo;
     public String turn;
     public String[][] board = new String[9][7];
     public Move move = new Move(this);
+    
+    public Game(String playerOneName, String playerTwoName){
 
-    public Game(String p1_name, String p2_name){
-
-        player_1 = p1_name;
-        player_2 = p2_name;
+        playerOne = playerOneName;
+        playerTwo = playerTwoName;
         turn = "blue";
 
         for(int i=0; i<9; i++){
@@ -83,7 +83,7 @@ public class Game {
 
     private boolean isTurn(String player){
         // returns true if it is the turn of the player submitting the move, else returns false.
-        return (turn.equals("blue") && player.equals(player_1)) || (turn.equals("red") && player.equals(player_2));
+        return (turn.equals("blue") && player.equals(playerOne)) || (turn.equals("red") && player.equals(playerTwo));
     }
 
     public static void main(String[] arg){
