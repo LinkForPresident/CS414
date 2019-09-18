@@ -9,9 +9,9 @@ export default class App extends React.Component {
         operation: null,
     };
 
-    handleClick = buttonName => {
-
-    };
+    // handleClick = buttonName => {
+    //
+    // };
 
     render() {
         return (
@@ -31,12 +31,14 @@ class Header extends React.Component {
                     <TabList>
                         <Tab>Home</Tab>
                         <Tab>Game</Tab>
+                        <Tab>History</Tab>
                         <Tab>Invite</Tab>
                         <Tab>Login</Tab>
                         <Tab>User</Tab>
                     </TabList>
                     <TabPanel><Home/></TabPanel>
                     <TabPanel><Game/></TabPanel>
+                    <TabPanel><History/></TabPanel>
                     <TabPanel><Invite/></TabPanel>
                     <TabPanel><Login/></TabPanel>
                     <TabPanel><User/></TabPanel>
@@ -46,21 +48,32 @@ class Header extends React.Component {
     }
 }
 
+
+class Home extends React.Component {
+    render() {
+        return (
+            <div className={'HomePage'}>
+                <p>Home Goes here</p>
+            </div>
+        )
+    }
+}
+
 class Game extends React.Component {
     render() {
         return (
-            <div className={'Game'}>
+            <div className={'GamePage'}>
                 <p>Game Goes here</p>
             </div>
         )
     }
 }
 
-class Home extends React.Component {
+class History extends React.Component {
     render() {
         return (
-            <div className={'Game'}>
-                <p>Home Goes here</p>
+            <div className={'HistoryPage'}>
+                <p>History Goes here</p>
             </div>
         )
     }
@@ -69,7 +82,7 @@ class Home extends React.Component {
 class Invite extends React.Component {
     render() {
         return (
-            <div className={'Game'}>
+            <div className={'InvitePage'}>
                 <p>Invite Goes here</p>
             </div>
         )
@@ -79,7 +92,7 @@ class Invite extends React.Component {
 class Login extends React.Component {
     render() {
         return (
-            <div className={'Game'}>
+            <div className={'LoginPage'}>
                 <p>Login Goes here</p>
             </div>
         )
@@ -89,7 +102,7 @@ class Login extends React.Component {
 class User extends React.Component {
     render() {
         return (
-            <div className={'Game'}>
+            <div className={'UserPage'}>
                 <p>User Goes here</p>
             </div>
         )
