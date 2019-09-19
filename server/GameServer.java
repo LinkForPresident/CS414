@@ -3,6 +3,7 @@ import java.io.*;
 import java.lang.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.sql.*;
 
 public class GameServer{
 
@@ -11,7 +12,7 @@ public class GameServer{
     private static final String HEADER = "HTTP/1.0 200 OK\nContent-Type: text/html\n\n";
     private static final String DEFAULT_METHOD = "GET";
     private static final String DEFAULT_PAGE = "/index.html";
-    private static final double HASH_KEY = 47382;
+    private static final double HASH_KEY = 47324824;
 
     private ServerSocket serverListener;
     private Socket clientSocket;
@@ -25,6 +26,11 @@ public class GameServer{
     private String action;
     private Map<String, String> args = new HashMap<String, String>();
 
+    static final String JDBC_DRIVER = "org.mariadb.jdbc.Driver";
+    static final String DB_URL = "jdbc:mariadb://10.20.0.10/cs414";
+    static final String USER = "user";
+    static final String PASS = "the_password_123";
+
     private GameServer(){
 
         try{
@@ -32,6 +38,7 @@ public class GameServer{
             System.out.println("GameServer listening.");
 
             while (true) {
+
                 try{
                     clientSocket = serverListener.accept(); // accept a connection from a client, fork socket for this connection.
                     setUpConnection();
@@ -52,6 +59,11 @@ public class GameServer{
         inputStream = clientSocket.getInputStream(); // gets data from client.
         bufferedReader = new BufferedReader(new InputStreamReader(inputStream)); // stores data from client.
         outputStream = new PrintWriter(clientSocket.getOutputStream(), true); // sends data to client.
+        request = "";
+        method = "";
+        path = "";
+        action = "";
+        args = new HashMap<String, String>();
     }
 
     private void parseRequest() throws IOException, ArrayIndexOutOfBoundsException, NullPointerException{
@@ -71,7 +83,6 @@ public class GameServer{
 
     private void handleRequest() throws IOException{
 
-        System.out.println(request);
         switch(method){
             case "GET":
                 handleGETRequest();
@@ -82,7 +93,14 @@ public class GameServer{
         }
     }
 
-    private void handleGETRequest() throws IOException{
+    private void handleGETRequest() throws IOException {
+
+        handleUserAuthentication();
+        serveGETRequest();
+
+    }
+
+    private void serveGETRequest() throws IOException {
 
         File file = new File(RELATIVE_PATH + path);
 
@@ -116,7 +134,6 @@ public class GameServer{
         String line = "";
 
         while((line = bufferedReader.readLine()).length() != 0){
-            System.out.println(line);
             if(line.contains("Content-Length")){
                 length = Integer.parseInt(line.split(" ")[1]);
             }
@@ -137,13 +154,15 @@ public class GameServer{
 
     private void handleAction() throws IOException{
 
-        action = args.get("action");
         switch (action) {
             case "user_registration":
                 // handleUserRegistration(); needs to register new user and redirect to index.html.
                 break;
             case "login":
                 handleLogin();
+                break;
+            case "logout":
+                handleLogout();
                 break;
             case "create_game":
                 // handleCreateGame();
@@ -165,40 +184,183 @@ public class GameServer{
 
     private double[] getAuthTokens(){
 
-        double username = args.get("username").hashCode() * HASH_KEY;
-        double password = args.get("password").hashCode() * HASH_KEY;
-        double pk = (username % password) * HASH_KEY;
+        double username = args.get("username").hashCode() % HASH_KEY;
+        double password = args.get("password").hashCode() % HASH_KEY;
+        double pk = (username % password) % HASH_KEY;
         return new double[]{username, password, pk};
     }
 
-    private void handleUserAuthentication(){
+    private void handleUserAuthentication() throws IOException{
 
-        String clientIP = clientSocket.getInetAddress().toString();
-        if(isLoggedIn(clientIP)){
-            return;
+        String clientIP = clientSocket.getInetAddress().toString().replace("/","");
+        action = args.getOrDefault("action","GET_REQUEST");
+
+        if(!isLoggedIn(clientIP) && !action.equals("user_registration") && !action.equals("login") && !action.equals("logout")){
+            redirectToLogin();
         }
-
-        double[] authTokens = getAuthTokens();
-
-        // now use pk in SELECT statement to DB to lookup whether user exists.
-
-        // if user exists, bind this user to the client IP. The IP is now "logged in". Return.
-
-        // if user does not exist, return error message.
-
     }
 
     private boolean isLoggedIn(String clientIP){
         // check db to see if this IP is in the "logged in" table.
 
         boolean loggedIn = false;
+
+        Connection connection = null;
+        Statement statement = null;
+        try {
+
+            Class.forName(JDBC_DRIVER); // register JDBC driver.
+            connection = DriverManager.getConnection(
+                    DB_URL, USER, PASS); //Open a connection to the database
+            statement = connection.createStatement();
+
+            String temp = String.format("DELETE FROM LOGGED_IN WHERE ip='-1492488.000000'");
+            ResultSet rsas = statement.executeQuery(temp);
+
+            String check_auth = String.format("SELECT 1 FROM LOGGED_IN WHERE ip='%s'", clientIP);
+            ResultSet resultSet = statement.executeQuery(check_auth);
+
+            if(resultSet.next()){ // User exists and has been authenticated, the request handling can continue.
+                loggedIn = true;
+                System.out.println("Client is logged in.");
+            }
+            else{   // User does not exist. Stop the request handling.
+                System.out.println("Client is not logged in.");
+                loggedIn = false;
+            }
+
+        } catch (SQLException se) {
+            //Handle errors for JDBC
+            se.printStackTrace();
+        } catch (Exception e) {
+            //Handle errors for Class.forName
+            e.printStackTrace();
+        } finally {
+            //finally block used to close resources
+            try {
+                if (statement != null) {
+                    connection.close();
+                }
+            } catch (SQLException se) {
+            }// do nothing
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }//end finally try
+        }//end try
+
         return loggedIn;
     }
 
     private void handleLogin() throws IOException{
 
+        String clientIP = clientSocket.getInetAddress().toString().replace("/","");
+
+        Connection connection = null;
+        Statement statement = null;
+        try {
+
+            Class.forName(JDBC_DRIVER); // register JDBC driver.
+            connection = DriverManager.getConnection(
+                    DB_URL, USER, PASS); //Open a connection to the database
+            statement = connection.createStatement();
+
+            double hashCode = getAuthTokens()[2];
+
+            String check_auth = String.format("SELECT 1 FROM User WHERE hash_code='%s'", hashCode);
+            ResultSet resultSet = statement.executeQuery(check_auth);
+
+            if(resultSet.next()){ // User exists and has been authenticated, place IP into Logged_In table.
+                String addToLoggedIn = String.format("INSERT INTO LOGGED_IN VALUES ('%s');", clientIP);
+                statement.executeQuery(addToLoggedIn);
+            }
+            else{   // User does not exist. Stop the request handling.
+                redirectToLogin();
+            }
+
+        } catch (SQLException se) {
+            //Handle errors for JDBC
+            se.printStackTrace();
+        } catch (Exception e) {
+            //Handle errors for Class.forName
+            e.printStackTrace();
+        } finally {
+            //finally block used to close resources
+            try {
+                if (statement != null) {
+                    connection.close();
+                }
+            } catch (SQLException se) {
+            }// do nothing
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }//end finally try
+        }//end try
         path = "/index.html";
-        handleGETRequest();
+        serveGETRequest();
+    }
+
+    private void handleLogout() throws IOException{
+
+        String clientIP = clientSocket.getInetAddress().toString().replace("/","");
+
+        Connection connection = null;
+        Statement statement = null;
+        try {
+
+            Class.forName(JDBC_DRIVER); // register JDBC driver.
+            connection = DriverManager.getConnection(
+                    DB_URL, USER, PASS); //Open a connection to the database
+            statement = connection.createStatement();
+            System.out.println(String.format("Client IP:%s",clientIP));
+            String logOut = String.format("DELETE FROM LOGGED_IN WHERE ip='%s'", clientIP);
+            statement.executeQuery(logOut);
+
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM LOGGED_IN;");
+
+            while(resultSet.next()){
+                System.out.println(resultSet.getString(1));
+            }
+
+
+        } catch (SQLException se) {
+            //Handle errors for JDBC
+            se.printStackTrace();
+        } catch (Exception e) {
+            //Handle errors for Class.forName
+            e.printStackTrace();
+        } finally {
+            //finally block used to close resources
+            try {
+                if (statement != null) {
+                    connection.close();
+                }
+            } catch (SQLException se) {
+            }// do nothing
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }//end finally try
+        }//end try
+        path = "/login.html";
+        serveGETRequest();
+    }
+
+    private void redirectToLogin() throws IOException{
+
+        path = "/login.html";
+        serveGETRequest();
+        tearDownConnection();
     }
 
     private void tearDownConnection() throws IOException{
