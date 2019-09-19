@@ -26,6 +26,7 @@ public class GameServer{
     private Map<String, String> args = new HashMap<String, String>();
 
     private GameServer(){
+
         try{
             serverListener = new ServerSocket(PORT_NUMBER); // Set up server to listen at PORT_NUMBER.
             System.out.println("GameServer listening.");
@@ -47,12 +48,14 @@ public class GameServer{
     }
 
     private void setUpConnection() throws IOException{
+
         inputStream = clientSocket.getInputStream(); // gets data from client.
         bufferedReader = new BufferedReader(new InputStreamReader(inputStream)); // stores data from client.
         outputStream = new PrintWriter(clientSocket.getOutputStream(), true); // sends data to client.
     }
 
     private void parseRequest() throws IOException, ArrayIndexOutOfBoundsException, NullPointerException{
+
         request = bufferedReader.readLine();
         method = DEFAULT_METHOD;
         path = DEFAULT_PAGE;
@@ -67,6 +70,7 @@ public class GameServer{
     }
 
     private void handleRequest() throws IOException{
+
         System.out.println(request);
         switch(method){
             case "GET":
@@ -79,6 +83,7 @@ public class GameServer{
     }
 
     private void handleGETRequest() throws IOException{
+
         File file = new File(RELATIVE_PATH + path);
 
         if(!file.exists()){
@@ -99,21 +104,19 @@ public class GameServer{
     }
 
     private void handlePOSTRequest() throws IOException{
-        System.out.println("test0");
-        parsePOSTRequest();
-        System.out.println("test1");
+
+        parsePOSTRequestArgs();
         handleUserAuthentication();
-        System.out.println("test2");
         handleAction();
-        System.out.println("test3");
     }
 
-    private void parsePOSTRequest() throws IOException{
+    private void parsePOSTRequestArgs() throws IOException{
+
         int length = 0;
         String line = "";
 
         while((line = bufferedReader.readLine()).length() != 0){
-
+            System.out.println(line);
             if(line.contains("Content-Length")){
                 length = Integer.parseInt(line.split(" ")[1]);
             }
@@ -133,6 +136,7 @@ public class GameServer{
     }
 
     private void handleAction() throws IOException{
+
         action = args.get("action");
         switch (action) {
             case "user_registration":
@@ -159,30 +163,52 @@ public class GameServer{
         }
     }
 
-    private void handleUserAuthentication(){
+    private double[] getAuthTokens(){
+
         double username = args.get("username").hashCode() * HASH_KEY;
         double password = args.get("password").hashCode() * HASH_KEY;
         double pk = (username % password) * HASH_KEY;
+        return new double[]{username, password, pk};
+    }
+
+    private void handleUserAuthentication(){
+
+        String clientIP = clientSocket.getInetAddress().toString();
+        if(isLoggedIn(clientIP)){
+            return;
+        }
+
+        double[] authTokens = getAuthTokens();
 
         // now use pk in SELECT statement to DB to lookup whether user exists.
 
-        // if user exists, return.
+        // if user exists, bind this user to the client IP. The IP is now "logged in". Return.
 
         // if user does not exist, return error message.
 
     }
 
+    private boolean isLoggedIn(String clientIP){
+        // check db to see if this IP is in the "logged in" table.
+
+        boolean loggedIn = false;
+        return loggedIn;
+    }
+
     private void handleLogin() throws IOException{
+
         path = "/index.html";
         handleGETRequest();
     }
 
     private void tearDownConnection() throws IOException{
+
         bufferedReader.close();
         outputStream.close();
     }
 
     public static void main(String[] args){
+
         GameServer gameServer = new GameServer();
     }
 }
