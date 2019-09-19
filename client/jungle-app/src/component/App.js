@@ -1,6 +1,8 @@
 
 import React from "react";
 import {Tabs, TabList, Tab, TabPanel} from 'react-tabs';
+import { Button } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default class App extends React.Component {
     state = {
@@ -90,10 +92,23 @@ class Invite extends React.Component {
 }
 
 class Login extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {isToggleOn: true};
+        this.handleClick = this.handleClick.bind(this)
+    }
+
+    handleClick() {
+        this.setState(state => ({
+            isToggleOn: !state.isToggleOn
+        }));
+    }
+
     render() {
         return (
             <div className={'LoginPage'}>
-                <p>Login Goes here</p>
+                <Button variant="primary" onClick={this.handleClick}>Login Placeholder</Button>
+                <p>{this.state.isToggleOn ? 'ON' : 'OFF'}</p>
             </div>
         )
     }
