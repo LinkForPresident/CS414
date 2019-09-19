@@ -5,17 +5,17 @@ import java.lang.*;
 
 public class Game {
 
-    public String player_1;
-    public String player_2;
+    public String playerOne;
+    public String playerTwo;
     public String turn;
     public String[][] board = new String[9][7];
     public Move move = new Move(this);
     public String winner = "";
 
-    public Game(String p1_name, String p2_name){
+    public Game(String playerOneName, String playerTwoName){
 
-        player_1 = p1_name;
-        player_2 = p2_name;
+        playerOne = playerOneName;
+        playerTwo = playerTwoName;
         turn = "blue";
 
         for(int i=0; i<9; i++){
@@ -86,7 +86,7 @@ public class Game {
 
     private boolean isTurn(String player){
         // returns true if it is the turn of the player submitting the move, else returns false.
-        return (turn.equals("blue") && player.equals(player_1)) || (turn.equals("red") && player.equals(player_2));
+        return (turn.equals("blue") && player.equals(playerOne)) || (turn.equals("red") && player.equals(playerTwo));
     }
 
     private void checkIfWinner(){
@@ -95,17 +95,17 @@ public class Game {
         for(int i=0; i<9; i++){
             for(int j=0; j<7; j++){
                 if(board[i][j].charAt(0) == 'b'){
-                    if(i == 0 && j == 3) winner = player_1; // if there is a blue piece in the red team den
+                    if(i == 0 && j == 3) winner = playerOne; // if there is a blue piece in the red team den
                     bluePieces++;
                 }
                 if(board[i][j].charAt(0) == 'r'){
-                    if(i == 8 && j == 3) winner = player_2; // if there is a red piece in the blue team den
+                    if(i == 8 && j == 3) winner = playerTwo; // if there is a red piece in the blue team den
                     redPieces++;
                 }
             }
         }
-        if(redPieces == 0) winner = player_1;
-        if(bluePieces == 0) winner = player_2;
+        if(redPieces == 0) winner = playerOne;
+        if(bluePieces == 0) winner = playerTwo;
     }
 
     public static void main(String[] arg){
