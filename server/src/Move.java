@@ -1,5 +1,6 @@
 package src;
 
+import java.nio.channels.SelectableChannel;
 import java.util.Arrays;
 
 class Move {
@@ -23,17 +24,16 @@ class Move {
     }
 
     void updateValidTiles(){
+        for(int i=0; i<9; i++) {
+            for (int j = 0; j < 7; j++) {
+                validTiles[i][j] = "_";
+            }
+        }
         if(selectedRow != -1 && selectedCol != -1) {
             if(selectedCol <= 5) handleUpdate(selectedRow, selectedCol+1);
             if(selectedCol >= 1) handleUpdate(selectedRow, selectedCol-1);
             if(selectedRow <= 7) handleUpdate(selectedRow+1, selectedCol);
             if(selectedRow >= 1) handleUpdate(selectedRow-1, selectedCol);
-        } else {
-            for(int i=0; i<9; i++){
-                for(int j=0; j<7; j++){
-                    validTiles[i][j] = "_";
-                }
-            }
         }
         System.out.println("");
         printValidTiles();
@@ -46,12 +46,33 @@ class Move {
                 if((isEnemyUnit(row, col) && canCaptureUnit(row, col)) || !isEnemyUnit(row, col)) // if there is an enemy unit that the unit being moved can capture, or there is no enemy
                     validTiles[row][col] = "*";
             } else if (isLionOrTiger(selectedRow, selectedCol)) { // if the unit being moved is a lion or tiger
-                handleLionTigerMovement();
+                handleLionTigerMovement(row, col);
             }
         }
     }
 
-    private void handleLionTigerMovement(){
+    private void handleLionTigerMovement(int row, int col){
+
+        int rowOffset = row - selectedRow;
+        int colOffset = col - selectedCol;
+
+        if(colOffset != 0){ // horizontal leap
+            if(!isRat(selectedRow, selectedCol+colOffset) && !isRat(selectedRow, selectedCol+(colOffset*2)) && !isRat(selectedRow, selectedCol+(colOffset*3))){
+                if((isEnemyUnit(selectedRow, selectedCol+(colOffset*3)) && canCaptureUnit(selectedRow, selectedCol+(colOffset*3))) || // if there is an enemy unit that can be captured
+                        (!isEnemyUnit(selectedRow, selectedCol+(colOffset*3)) && !isFriendlyUnit(selectedRow, selectedCol+(colOffset*3)))) { // if there is no enemy or friendly units
+                    validTiles[selectedRow][selectedCol+(colOffset*3)] = "*";
+                }
+            }
+        }
+
+        if(rowOffset != 0){ // vertical leap
+            if(!isRat(selectedRow+rowOffset, selectedCol) && !isRat(selectedRow+(rowOffset*2), selectedCol) && !isRat(selectedRow+(rowOffset*3), selectedCol)){
+                if((isEnemyUnit(selectedRow+(rowOffset*4), selectedCol) && canCaptureUnit(selectedRow+(rowOffset*4), selectedCol)) || // if there is an enemy unit that can be captured
+                        (!isEnemyUnit(selectedRow+(rowOffset*4), selectedCol) && !isFriendlyUnit(selectedRow+(rowOffset*4), selectedCol))) { // if there is no enemy or friendly units
+                    validTiles[selectedRow+(rowOffset*4)][selectedCol] = "*";
+                }
+            }
+        }
     }
 
     boolean isFriendlyUnit(int row, int col){
@@ -70,8 +91,8 @@ class Move {
     }
 
     private boolean canCaptureUnit(int row, int col){
-        // returns true if the piece at row, col has a lesser or equal power to the piece at selectedRow, SelectedCol
-        return (game.board[selectedRow][selectedCol].charAt(1) >= game.board[row][col].charAt(1)) && !isWater(selectedRow, selectedCol);
+        // returns true if the piece at row, col has a lesser or equal power (or row, col is a trap) to the piece at selectedRow, SelectedCol
+        return ((game.board[selectedRow][selectedCol].charAt(1) >= game.board[row][col].charAt(1) || isTrap(row, col)) && !isWater(selectedRow, selectedCol));
     }
 
     private boolean isLionOrTiger(int row, int col){

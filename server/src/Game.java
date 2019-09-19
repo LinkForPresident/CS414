@@ -10,6 +10,7 @@ public class Game {
     public String turn;
     public String[][] board = new String[9][7];
     public Move move = new Move(this);
+    public String winner = "";
 
     public Game(String p1_name, String p2_name){
 
@@ -40,8 +41,6 @@ public class Game {
         board[8][0] = "b6"; //blue team tiger (power 6)
         board[8][6] = "b7"; //blue team lion (power 7)
 
-        board[0][3] = "rd"; //red team den
-        board[8][3] = "bd"; //blue team den
     }
 
     void printBoard(){
@@ -52,13 +51,15 @@ public class Game {
     void sendInput(String player, int col, int row){
         // send input to the game in the format (player sending move, column selected, row selected)
         if(isTurn(player)){
-            if(move.isFriendlyUnit(row, col)){ // if the player is selecting one of their own tiles
-                move.selectedCol = col;
-                move.selectedRow = row;
-            } else if(move.selectedCol == col && move.selectedRow == row){ // if the second half of the move is the same as the first half (re-selecting the same tile)
+            if(move.selectedCol == col && move.selectedRow == row){ // if the second half of the move is the same as the first half (re-selecting the same tile)
                 move.selectedCol = -1;
                 move.selectedRow = -1;
-            } else if(move.validTiles[row][col].equals("*")){ // if row, col is a valid tile to move to
+            }
+            else if(move.isFriendlyUnit(row, col)){ // if the player is selecting one of their own tiles
+                move.selectedCol = col;
+                move.selectedRow = row;
+            }
+            else if(move.validTiles[row][col].equals("*")) { // if row, col is a valid tile to move to
                 makeMove(row, col);
             }
             move.updateValidTiles();
@@ -77,6 +78,8 @@ public class Game {
         move.selectedCol = -1;
         move.updateValidTiles();
 
+        checkIfWinner();
+
         System.out.println("");
         printBoard();
     }
@@ -84,6 +87,25 @@ public class Game {
     private boolean isTurn(String player){
         // returns true if it is the turn of the player submitting the move, else returns false.
         return (turn.equals("blue") && player.equals(player_1)) || (turn.equals("red") && player.equals(player_2));
+    }
+
+    private void checkIfWinner(){
+        int redPieces = 0;
+        int bluePieces = 0;
+        for(int i=0; i<9; i++){
+            for(int j=0; j<7; j++){
+                if(board[i][j].charAt(0) == 'b'){
+                    if(i == 0 && j == 3) winner = player_1; // if there is a blue piece in the red team den
+                    bluePieces++;
+                }
+                if(board[i][j].charAt(0) == 'r'){
+                    if(i == 8 && j == 3) winner = player_2; // if there is a red piece in the blue team den
+                    redPieces++;
+                }
+            }
+        }
+        if(redPieces == 0) winner = player_1;
+        if(bluePieces == 0) winner = player_2;
     }
 
     public static void main(String[] arg){
