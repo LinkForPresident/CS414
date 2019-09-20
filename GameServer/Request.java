@@ -43,7 +43,6 @@ public class Request extends GameConnector{
             }
 
             if (method.equals("POST")) {
-
                 int length = 0;
                 String line = "";
 
@@ -51,7 +50,6 @@ public class Request extends GameConnector{
                     if (line.contains("Content-Length")) {
                         length = Integer.parseInt(line.split(" ")[1]);
                     }
-
                 }
 
                 char[] temp = new char[length];
@@ -71,7 +69,7 @@ public class Request extends GameConnector{
                     user_hash = (username % password) % HASH_KEY;
                 }
             }
-        }catch(NullPointerException | ArrayIndexOutOfBoundsException e){}
-
+        }catch(NullPointerException | ArrayIndexOutOfBoundsException e){
+        }
     }
 }

@@ -28,11 +28,11 @@ class GameConnector extends Server{
         } catch (IOException e) {
             e.printStackTrace();
         }
-        catch(NullPointerException n){
+        catch(NullPointerException e){
             try {
                 tearDownConnection();
                 return;
-            } catch (IOException e) {
+            } catch (IOException ee) {
                 e.printStackTrace();
             }
         }
@@ -58,15 +58,16 @@ class GameConnector extends Server{
     }
 
     private void setUpConnection() throws IOException, NullPointerException{
+
         inputStream = this.clientSocket.getInputStream(); // gets data from client.
         bufferedReader = new BufferedReader(new InputStreamReader(inputStream)); // stores data from client.
         outputStream = new PrintWriter(clientSocket.getOutputStream(), true); // sends data to client.
         request = new Request(bufferedReader, clientSocket);
-
     }
 
 
     private void handleRequest() throws IOException{
+
         System.out.println("Handling request!");
         switch(request.method){
             case "GET":
@@ -85,6 +86,7 @@ class GameConnector extends Server{
     }
 
     private void handleGETRequest(String path) throws IOException {
+
         System.out.println("Handling GET request!");
         String htmlResponse = HEADER;
         try {
@@ -155,7 +157,6 @@ class GameConnector extends Server{
         bufferedReader.close();
         outputStream.close();
     }
-
 
 }
 

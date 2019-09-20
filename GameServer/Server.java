@@ -29,7 +29,6 @@ public class Server extends Thread{
             System.out.println("GameServer listening.");
 
             while (true) {
-
                 try{
                     Socket clientSocket = serverListener.accept();
                     Thread thread = new GameConnector(clientSocket);
@@ -44,6 +43,7 @@ public class Server extends Thread{
     }
 
     String getHTMLPage(String path) throws IOException{
+
         System.out.println("Fetching HTML Page!");
         File file = new File(RELATIVE_PATH + path);
         FileReader fileReader = new FileReader(file);
@@ -54,6 +54,7 @@ public class Server extends Thread{
         while((line = fileBuffer.readLine()) != null){ // read until end of file.
             response += line; // append to response.
         }
+
         fileBuffer.close();
         return response;
     }
@@ -61,14 +62,11 @@ public class Server extends Thread{
 
 
     boolean isLoggedIn(String clientIP){
-        // check db to see if this IP is in the "logged in" table.
 
         boolean loggedIn = false;
-
         Connection connection = null;
         Statement statement = null;
         try {
-
             Class.forName(JDBC_DRIVER); // register JDBC driver.
             connection = DriverManager.getConnection(
                     DB_URL, USER, PASS); //Open a connection to the database
@@ -86,29 +84,9 @@ public class Server extends Thread{
                 loggedIn = false;
             }
 
-        } catch (SQLException se) {
-            //Handle errors for JDBC
-            se.printStackTrace();
-        } catch (Exception e) {
-            //Handle errors for Class.forName
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
-        } finally {
-            //finally block used to close resources
-            try {
-                if (statement != null) {
-                    connection.close();
-                }
-            } catch (SQLException se) {
-            }// do nothing
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
         }
-
         return loggedIn;
     }
 
@@ -154,36 +132,9 @@ public class Server extends Thread{
             String logOut = String.format("DELETE FROM LOGGED_IN WHERE ip='%s'", clientIP);
             statement.executeQuery(logOut);
 
-           // ResultSet resultSet = statement.executeQuery("SELECT * FROM LOGGED_IN;");
-
-         //   while(resultSet.next()){
-             //   System.out.println(resultSet.getString(1));
-            //}
-
-
-        } catch (SQLException se) {
-            //Handle errors for JDBC
-            se.printStackTrace();
-        } catch (Exception e) {
-            //Handle errors for Class.forName
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
-        } finally {
-            //finally block used to close resources
-            try {
-                if (statement != null) {
-                    connection.close();
-                }
-            } catch (SQLException se) {
-            }// do nothing
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
         }
-
     }
 
     public static void main(String[] args){
