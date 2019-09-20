@@ -13,14 +13,14 @@ public class Server extends Thread{
     static final String HEADER = "HTTP/1.0 200 OK\nContent-Type: text/html\n\n";
     static final String DEFAULT_METHOD = "GET";
     static final String DEFAULT_PAGE = "/index.html";
-    static final double HASH_KEY = 47324824;
+    static final double HASH_KEY = 47324824;    // used in the encryption process of user authentication.
 
     private ServerSocket serverListener;
 
     private static final String JDBC_DRIVER = "org.mariadb.jdbc.Driver";
     private static final String DB_URL = "jdbc:mariadb://10.20.0.10/cs414";
-    private static final String USER = "user";
-    private static final String PASS = "the_password_123";
+    private static final String DB_USER = "user";
+    private static final String DB_PASS = "the_password_123";
 
     protected Server(){
 
@@ -30,8 +30,9 @@ public class Server extends Thread{
 
             while (true) {
                 try{
-                    Socket clientSocket = serverListener.accept();
-                    Thread thread = new GameConnector(clientSocket);
+                    Socket clientSocket = serverListener.accept(); // accept a connection from a client.
+                    System.out.println("Connection accepted from client.");
+                    Thread thread = new GameConnector(clientSocket); // start a thread to handle the connection.
                     thread.start();
                 }
                 catch(ArrayIndexOutOfBoundsException | NullPointerException e){
@@ -43,8 +44,8 @@ public class Server extends Thread{
     }
 
     String getHTMLPage(String path) throws IOException{
-
-        System.out.println("Fetching HTML Page!");
+        // Fetch an HTML page for the client.
+        System.out.println(String.format("Fetching HTML Page: %s", path));
         File file = new File(RELATIVE_PATH + path);
         FileReader fileReader = new FileReader(file);
         BufferedReader fileBuffer = new BufferedReader(fileReader); // read the file into a buffer.
@@ -62,25 +63,24 @@ public class Server extends Thread{
 
 
     boolean isLoggedIn(String clientIP){
-
+    // check whether a client is logged in, i.e. the client IP address is an entry in the Logged_In table.
         boolean loggedIn = false;
-        Connection connection = null;
-        Statement statement = null;
+        Connection connection;
+        Statement statement;
         try {
-            Class.forName(JDBC_DRIVER); // register JDBC driver.
+            Class.forName(JDBC_DRIVER); // register the JDBC driver.
             connection = DriverManager.getConnection(
-                    DB_URL, USER, PASS); //Open a connection to the database
+                    DB_URL, DB_USER, DB_PASS); // Open a connection to the database.
             statement = connection.createStatement();
-
-            String check_auth = String.format("SELECT 1 FROM LOGGED_IN WHERE ip='%s'", clientIP);
-            ResultSet resultSet = statement.executeQuery(check_auth);
+            String checkAuth = String.format("SELECT 1 FROM LOGGED_IN WHERE ip='%s'", clientIP);
+            ResultSet resultSet = statement.executeQuery(checkAuth);
 
             if(resultSet.next()){ // User exists and has been authenticated, the request handling can continue.
                 loggedIn = true;
-                System.out.println("Client is logged in.");
+                System.out.println(String.format("%s client is logged in.", clientIP));
             }
             else{   // User does not exist. Stop the request handling.
-                System.out.println("Client is not logged in.");
+                System.out.println(String.format("%s client is not logged in.", clientIP));
                 loggedIn = false;
             }
 
@@ -91,18 +91,17 @@ public class Server extends Thread{
     }
 
     void login(String clientIP, double hashCode){
-
-        Connection connection = null;
-        Statement statement = null;
-
+        // Handle a POST request to login a client.
+        Connection connection;
+        Statement statement;
         try {
-            Class.forName(JDBC_DRIVER); // register JDBC driver.
+            Class.forName(JDBC_DRIVER); // register the JDBC driver.
             connection = DriverManager.getConnection(
-                    DB_URL, USER, PASS); //Open a connection to the database
+                    DB_URL, DB_USER, DB_PASS); // Open a connection to the database.
             statement = connection.createStatement();
 
-            String check_auth = String.format("SELECT 1 FROM User WHERE hash_code='%s'", hashCode);
-            ResultSet resultSet = statement.executeQuery(check_auth);
+            String checkAuth = String.format("SELECT 1 FROM User WHERE hash_code='%s'", hashCode);
+            ResultSet resultSet = statement.executeQuery(checkAuth);
 
             if(resultSet.next()){ // User exists and has been authenticated, place IP into Logged_In table.
                 String addToLoggedIn = String.format("INSERT INTO LOGGED_IN VALUES ('%s');", clientIP);
@@ -112,6 +111,8 @@ public class Server extends Thread{
                 throw new NoSuchElementException("User does not exist!");
             }
 
+            System.out.println(String.format("%s client has been in out.", clientIP));
+
         } catch (SQLException | ClassNotFoundException se) {
             //Handle errors for JDBC
             se.printStackTrace();
@@ -119,18 +120,17 @@ public class Server extends Thread{
     }
 
     void logout(String clientIP) throws IOException{
-
-        Connection connection = null;
-        Statement statement = null;
+        // Handle a POST request to logout a client.
+        Connection connection;
+        Statement statement;
         try {
-
-            Class.forName(JDBC_DRIVER); // register JDBC driver.
+            Class.forName(JDBC_DRIVER); // register the JDBC driver.
             connection = DriverManager.getConnection(
-                    DB_URL, USER, PASS); //Open a connection to the database
+                    DB_URL, DB_USER, DB_PASS); // Open a connection to the database.
             statement = connection.createStatement();
-            System.out.println(String.format("Client IP:%s",clientIP));
             String logOut = String.format("DELETE FROM LOGGED_IN WHERE ip='%s'", clientIP);
             statement.executeQuery(logOut);
+            System.out.println(String.format("%s client has been logged out.", clientIP));
 
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();

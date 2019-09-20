@@ -20,7 +20,7 @@ public class Request extends GameConnector{
     protected Socket clientSocket;
 
     public Request(BufferedReader bufferedReader, Socket clientSocket) throws IOException, ArrayIndexOutOfBoundsException, NullPointerException{
-
+        // constructor
         this.bufferedReader = bufferedReader;
         this.clientSocket = clientSocket;
         parseRequest();
@@ -28,10 +28,10 @@ public class Request extends GameConnector{
     }
 
     private void parseRequest() throws IOException, ArrayIndexOutOfBoundsException, NullPointerException{
-
+        // parse the request for various arguments and parameters.
         clientIP = clientSocket.getInetAddress().toString().replace("/","");
-        method = DEFAULT_METHOD;
-        path = DEFAULT_PAGE;
+        method = DEFAULT_METHOD; // GET, POST, etc.
+        path = DEFAULT_PAGE; // used for GET requests.
 
         try {
             String[] parts = bufferedReader.readLine().split(" ");
@@ -43,6 +43,7 @@ public class Request extends GameConnector{
             }
 
             if (method.equals("POST")) {
+                // TODO: Refactor, there has got to be an easier way of doing this!
                 int length = 0;
                 String line = "";
 
@@ -55,6 +56,7 @@ public class Request extends GameConnector{
                 char[] temp = new char[length];
                 bufferedReader.read(temp);
                 String[] kv_arr = new String(temp).split("&"); // split by key-value pair, which are separated by &;
+                // extract the POST request arguments.
                 for (String arg : kv_arr) {
                     String[] kv = arg.split("=");   // split by key and and value, which are separated by =
                     String key = kv[0];
@@ -62,11 +64,11 @@ public class Request extends GameConnector{
                     args.put(key, value);
 
                 }
-                action = args.get("action");
+                action = args.get("action"); // whatever the client is trying to do: "login", "move_piece", etc.
                 if(action.equals("login")) {
                     username = args.get("username").hashCode() % HASH_KEY;
                     password = args.get("password").hashCode() % HASH_KEY;
-                    user_hash = (username % password) % HASH_KEY;
+                    user_hash = (username % password) % HASH_KEY;   // calculate the hash that acts as the primary key in the User table.
                 }
             }
         }catch(NullPointerException | ArrayIndexOutOfBoundsException e){
