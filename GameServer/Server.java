@@ -112,7 +112,7 @@ public class Server extends Thread{
         return loggedIn;
     }
 
-    void login(String clientIP, double hashCode) throws IOException{
+    void login(String clientIP, double hashCode){
 
         Connection connection = null;
         Statement statement = null;
@@ -134,27 +134,9 @@ public class Server extends Thread{
                 throw new NoSuchElementException("User does not exist!");
             }
 
-        } catch (SQLException se) {
+        } catch (SQLException | ClassNotFoundException se) {
             //Handle errors for JDBC
             se.printStackTrace();
-        } catch (Exception e) {
-            //Handle errors for Class.forName
-            e.printStackTrace();
-        } finally {
-            //finally block used to close resources
-            try {
-                if (statement != null) {
-                    connection.close();
-                }
-            } catch (SQLException se) {
-            }// do nothing
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
         }
     }
 

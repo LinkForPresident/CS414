@@ -2,7 +2,7 @@ package GameServer;
 
 import java.io.*;
 import java.net.Socket;
-import java.rmi.NoSuchObjectException;
+import java.util.NoSuchElementException;
 
 class GameConnector extends Server{
 
@@ -130,8 +130,10 @@ class GameConnector extends Server{
 
         try {
             login(request.clientIP, request.user_hash);
-        }catch(NoSuchObjectException e){
+        }catch(NoSuchElementException e){
+            System.out.println("test");
             redirectTo("/login.html");
+            return;
         }
         redirectTo("/index.html");
     }

@@ -71,7 +71,7 @@ public class Request extends GameConnector{
                     user_hash = (username % password) % HASH_KEY;
                 }
             }
-        }catch(NullPointerException n){}
+        }catch(NullPointerException | ArrayIndexOutOfBoundsException e){}
 
     }
 }
