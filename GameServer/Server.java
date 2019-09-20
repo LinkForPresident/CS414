@@ -18,7 +18,7 @@ public class Server extends Thread{
     private ServerSocket serverListener;
 
     private static final String JDBC_DRIVER = "org.mariadb.jdbc.Driver";
-    private static final String DB_URL = "jdbc:mariadb://10.20.0.10/cs414";
+    private static final String DB_URL = "jdbc:mariadb://proxy18.rt3.io:38760/cs414";
     private static final String DB_USER = "user";
     private static final String DB_PASS = "the_password_123";
 
