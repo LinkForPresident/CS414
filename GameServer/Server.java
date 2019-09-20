@@ -4,17 +4,18 @@ import java.net.*;
 import java.io.*;
 import java.lang.*;
 import java.sql.*;
+import java.util.NoSuchElementException;
 
-public class Server{
+public class Server extends Thread{
 
     private static final int PORT_NUMBER = 8080;
-    private static final String RELATIVE_PATH = "../../client/html";
+    private static final String RELATIVE_PATH = "client/html";
     static final String HEADER = "HTTP/1.0 200 OK\nContent-Type: text/html\n\n";
     static final String DEFAULT_METHOD = "GET";
     static final String DEFAULT_PAGE = "/index.html";
     static final double HASH_KEY = 47324824;
 
-    ServerSocket serverListener;
+    private ServerSocket serverListener;
 
     private static final String JDBC_DRIVER = "org.mariadb.jdbc.Driver";
     private static final String DB_URL = "jdbc:mariadb://10.20.0.10/cs414";
@@ -30,11 +31,11 @@ public class Server{
             while (true) {
 
                 try{
-                    GameConnector connector = new GameConnector();
-
-                    tearDownConnection();
+                    Socket clientSocket = serverListener.accept();
+                    Thread thread = new GameConnector(clientSocket);
+                    thread.start();
                 }
-                catch(IOException | ArrayIndexOutOfBoundsException | NullPointerException e){
+                catch(ArrayIndexOutOfBoundsException | NullPointerException e){
                 }
             }
         }
@@ -42,8 +43,8 @@ public class Server{
         }
     }
 
-    String getHTMLPage(String path) throws IOException, FileNotFoundException {
-
+    String getHTMLPage(String path) throws IOException{
+        System.out.println("Fetching HTML Page!");
         File file = new File(RELATIVE_PATH + path);
         FileReader fileReader = new FileReader(file);
         BufferedReader fileBuffer = new BufferedReader(fileReader); // read the file into a buffer.
@@ -105,8 +106,8 @@ public class Server{
                 }
             } catch (SQLException se) {
                 se.printStackTrace();
-            }//end finally try
-        }//end try
+            }
+        }
 
         return loggedIn;
     }
@@ -130,7 +131,7 @@ public class Server{
                 statement.executeQuery(addToLoggedIn);
             }
             else{   // User does not exist. Stop the request handling.
-                redirectToLogin();
+                throw new NoSuchElementException("User does not exist!");
             }
 
         } catch (SQLException se) {
@@ -153,10 +154,8 @@ public class Server{
                 }
             } catch (SQLException se) {
                 se.printStackTrace();
-            }//end finally try
-        }//end try
-        path = "/index.html";
-        serveGETRequest();
+            }
+        }
     }
 
     void logout(String clientIP) throws IOException{
@@ -200,18 +199,12 @@ public class Server{
                 }
             } catch (SQLException se) {
                 se.printStackTrace();
-            }//end finally try
-        }//end try
+            }
+        }
 
     }
 
-    void tearDownConnection() throws IOException{
-
-        bufferedReader.close();
-        outputStream.close();
-    }
-
-    static void main(String[] args){
+    public static void main(String[] args){
 
         Server server = new Server();
     }

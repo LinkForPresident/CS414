@@ -2,42 +2,72 @@ package GameServer;
 
 import java.io.*;
 import java.net.Socket;
+import java.rmi.NoSuchObjectException;
 
-public class GameConnector extends Server{
+class GameConnector extends Server{
 
-    protected Socket clientSocket;
-    protected InputStream inputStream;
-    protected PrintWriter outputStream;
-    protected BufferedReader bufferedReader;
-    protected Request request;
+    Socket clientSocket;
+    private InputStream inputStream;
+    private PrintWriter outputStream;
+    BufferedReader bufferedReader;
+    private Request request;
 
-
-    GameConnector() throws IOException {
-
-        setUpConnection();
-        if(clientIsAuthenticated()){
-            handleRequest();
-        }
-        else{
-            redirectTo("/login.html");
-        }
-        tearDownConnection();
-
+    GameConnector(){
 
     }
 
-    private void setUpConnection() throws IOException{
+    GameConnector(Socket clientSocket){
+        this.clientSocket = clientSocket;
 
-        clientSocket = super.serverListener.accept();
-        inputStream = clientSocket.getInputStream(); // gets data from client.
+    }
+
+    @Override
+    public void run(){
+        try {
+            setUpConnection();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        catch(NullPointerException n){
+            try {
+                tearDownConnection();
+                return;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if(clientIsAuthenticated()){
+            try {
+                handleRequest();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            try {
+                redirectTo("/login.html");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            tearDownConnection();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setUpConnection() throws IOException, NullPointerException{
+        inputStream = this.clientSocket.getInputStream(); // gets data from client.
         bufferedReader = new BufferedReader(new InputStreamReader(inputStream)); // stores data from client.
         outputStream = new PrintWriter(clientSocket.getOutputStream(), true); // sends data to client.
-        request = new Request();
+        request = new Request(bufferedReader, clientSocket);
+
     }
 
 
     private void handleRequest() throws IOException{
-
+        System.out.println("Handling request!");
         switch(request.method){
             case "GET":
                 handleGETRequest(request.path);
@@ -55,7 +85,7 @@ public class GameConnector extends Server{
     }
 
     private void handleGETRequest(String path) throws IOException {
-
+        System.out.println("Handling GET request!");
         String htmlResponse = HEADER;
         try {
             htmlResponse += getHTMLPage(path);
@@ -72,12 +102,10 @@ public class GameConnector extends Server{
                 // registerUser();
                 break;
             case "login":
-                login(request.clientIP, request.user_hash);
-                redirectTo("/index.html");
+                handleLogin();
                 break;
             case "logout":
-                logout(request.clientIP);
-                redirectTo("/login.html");
+                handleLogout();
                 break;
             case "create_game":
                 // createGame();
@@ -98,11 +126,30 @@ public class GameConnector extends Server{
 
     }
 
+    private void handleLogin() throws IOException{
+
+        try {
+            login(request.clientIP, request.user_hash);
+        }catch(NoSuchObjectException e){
+            redirectTo("/login.html");
+        }
+        redirectTo("/index.html");
+    }
+
+    private void handleLogout() throws IOException{
+
+        logout(request.clientIP);
+        redirectTo("/login.html");
+    }
+
+
     private void redirectTo(String path) throws IOException{
+
         handleGETRequest(path);
     }
 
-    void tearDownConnection() throws IOException{
+    private void tearDownConnection() throws IOException{
+
         bufferedReader.close();
         outputStream.close();
     }
