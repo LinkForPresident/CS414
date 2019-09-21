@@ -10,7 +10,6 @@ public class Server extends Thread{
 
     private static final int PORT_NUMBER = 8080;
     private static final String RELATIVE_PATH = "client/html";
-    static final String HEADER = "HTTP/1.0 200 OK\nContent-Type: text/html\n\n";
     static final String DEFAULT_METHOD = "GET";
     static final String DEFAULT_PAGE = "/index.html";
     static final double HASH_KEY = 47324824;    // used in the encryption process of user authentication.
@@ -18,9 +17,9 @@ public class Server extends Thread{
     private ServerSocket serverListener;
 
     private static final String JDBC_DRIVER = "org.mariadb.jdbc.Driver";
-    private static final String DB_URL = "jdbc:mariadb://proxy18.rt3.io:38760/cs414";
-    private static final String DB_USER = "user";
-    private static final String DB_PASS = "the_password_123";
+    private static final String DB_URL = "jdbc:mariadb://proxy19.rt3.io:39136/cs414";
+    private static final String DB_USERNAME = "user";
+    private static final String DB_PASSWORD = "the_password_123";
 
     protected Server(){
 
@@ -62,7 +61,7 @@ public class Server extends Thread{
 
 
 
-    boolean isLoggedIn(String clientIP){
+    boolean isLoggedIn(double user_hash){
     // check whether a client is logged in, i.e. the client IP address is an entry in the Logged_In table.
         boolean loggedIn = false;
         Connection connection;
@@ -70,17 +69,17 @@ public class Server extends Thread{
         try {
             Class.forName(JDBC_DRIVER); // register the JDBC driver.
             connection = DriverManager.getConnection(
-                    DB_URL, DB_USER, DB_PASS); // Open a connection to the database.
+                    DB_URL, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
             statement = connection.createStatement();
-            String checkAuth = String.format("SELECT 1 FROM LOGGED_IN WHERE ip='%s'", clientIP);
+            String checkAuth = String.format("SELECT 1 FROM Logged_in WHERE user_hash='%f'", user_hash);
             ResultSet resultSet = statement.executeQuery(checkAuth);
 
             if(resultSet.next()){ // User exists and has been authenticated, the request handling can continue.
                 loggedIn = true;
-                System.out.println(String.format("%s client is logged in.", clientIP));
+                System.out.println(String.format("%f client is logged in.", user_hash));
             }
             else{   // User does not exist. Stop the request handling.
-                System.out.println(String.format("%s client is not logged in.", clientIP));
+                System.out.println(String.format("%f client is not logged in.", user_hash));
                 loggedIn = false;
             }
 
@@ -90,28 +89,28 @@ public class Server extends Thread{
         return loggedIn;
     }
 
-    void login(String clientIP, double hashCode){
+    void login(double user_hash){
         // Handle a POST request to login a client.
         Connection connection;
         Statement statement;
         try {
             Class.forName(JDBC_DRIVER); // register the JDBC driver.
             connection = DriverManager.getConnection(
-                    DB_URL, DB_USER, DB_PASS); // Open a connection to the database.
+                    DB_URL, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
             statement = connection.createStatement();
 
-            String checkAuth = String.format("SELECT 1 FROM User WHERE hash_code='%s'", hashCode);
+            String checkAuth = String.format("SELECT 1 FROM User WHERE hash_code='%f'", user_hash);
             ResultSet resultSet = statement.executeQuery(checkAuth);
 
             if(resultSet.next()){ // User exists and has been authenticated, place IP into Logged_In table.
-                String addToLoggedIn = String.format("INSERT INTO LOGGED_IN VALUES ('%s');", clientIP);
+                String addToLoggedIn = String.format("INSERT INTO Logged_in VALUES ('%f');", user_hash);
                 statement.executeQuery(addToLoggedIn);
             }
             else{   // User does not exist. Stop the request handling.
                 throw new NoSuchElementException("User does not exist!");
             }
 
-            System.out.println(String.format("%s client has been in out.", clientIP));
+            System.out.println(String.format("%f client has been in out.", user_hash));
 
         } catch (SQLException | ClassNotFoundException se) {
             //Handle errors for JDBC
@@ -119,18 +118,37 @@ public class Server extends Thread{
         }
     }
 
-    void logout(String clientIP) throws IOException{
+    void logout(double user_hash) throws IOException{
         // Handle a POST request to logout a client.
         Connection connection;
         Statement statement;
         try {
             Class.forName(JDBC_DRIVER); // register the JDBC driver.
             connection = DriverManager.getConnection(
-                    DB_URL, DB_USER, DB_PASS); // Open a connection to the database.
+                    DB_URL, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
             statement = connection.createStatement();
-            String logOut = String.format("DELETE FROM LOGGED_IN WHERE ip='%s'", clientIP);
+            String logOut = String.format("DELETE FROM Logged_in WHERE user_hash='%f'", user_hash);
             statement.executeQuery(logOut);
-            System.out.println(String.format("%s client has been logged out.", clientIP));
+            System.out.println(String.format("%f client has been logged out.", user_hash));
+
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void registerUser(String username, String password, double user_hash){
+        // handle a POST request to register a new user in the system.
+        Connection connection;
+        Statement statement;
+        try {
+            Class.forName(JDBC_DRIVER); // register the JDBC driver.
+            connection = DriverManager.getConnection(
+                    DB_URL, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
+            statement = connection.createStatement();
+            String registerUser = String.format("INSERT INTO User VALUES('%s', '%s', '%f')",
+                    username, password, user_hash);
+            statement.executeQuery(registerUser);
+            System.out.println(String.format("%s client has been registered as a new user.", username));
 
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();

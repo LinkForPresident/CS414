@@ -12,10 +12,11 @@ public class Request extends GameConnector{
     protected String path = "";
     protected String action = "";
     protected Map<String, String> args = new HashMap<String, String>();
-    protected double username;
-    protected double password;
+    protected String username;
+    protected String password;
     protected double user_hash;
     protected String clientIP;
+    protected double cookie = -1;
     protected BufferedReader bufferedReader;
     protected Socket clientSocket;
 
@@ -42,16 +43,21 @@ public class Request extends GameConnector{
                 path = DEFAULT_PAGE;
             }
 
-            if (method.equals("POST")) {
-                // TODO: Refactor, there has got to be an easier way of doing this!
-                int length = 0;
-                String line = "";
-
-                while ((line = bufferedReader.readLine()).length() != 0) {
-                    if (line.contains("Content-Length")) {
-                        length = Integer.parseInt(line.split(" ")[1]);
-                    }
+            int length = 0;
+            String line = "";
+            while ((line = bufferedReader.readLine()).length() != 0) {
+                System.out.println(line);
+                if (line.contains("Content-Length")) {
+                    length = Integer.parseInt(line.split(" ")[1]);
                 }
+                if(line.contains("Cookie")){
+                    cookie = Double.parseDouble(line.split("=")[1]);
+                }
+            }
+
+            if (method.equals("POST")) {
+                System.out.println("POST");
+                // TODO: Refactor, there has got to be an easier way of doing this!
 
                 char[] temp = new char[length];
                 bufferedReader.read(temp);
@@ -65,10 +71,13 @@ public class Request extends GameConnector{
 
                 }
                 action = args.get("action"); // whatever the client is trying to do: "login", "move_piece", etc.
-                if(action.equals("login")) {
-                    username = args.get("username").hashCode() % HASH_KEY;
-                    password = args.get("password").hashCode() % HASH_KEY;
-                    user_hash = (username % password) % HASH_KEY;   // calculate the hash that acts as the primary key in the User table.
+                if(action.equals("login") || action.equals("user_registration")) {
+                    username = args.get("username");
+                    double username_hash = username.hashCode() % HASH_KEY;
+                    password = args.get("password");
+                    double password_hash = password.hashCode() % HASH_KEY;
+                    user_hash = (username_hash % password_hash) % HASH_KEY;   // calculate the hash that acts as the primary key in the User table.
+                    System.out.println(String.format("UN PW HASH: %s, %s, %f", username, password, user_hash));
                 }
             }
         }catch(NullPointerException | ArrayIndexOutOfBoundsException e){

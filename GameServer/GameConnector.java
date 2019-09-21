@@ -11,6 +11,7 @@ class GameConnector extends Server{
     private PrintWriter outputStream;
     BufferedReader bufferedReader;
     private Request request;
+    private String HEADER = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n";
 
     GameConnector(){
         // generic constructor, needed to avoid a compilation error.
@@ -53,6 +54,7 @@ class GameConnector extends Server{
         else{
             // client is not authenticated, deny access and redirect to the login page.
             try {
+                System.out.println("Client is not authenticated, redirecting to login page.");
                 redirectTo("/login.html");
             } catch (IOException e) {
                 e.printStackTrace();
@@ -89,13 +91,13 @@ class GameConnector extends Server{
 
     private boolean clientIsAuthenticated(){
         // check if client is logged in, or is trying to either register, login or logout.
-        return isLoggedIn(request.clientIP) || request.action.equals("user_registration") || request.action.equals("login") || request.action.equals("logout");
+        return request.action.equals("user_registration") || request.action.equals("login") || request.action.equals("logout") || isLoggedIn(request.cookie);
     }
 
     private void handleGETRequest(String path) throws IOException {
         // handle a client GET request.
         System.out.println("Handling GET request!");
-        String htmlResponse = HEADER;
+        String htmlResponse = HEADER + "\r\n\r\n";
         try {
             htmlResponse += getHTMLPage(path);  // get the HTML source.
             outputStream.println(htmlResponse); // send the response to the client.
@@ -108,7 +110,8 @@ class GameConnector extends Server{
         // handle a client POST request.
         switch (request.action) {
             case "user_registration":
-                // registerUser();
+                System.out.println("User is trying to register!");
+                handleUserRegistration();
                 break;
             case "login":
                 handleLogin();
@@ -137,7 +140,10 @@ class GameConnector extends Server{
     private void handleLogin() throws IOException{
         // handle a client requesting to log in.
         try {
-            login(request.clientIP, request.user_hash);
+            login(request.user_hash);
+            HEADER += String.format("Set-Cookie: user_hash=%f\r\n\r\n", request.user_hash);
+
+
         }catch(NoSuchElementException e){
             // user with the username-password pair does not exist in the database.
             redirectTo("/login.html");
@@ -149,7 +155,13 @@ class GameConnector extends Server{
 
     private void handleLogout() throws IOException{
         // handle a client requesting to log out.
-        logout(request.clientIP);
+        logout(request.cookie);
+        redirectTo("/login.html");
+    }
+
+    private void handleUserRegistration() throws IOException{
+        // handle a client requesting to register a new account.
+        registerUser(request.username, request.password, request.user_hash);
         redirectTo("/login.html");
     }
 
