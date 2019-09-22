@@ -24,11 +24,10 @@ public class Request extends GameConnector{
         // constructor
         this.bufferedReader = bufferedReader;
         this.clientSocket = clientSocket;
-        parseRequest();
 
     }
 
-    private void parseRequest() throws IOException, ArrayIndexOutOfBoundsException, NullPointerException{
+    protected int parseRequest() throws IOException, ArrayIndexOutOfBoundsException, NullPointerException{
         // parse the request for various arguments and parameters.
         clientIP = clientSocket.getRemoteSocketAddress().toString().split(":")[0];
         method = DEFAULT_METHOD; // GET, POST, etc.
@@ -46,7 +45,6 @@ public class Request extends GameConnector{
             int length = 0;
             String line = "";
             while ((line = bufferedReader.readLine()).length() != 0) {
-                System.out.println(line);
                 if (line.contains("Content-Length")) {
                     length = Integer.parseInt(line.split(" ")[1]);
                 }
@@ -77,10 +75,12 @@ public class Request extends GameConnector{
                     password = args.get("password");
                     double password_hash = password.hashCode() % HASH_KEY;
                     user_hash = (username_hash % password_hash) % HASH_KEY;   // calculate the hash that acts as the primary key in the User table.
-                    System.out.println(String.format("UN PW HASH: %s, %s, %f", username, password, user_hash));
+                    System.out.println(String.format("==DEBUG==:: UN PW HASH: %s, %s, %f", username, password, user_hash));
                 }
             }
         }catch(NullPointerException | ArrayIndexOutOfBoundsException e){
+            return -1;
         }
+        return 0;
     }
 }

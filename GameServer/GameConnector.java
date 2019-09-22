@@ -2,6 +2,7 @@ package GameServer;
 
 import java.io.*;
 import java.net.Socket;
+import java.sql.SQLNonTransientConnectionException;
 import java.util.NoSuchElementException;
 
 class GameConnector extends Server{
@@ -32,6 +33,7 @@ class GameConnector extends Server{
             setUpConnection();
         } catch (IOException e) {
             e.printStackTrace();
+            return;
         }
         catch(NullPointerException e){
             // in case of an error in set up, tear down the connection.
@@ -54,7 +56,7 @@ class GameConnector extends Server{
         else{
             // client is not authenticated, deny access and redirect to the login page.
             try {
-                System.out.println("Client is not authenticated, redirecting to login page.");
+                System.out.println("==DEBUG==:: Client is not authenticated, redirecting to login page.");
                 redirectTo("/login.html");
             } catch (IOException e) {
                 e.printStackTrace();
@@ -72,13 +74,16 @@ class GameConnector extends Server{
         // set up the necessary data structures to handle a client socket connection.
         inputStream = this.clientSocket.getInputStream(); // gets data from client.
         bufferedReader = new BufferedReader(new InputStreamReader(inputStream)); // stores data from client.
-        outputStream = new PrintWriter(clientSocket.getOutputStream(), true); // sends data to client.
         request = new Request(bufferedReader, clientSocket); // create request object
+        if(request.parseRequest() == -1){
+            throw new IOException("==DEBUG==:: Not a real request by the user, but by the browser automatically!");
+        }
+        outputStream = new PrintWriter(clientSocket.getOutputStream(), true); // sends data to client.
     }
 
     private void handleRequest() throws IOException{
         // handle the client requests, GET aor POST.
-        System.out.println("Handling request!");
+        System.out.println("==INFO==:: Handling request!");
         switch(request.method){
             case "GET":
                 handleGETRequest(request.path);
@@ -96,13 +101,13 @@ class GameConnector extends Server{
 
     private void handleGETRequest(String path) throws IOException {
         // handle a client GET request.
-        System.out.println("Handling GET request!");
+        System.out.println("==INFO==:: Handling GET request!");
         String htmlResponse = HEADER + "\r\n\r\n";
         try {
             htmlResponse += getHTMLPage(path);  // get the HTML source.
             outputStream.println(htmlResponse); // send the response to the client.
         }catch(FileNotFoundException e){
-            outputStream.println("404 file not found!");
+            outputStream.println("==DEBUG==:: 404 file not found!");
         }
     }
 
@@ -110,7 +115,7 @@ class GameConnector extends Server{
         // handle a client POST request.
         switch (request.action) {
             case "user_registration":
-                System.out.println("User is trying to register!");
+                System.out.println("==INFO==:: User is trying to register!");
                 handleUserRegistration();
                 break;
             case "login":
@@ -144,7 +149,7 @@ class GameConnector extends Server{
             HEADER += String.format("Set-Cookie: user_hash=%f\r\n\r\n", request.user_hash);
 
 
-        }catch(NoSuchElementException e){
+        }catch(NoSuchElementException | SQLNonTransientConnectionException e){
             // user with the username-password pair does not exist in the database.
             redirectTo("/login.html");
             return;
