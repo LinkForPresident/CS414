@@ -45,22 +45,25 @@ class GameConnector extends Server{
             }
         }
         // check client authentication.
-        if(clientIsAuthenticated()){
-            // client is authenticated, handle the client's request.
-            try {
-                handleRequest();
-            } catch (IOException e) {
-                e.printStackTrace();
+        try {
+            if (clientIsAuthenticated()) {
+                // client is authenticated, handle the client's request.
+                try {
+                    handleRequest();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                // client is not authenticated, deny access and redirect to the login page.
+                try {
+                    System.out.println("==DEBUG==:: Client is not authenticated, redirecting to login page.");
+                    redirectTo("/login.html");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        }
-        else{
-            // client is not authenticated, deny access and redirect to the login page.
-            try {
-                System.out.println("==DEBUG==:: Client is not authenticated, redirecting to login page.");
-                redirectTo("/login.html");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        }catch(SQLNonTransientConnectionException e){
+            System.out.println("==ERROR==:: Problem connecting to database!");
         }
         // request has been fulfilled, tear down the connection.
         try {
@@ -94,7 +97,7 @@ class GameConnector extends Server{
         }
     }
 
-    private boolean clientIsAuthenticated(){
+    private boolean clientIsAuthenticated() throws SQLNonTransientConnectionException{
         // check if client is logged in, or is trying to either register, login or logout.
         return request.action.equals("user_registration") || request.action.equals("login") || request.action.equals("logout") || isLoggedIn(request.cookie);
     }
@@ -149,8 +152,13 @@ class GameConnector extends Server{
             HEADER += String.format("Set-Cookie: user_hash=%f\r\n\r\n", request.user_hash);
 
 
-        }catch(NoSuchElementException | SQLNonTransientConnectionException e){
+        }catch(NoSuchElementException e) {
             // user with the username-password pair does not exist in the database.
+            redirectTo("/login.html");
+            return;
+        }
+        catch(SQLNonTransientConnectionException sql){
+            System.out.println("==ERROR==:: Problem connecting to the database.");
             redirectTo("/login.html");
             return;
         }

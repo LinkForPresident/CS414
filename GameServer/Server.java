@@ -32,11 +32,11 @@ public class Server extends Thread{
     protected void serve(){
 
         try{
-           // connectToDatabase();
+            connectToDatabase();
             serverListener = new ServerSocket(PORT_NUMBER); // Set up server to listen at PORT_NUMBER.
             System.out.println("==INFO==:: GameServer listening.");
         }
-        catch(IOException | NullPointerException e){
+        catch(IOException | NullPointerException | InterruptedException e){
             System.out.println("ERROR!");
         }
 
@@ -67,7 +67,7 @@ public class Server extends Thread{
 
         String getProxyAddress = String.format("curl -X POST -H \"token:%s\" -H \"developerkey\":\"%s\" -d \'{\"wait\":\"true\", " +
                 "\"deviceaddress\":\"\'%s\'\"}' https://api.remot3.it/apv/v27/device/connect", sessionToken, devAPIKey, deviceAddress);
-        System.out.println(getProxyAddress);
+        // System.out.println(getProxyAddress);
 
         FileWriter fileWriter = new FileWriter("GameServer/getProxyAddress.sh");
         fileWriter.write(getProxyAddress);
@@ -84,7 +84,14 @@ public class Server extends Thread{
             response += part;
         }
         // System.out.println("==DEBUG==:: getProxyAddress.sh response: " + response);
-        PROXY_ADDRESS = response.split(",")[4].replace("\\", "").split(":", 2)[1].replace("\"", "").replace("http://", "");
+        String[] components = response.split(",");
+        for(String component: components){
+            if(component.contains("\"proxy\"")){
+                PROXY_ADDRESS = component.replace("\\", "").replace("\"", "")
+                        .split("proxy:")[1].replace("http://", "");
+                break;
+            }
+        }
         PROXY_ADDRESS = "jdbc:mariadb://" + PROXY_ADDRESS + "/cs414";
         System.out.println("==DEBUG==:: Database proxy address: "+PROXY_ADDRESS);
 
@@ -107,13 +114,13 @@ public class Server extends Thread{
         return response;
     }
 
-    boolean isLoggedIn(double user_hash){
+    boolean isLoggedIn(double user_hash) throws SQLNonTransientConnectionException{
     // check whether a client is logged in, i.e. the client IP address is an entry in the Logged_In table.
         boolean loggedIn = false;
         Connection connection;
         Statement statement;
         try {
-            connectToDatabase();
+            //connectToDatabase();
             Class.forName(JDBC_DRIVER); // register the JDBC driver.
             connection = DriverManager.getConnection(
                     PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
@@ -129,19 +136,21 @@ public class Server extends Thread{
                 System.out.println(String.format("==INFO==:: %f client is not logged in.", user_hash));
                 loggedIn = false;
             }
+        } catch(SQLNonTransientConnectionException e){
+            throw new SQLNonTransientConnectionException();
 
-        } catch (SQLException | ClassNotFoundException | InterruptedException | IOException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         return loggedIn;
     }
 
-    void login(double user_hash) throws SQLNonTransientConnectionException{
+    void login(double user_hash) throws SQLNonTransientConnectionException {
         // Handle a POST request to login a client.
         Connection connection;
         Statement statement;
         try {
-            connectToDatabase();
+            //connectToDatabase();
             Class.forName(JDBC_DRIVER); // register the JDBC driver.
             connection = DriverManager.getConnection(
                     PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
@@ -150,19 +159,22 @@ public class Server extends Thread{
             String checkAuth = String.format("SELECT 1 FROM User WHERE hash_code='%f'", user_hash);
             ResultSet resultSet = statement.executeQuery(checkAuth);
 
-            if(resultSet.next()){ // User exists and has been authenticated, place IP into Logged_In table.
+            if (resultSet.next()) { // User exists and has been authenticated, place IP into Logged_In table.
                 String addToLoggedIn = String.format("INSERT INTO Logged_in VALUES ('%f');", user_hash);
                 statement.executeQuery(addToLoggedIn);
-            }
-            else{   // User does not exist. Stop the request handling.
+            } else {   // User does not exist. Stop the request handling.
                 throw new NoSuchElementException(String.format("==DEBUG==:: User %f does not exist!", user_hash));
             }
 
             System.out.println(String.format("==INFO==:: %f client has been logged in.", user_hash));
 
-        } catch (SQLException | ClassNotFoundException | InterruptedException | IOException e) {
+        } catch(SQLNonTransientConnectionException e){
+            throw new SQLNonTransientConnectionException();
+
+        } catch (SQLException | ClassNotFoundException e) {
             //Handle errors for JDBC
             e.printStackTrace();
+
         }
     }
 
@@ -171,7 +183,7 @@ public class Server extends Thread{
         Connection connection;
         Statement statement;
         try {
-            connectToDatabase();
+          //  connectToDatabase();
             Class.forName(JDBC_DRIVER); // register the JDBC driver.
             connection = DriverManager.getConnection(
                     PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
@@ -180,7 +192,7 @@ public class Server extends Thread{
             statement.executeQuery(logOut);
             System.out.println(String.format("==INFO==:: %f client has been logged out.", user_hash));
 
-        } catch (SQLException | ClassNotFoundException | InterruptedException | IOException e) {
+        } catch (SQLException | ClassNotFoundException  e) {
             e.printStackTrace();
         }
     }
@@ -190,7 +202,7 @@ public class Server extends Thread{
         Connection connection;
         Statement statement;
         try {
-            connectToDatabase();
+            //connectToDatabase();
             Class.forName(JDBC_DRIVER); // register the JDBC driver.
             connection = DriverManager.getConnection(
                     PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
@@ -200,7 +212,7 @@ public class Server extends Thread{
             statement.executeQuery(registerUser);
             System.out.println(String.format("==INFO==:: %s client has been registered as a new user.", username));
 
-        } catch (SQLException | ClassNotFoundException | InterruptedException | IOException e) {
+        } catch (SQLException | ClassNotFoundException  e) {
             e.printStackTrace();
         }
     }

@@ -54,7 +54,6 @@ public class Request extends GameConnector{
             }
 
             if (method.equals("POST")) {
-                System.out.println("POST");
                 // TODO: Refactor, there has got to be an easier way of doing this!
 
                 char[] temp = new char[length];
@@ -75,7 +74,7 @@ public class Request extends GameConnector{
                     password = args.get("password");
                     double password_hash = password.hashCode() % HASH_KEY;
                     user_hash = (username_hash % password_hash) % HASH_KEY;   // calculate the hash that acts as the primary key in the User table.
-                    System.out.println(String.format("==DEBUG==:: UN PW HASH: %s, %s, %f", username, password, user_hash));
+                    System.out.println(String.format("==DEBUG==:: Username, Password and User_Hash: %s, %s, %f", username, password, user_hash));
                 }
             }
         }catch(NullPointerException | ArrayIndexOutOfBoundsException e){
