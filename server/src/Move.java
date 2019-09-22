@@ -35,8 +35,6 @@ class Move {
             if(selectedRow <= 7) handleUpdate(selectedRow+1, selectedCol);
             if(selectedRow >= 1) handleUpdate(selectedRow-1, selectedCol);
         }
-        System.out.println("");
-        printValidTiles();
     }
 
     private void handleUpdate(int row, int col) {

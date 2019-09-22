@@ -46,6 +46,7 @@ public class Game {
     void printBoard(){
         // prints out the board in a readable fashion
         for(int i=0; i<9; i++) System.out.println(Arrays.toString(board[i]));
+        System.out.println("");
     }
 
     void sendInput(String player, int col, int row){
