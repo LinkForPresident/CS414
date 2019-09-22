@@ -32,17 +32,17 @@ class GameConnector extends Server{
         // set up the connection with the client.
         try {
             setUpConnection();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
-        catch(NullPointerException e){
+        } catch(NullPointerException | IOException e){
             // in case of an error in set up, tear down the connection.
             try {
+                System.out.println("==ERROR==:: Encountered an error while trying to set up connection; tearing down connection.");
+                e.printStackTrace();
                 tearDownConnection();
                 return;
             } catch (IOException ee) {
-                e.printStackTrace();
+                System.out.println("==ERROR==:: Encountered an error while trying to set up connection, and encountered an error while tearing down the connection as well.");
+                ee.printStackTrace();
+                return;
             }
         }
         // check client authentication.
@@ -52,7 +52,16 @@ class GameConnector extends Server{
                 try {
                     handleRequest();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    try {
+                        System.out.println("==ERROR==:: Encountered an error while attempting to handle the request; tearing down connection.");
+                        e.printStackTrace();
+                        tearDownConnection();
+                        return;
+                    } catch (IOException ee) {
+                        System.out.println("==ERROR==:: Encountered an error while attempting to handle the request, and encountered an error while tearing down connection as well.");
+                        ee.printStackTrace();
+                        return;
+                    }
                 }
             } else {
                 // client is not authenticated, deny access and redirect to the login page.
@@ -60,16 +69,20 @@ class GameConnector extends Server{
                     System.out.println("==DEBUG==:: Client is not authenticated, redirecting to login page.");
                     redirectTo("/login.html");
                 } catch (IOException e) {
+                    System.out.println("==ERROR==:: Encountered an error while attempting to redirect client to login page after failed authentication check.");
                     e.printStackTrace();
                 }
             }
-        }catch(SQLNonTransientConnectionException e){
-            System.out.println("==ERROR==:: Problem connecting to database!");
+        } catch(SQLNonTransientConnectionException sql){
+            System.out.println("==ERROR==:: Encountered an error while attempting verify authenticity due to a problem connecting to the database. " +
+                    "(HINT: the proxy server is likely different than what is set.)");
+            sql.printStackTrace();
         }
         // request has been fulfilled, tear down the connection.
         try {
             tearDownConnection();
         } catch (IOException e) {
+            System.out.println("==ERROR==:: Encountered an error while attempting to tear down the connection after the client's request has been fulfilled.");
             e.printStackTrace();
         }
     }
@@ -78,15 +91,21 @@ class GameConnector extends Server{
         // set up the necessary data structures to handle a client socket connection.
         inputStream = this.clientSocket.getInputStream(); // gets data from client.
         bufferedReader = new BufferedReader(new InputStreamReader(inputStream)); // stores data from client.
-        request = new Request(bufferedReader, clientSocket); // create request object
-        if(request.parseRequest() == -1){
-            throw new IOException("==DEBUG==:: Not a real request by the user, but by the browser automatically!");
-        }
         outputStream = new PrintWriter(clientSocket.getOutputStream(), true); // sends data to client.
+        request = new Request(bufferedReader, clientSocket); // create request object
+        int flag = request.parseRequest();
+        if(flag == -1){
+            throw new IOException("==DEBUG==:: This was not a real request by the user, but an automatic request by the browser.");
+        }
+        else if(flag == -2){
+            outputStream.println(HEADER + "\r\n\r\n");
+            throw new FileNotFoundException("==DEBUG==:: Client automatically requested '/css/common.css', which does not exist.");
+        }
         try{
             establishDatabaseProxyAddress();
         }catch(InterruptedException | ClassNotFoundException | SQLException e){
-            System.out.println("Problem with the remote API to connect to the database!");
+            System.out.println("==ERROR==:: Encountered an error while attempting to curl proxy server credentials for the database.");
+            e.printStackTrace();
         }
     }
 
@@ -116,7 +135,9 @@ class GameConnector extends Server{
             htmlResponse += getHTMLPage(path);  // get the HTML source.
             outputStream.println(htmlResponse); // send the response to the client.
         }catch(FileNotFoundException e){
-            outputStream.println("==DEBUG==:: 404 file not found!");
+            System.out.println(String.format("==DEBUG==:: 404 file %s not found", path));
+            e.printStackTrace();
+            outputStream.println("404 file not found.");
         }
     }
 
@@ -153,35 +174,60 @@ class GameConnector extends Server{
 
     private void handleLogin() throws IOException{
         // handle a client requesting to log in.
+        System.out.println(String.format("==INFO==:: Attempting to log in user %s", request.username));
         try {
             login(request.user_hash);
             HEADER += String.format("Set-Cookie: user_hash=%f\r\n\r\n", request.user_hash);
-
-
+            // automatically redirect to the home page.
+            System.out.println(String.format("==INFO==:: User '%s' has been logged in.", request.username));
+            redirectTo("/index.html");
         }catch(NoSuchElementException e) {
             // user with the username-password pair does not exist in the database.
+            System.out.println(String.format("==DEBUG==:: User with username %s , password %s , and user_hash %s does " +
+                    "not exist in database. Attempting to redirect to login.html", request.username, request.password,
+                    request.user_hash));
+            e.printStackTrace();
             redirectTo("/login.html");
-            return;
         }
         catch(SQLNonTransientConnectionException sql){
-            System.out.println("==ERROR==:: Problem connecting to the database.");
+            System.out.println("==ERROR==:: Encountered an error while attempting handle a login attempt due to a " +
+                    "problem connecting to the database. (HINT: the proxy server is likely different than what is set.)" +
+                    "Redirecting to login.html.");
+            sql.printStackTrace();
             redirectTo("/login.html");
-            return;
         }
-        // automatically redirect to the home page.
-        redirectTo("/index.html");
     }
 
     private void handleLogout() throws IOException{
         // handle a client requesting to log out.
-        logout(request.cookie);
-        redirectTo("/login.html");
+        System.out.println(String.format("==INFO==:: Attempting to log out user %s", request.username));
+        try {
+            logout(request.cookie);
+            System.out.println(String.format("==INFO==:: User %s has been logged out", request.username));
+            redirectTo("/login.html");
+        }catch(SQLNonTransientConnectionException sql){
+            System.out.println("==ERROR==:: Encountered an error while attempting handle a logout attempt due to a " +
+                    "problem connecting to the database. (HINT: the proxy server is likely different than what is set.)" +
+                    "Redirecting to login.html.");
+            sql.printStackTrace();
+            redirectTo("/login.html");
+        }
     }
 
     private void handleUserRegistration() throws IOException{
         // handle a client requesting to register a new account.
-        registerUser(request.username, request.password, request.user_hash);
-        redirectTo("/login.html");
+        System.out.println(String.format("==INFO==:: Attempting to register user %s", request.username));
+        try {
+            registerUser(request.username, request.password, request.user_hash);
+            System.out.println(String.format("==INFO==:: New user %s has been registered", request.username));
+            redirectTo("/login.html");
+        }catch(SQLNonTransientConnectionException sql){
+            System.out.println("==ERROR==:: Encountered an error while attempting handle a user registration attempt due to a " +
+                    "problem connecting to the database. (HINT: the proxy server is likely different than what is set.)" +
+                    "Redirecting to login.html.");
+            sql.printStackTrace();
+            redirectTo("/login.html");
+        }
     }
 
     private void redirectTo(String path) throws IOException{

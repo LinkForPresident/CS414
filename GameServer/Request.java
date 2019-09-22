@@ -41,6 +41,9 @@ public class Request extends GameConnector{
             if (path.equals("/")) {
                 path = DEFAULT_PAGE;
             }
+            if (path.equals("/css/common.css")) {
+                return -2; // browsers automatically send a request for this file, which does not exist and wastes server resources.
+            }
 
             int length = 0;
             String line = "";

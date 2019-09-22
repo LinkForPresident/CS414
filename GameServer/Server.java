@@ -52,6 +52,17 @@ public class Server extends Thread{
 
     protected void establishDatabaseProxyAddress() throws IOException, InterruptedException, ClassNotFoundException, SQLException {
 
+        try {
+            System.out.println("==DEBUG==:: Attempting to connect to remote database with existing proxy server address.");
+            Class.forName(JDBC_DRIVER); // register the JDBC driver.
+            DriverManager.getConnection(
+                    PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
+            System.out.println("==DEBUG==:: Using the existing proxy server address was successful.");
+            return;
+        }catch(SQLNonTransientConnectionException sql){
+            System.out.println("==DEBUG==:: Using the existing proxy server address failed;" +
+                    " executing curl commands to retrieve new proxy server address.");
+        }
         Process process = Runtime.getRuntime().exec("GameServer/getSessionToken.sh");
         process.waitFor();
         InputStream inputStream = process.getInputStream();
@@ -84,7 +95,7 @@ public class Server extends Thread{
             response += part;
         }
         process.destroy();
-        System.out.println("==DEBUG==:: getProxyAddress.sh response: " + response);
+        // System.out.println("==DEBUG==:: getProxyAddress.sh response: " + response);
         String[] components = response.split(",");
         for(String component: components){
             if(component.contains("\"proxy\"")){
@@ -94,7 +105,7 @@ public class Server extends Thread{
             }
         }
         PROXY_ADDRESS = "jdbc:mariadb://" + PROXY_ADDRESS + "/cs414";
-        System.out.println("==DEBUG==:: Database proxy address: "+PROXY_ADDRESS);
+        // System.out.println("==DEBUG==:: Database proxy address: "+PROXY_ADDRESS);
 
     }
 
@@ -131,10 +142,8 @@ public class Server extends Thread{
 
             if(resultSet.next()){ // User exists and has been authenticated, the request handling can continue.
                 loggedIn = true;
-                System.out.println(String.format("==INFO==:: %f client is logged in.", user_hash));
             }
             else{   // User does not exist. Stop the request handling.
-                System.out.println(String.format("==INFO==:: %f client is not logged in.", user_hash));
                 loggedIn = false;
             }
         } catch(SQLNonTransientConnectionException e){
@@ -166,9 +175,6 @@ public class Server extends Thread{
             } else {   // User does not exist. Stop the request handling.
                 throw new NoSuchElementException(String.format("==DEBUG==:: User %f does not exist!", user_hash));
             }
-
-            System.out.println(String.format("==INFO==:: %f client has been logged in.", user_hash));
-
         } catch(SQLNonTransientConnectionException e){
             throw new SQLNonTransientConnectionException();
 
@@ -179,7 +185,7 @@ public class Server extends Thread{
         }
     }
 
-    void logout(double user_hash) throws IOException{
+    void logout(double user_hash) throws SQLNonTransientConnectionException{
         // Handle a POST request to logout a client.
         Connection connection;
         Statement statement;
@@ -191,14 +197,16 @@ public class Server extends Thread{
             statement = connection.createStatement();
             String logOut = String.format("DELETE FROM Logged_in WHERE user_hash='%f'", user_hash);
             statement.executeQuery(logOut);
-            System.out.println(String.format("==INFO==:: %f client has been logged out.", user_hash));
+
+        } catch(SQLNonTransientConnectionException e){
+            throw new SQLNonTransientConnectionException();
 
         } catch (SQLException | ClassNotFoundException  e) {
             e.printStackTrace();
         }
     }
 
-    void registerUser(String username, String password, double user_hash){
+    void registerUser(String username, String password, double user_hash) throws SQLNonTransientConnectionException{
         // handle a POST request to register a new user in the system.
         Connection connection;
         Statement statement;
@@ -211,7 +219,9 @@ public class Server extends Thread{
             String registerUser = String.format("INSERT INTO User VALUES('%s', '%s', '%f')",
                     username, password, user_hash);
             statement.executeQuery(registerUser);
-            System.out.println(String.format("==INFO==:: %s client has been registered as a new user.", username));
+
+        } catch(SQLNonTransientConnectionException e){
+            throw new SQLNonTransientConnectionException();
 
         } catch (SQLException | ClassNotFoundException  e) {
             e.printStackTrace();
