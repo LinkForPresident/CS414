@@ -3,13 +3,15 @@ package src;
 import junit.framework.*;
 import org.junit.Test;
 import org.junit.*;
+import src.exception.PlayerNameException;
 
 public class GameTest extends TestCase {
 
     private Game game;
 
     @BeforeClass
-    public void setUp(){
+    public void setUp() throws PlayerNameException {
+        // This will run before every method
         System.out.println("\nSTART OF TEST\n===================");
         game = new Game("Bob", "Sally");
     }
@@ -57,6 +59,35 @@ public class GameTest extends TestCase {
     }
 
     @Test
+    public void testPlayerNameException(){
+        System.out.println("Testing that Player Name Exceptions are being thrown as expected");
+
+        try {
+            game = new Game("", "Sally");
+        } catch (PlayerNameException e) {
+            assertTrue(e.getMessage().contains("Player One Name must not be empty"));
+        }
+
+        try {
+            game = new Game("Bob", "");
+        } catch (PlayerNameException e) {
+            assertTrue(e.getMessage().contains("Player Two Name must not be empty"));
+        }
+
+        try {
+            game = new Game("Sally", "Sally");
+        } catch (PlayerNameException e) {
+            assertTrue(e.getMessage().contains("Player One Name cannot be same as Player Two Name"));
+        }
+    }
+
+    @Test
+    public void testRiverJump() {
+        // Test that only Lion and Tiger piece can jump over river
+        game.printBoard();
+    }
+
+    @Test
     public void testMakeInvalidMove(){
         // Tests that invalid moves cannot be made
         System.out.println("Invalid move test: Tests that invalid moves cannot be made");
@@ -92,7 +123,6 @@ public class GameTest extends TestCase {
         game.sendInput("Bob",0,4);
         assertEquals("b1", game.board[5][0]);
         assertEquals("b3", game.board[4][0]);
-
     }
 
     @Test

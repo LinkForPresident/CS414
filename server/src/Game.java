@@ -1,5 +1,7 @@
 package src;
 
+import src.exception.PlayerNameException;
+
 import java.util.Arrays;
 import java.lang.*;
 
@@ -12,7 +14,17 @@ public class Game {
     public Move move = new Move(this);
     public String winner = "";
 
-    public Game(String playerOneName, String playerTwoName){
+    public Game(String playerOneName, String playerTwoName) throws PlayerNameException{
+
+        if(playerOneName.isEmpty()) {
+            throw new PlayerNameException("Player One Name must not be empty!");
+        }
+        else if(playerTwoName.isEmpty()) {
+            throw new PlayerNameException("Player Two Name must not be empty!");
+        }
+        else if(playerOneName.equals(playerTwoName)) {
+            throw new PlayerNameException("Player One Name cannot be same as Player Two Name!");
+        }
 
         playerOne = playerOneName;
         playerTwo = playerTwoName;
@@ -48,6 +60,19 @@ public class Game {
         for(int i=0; i<9; i++) System.out.println(Arrays.toString(board[i]));
         System.out.println("");
     }
+
+    void printBoardVerbose(){
+        // prints out the board in a readable fashion, including Trap and River squares
+        for(int i=0; i<board.length; i++) {
+            for(int j = 0; j<board[i].length; i++) {
+                String space = board[i][j];
+                System.out.print(space);
+            }
+            System.out.println();
+        }
+        System.out.println("");
+    }
+
 
     void sendInput(String player, int col, int row){
         // send input to the game in the format (player sending move, column selected, row selected)
