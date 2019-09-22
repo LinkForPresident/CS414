@@ -13,12 +13,16 @@ public class GameTest extends TestCase {
 
     public void testGamePieces(){
         // Tests that the game pieces are placed on to the board in the correct positions after the game is created.
+        System.out.println("Game Piece Test: Tests that the game pieces are put in the correct locations");
+
         assertEquals("r7", game.board[0][0]);
         assertEquals("b7", game.board[8][6]);
     }
 
     public void testTurn(){
         // Tests that the turn changes properly
+        System.out.println("Turn test: Tests that the turn changes properly");
+
         assertEquals("blue", game.turn);
         game.sendInput("Bob", 6, 8);
         assertEquals("blue", game.turn);
@@ -33,6 +37,7 @@ public class GameTest extends TestCase {
 
     public void testMakeValidMove(){
         // Tests that valid moves can be made
+        System.out.println("Valid move test: Tests that valid moves can be made");
 
         game.sendInput("Bob", 6, 8);
         game.sendInput("Bob", 6, 7);
@@ -115,6 +120,7 @@ public class GameTest extends TestCase {
 
     public void testWin_1(){
         System.out.println("Win test 1: Tests that you can win by capturing all enemy units");
+
         String newBoard[][] = {
                 {"__","__","__","__","__","__","__"},
                 {"__","r3","b6","__","__","__","__"},
@@ -134,7 +140,7 @@ public class GameTest extends TestCase {
     }
 
     public void testWin_2(){
-        System.out.println("Win test 1: Tests that you can win by capturing all enemy units");
+        System.out.println("Win test 1: Tests that you can win by entering the enemy den");
         String newBoard[][] = {
                 {"__","__","__","__","__","__","__"},
                 {"__","r3","__","b6","__","__","__"},
