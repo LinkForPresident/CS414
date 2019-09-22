@@ -1,16 +1,20 @@
 package src;
 
 import junit.framework.*;
+import org.junit.Test;
+import org.junit.*;
 
 public class GameTest extends TestCase {
 
     private Game game;
 
+    @BeforeClass
     public void setUp(){
         System.out.println("\nSTART OF TEST\n===================");
         game = new Game("Bob", "Sally");
     }
 
+    @Test
     public void testGamePieces(){
         // Tests that the game pieces are placed on to the board in the correct positions after the game is created.
         System.out.println("Game Piece Test: Tests that the game pieces are put in the correct locations");
@@ -19,6 +23,7 @@ public class GameTest extends TestCase {
         assertEquals("b7", game.board[8][6]);
     }
 
+    @Test
     public void testTurn(){
         // Tests that the turn changes properly
         System.out.println("Turn test: Tests that the turn changes properly");
@@ -35,6 +40,7 @@ public class GameTest extends TestCase {
         assertEquals("blue", game.turn);
     }
 
+    @Test
     public void testMakeValidMove(){
         // Tests that valid moves can be made
         System.out.println("Valid move test: Tests that valid moves can be made");
@@ -50,6 +56,7 @@ public class GameTest extends TestCase {
         assertEquals("r1", game.board[3][0]);
     }
 
+    @Test
     public void testMakeInvalidMove(){
         // Tests that invalid moves cannot be made
         System.out.println("Invalid move test: Tests that invalid moves cannot be made");
@@ -88,6 +95,7 @@ public class GameTest extends TestCase {
 
     }
 
+    @Test
     public void testTrap(){
         // Tests that traps work
         System.out.println("Trap Test: Tests that traps work");
@@ -118,6 +126,7 @@ public class GameTest extends TestCase {
 
     }
 
+    @Test
     public void testWin_1(){
         System.out.println("Win test 1: Tests that you can win by capturing all enemy units");
 
@@ -139,6 +148,7 @@ public class GameTest extends TestCase {
         assertEquals("Bob", game.winner);
     }
 
+    @Test
     public void testWin_2(){
         System.out.println("Win test 1: Tests that you can win by entering the enemy den");
         String newBoard[][] = {
@@ -157,25 +167,5 @@ public class GameTest extends TestCase {
         game.sendInput("Bob", 3, 1);
         game.sendInput("Bob", 3, 0);
         assertEquals("Bob", game.winner);
-    }
-
-
-    public GameTest(String name) {
-        super(name);
-    }
-
-    public static Test suite() {
-        return new TestSuite(GameTest.class);
-    }
-
-    public static void main(String[] args) {
-        TestSuite suite = new TestSuite();
-
-        if (args.length != 0)
-            for (String arg : args) suite.addTest(new GameTest(arg)); // Run specific tests as indicated from the command line
-        else
-            suite.addTest(GameTest.suite()); // Dynamically discover all of them, or use user-defined suite
-
-        junit.textui.TestRunner.run(suite);
     }
 }
