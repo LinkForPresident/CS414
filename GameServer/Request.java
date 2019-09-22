@@ -55,7 +55,7 @@ public class Request extends GameConnector{
 
             if (method.equals("POST")) {
                 // TODO: Refactor, there has got to be an easier way of doing this!
-
+                System.out.println(String.format("==DEBUG==:: The request method is %s.", method));
                 char[] temp = new char[length];
                 bufferedReader.read(temp);
                 String[] kv_arr = new String(temp).split("&"); // split by key-value pair, which are separated by &;
@@ -76,6 +76,10 @@ public class Request extends GameConnector{
                     user_hash = (username_hash % password_hash) % HASH_KEY;   // calculate the hash that acts as the primary key in the User table.
                     System.out.println(String.format("==DEBUG==:: Username, Password and User_Hash: %s, %s, %f", username, password, user_hash));
                 }
+            }
+            else{
+                System.out.println(String.format("==DEBUG==:: The request method is %s.", method));
+                System.out.println(String.format("==DEBUG==:: The request path is %s.", path));
             }
         }catch(NullPointerException | ArrayIndexOutOfBoundsException e){
             return -1;

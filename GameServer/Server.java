@@ -32,11 +32,11 @@ public class Server extends Thread{
     protected void serve(){
 
         try{
-            connectToDatabase();
+            //connectToDatabase();
             serverListener = new ServerSocket(PORT_NUMBER); // Set up server to listen at PORT_NUMBER.
             System.out.println("==INFO==:: GameServer listening.");
         }
-        catch(IOException | NullPointerException | InterruptedException e){
+        catch(IOException | NullPointerException e){
             System.out.println("ERROR!");
         }
 
@@ -50,7 +50,7 @@ public class Server extends Thread{
 
     }
 
-    private void connectToDatabase() throws IOException, InterruptedException {
+    protected void establishDatabaseProxyAddress() throws IOException, InterruptedException, ClassNotFoundException, SQLException {
 
         Process process = Runtime.getRuntime().exec("GameServer/getSessionToken.sh");
         process.waitFor();
@@ -83,7 +83,8 @@ public class Server extends Thread{
         while((part = bufferedReader.readLine()) != null){
             response += part;
         }
-        // System.out.println("==DEBUG==:: getProxyAddress.sh response: " + response);
+        process.destroy();
+        System.out.println("==DEBUG==:: getProxyAddress.sh response: " + response);
         String[] components = response.split(",");
         for(String component: components){
             if(component.contains("\"proxy\"")){

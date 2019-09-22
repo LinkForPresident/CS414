@@ -2,6 +2,7 @@ package GameServer;
 
 import java.io.*;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.util.NoSuchElementException;
 
@@ -82,6 +83,11 @@ class GameConnector extends Server{
             throw new IOException("==DEBUG==:: Not a real request by the user, but by the browser automatically!");
         }
         outputStream = new PrintWriter(clientSocket.getOutputStream(), true); // sends data to client.
+        try{
+            establishDatabaseProxyAddress();
+        }catch(InterruptedException | ClassNotFoundException | SQLException e){
+            System.out.println("Problem with the remote API to connect to the database!");
+        }
     }
 
     private void handleRequest() throws IOException{
