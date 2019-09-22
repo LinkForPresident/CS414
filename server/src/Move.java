@@ -88,9 +88,9 @@ class Move {
         return game.board[row][col].charAt(0) == enemy;
     }
 
-    private boolean canCaptureUnit(int row, int col){
+    private boolean canCaptureUnit(int row, int col) {
         // returns true if the piece at row, col has a lesser or equal power (or row, col is a trap) to the piece at selectedRow, SelectedCol
-        return ((game.board[selectedRow][selectedCol].charAt(1) >= game.board[row][col].charAt(1) || isTrap(row, col)) && !isWater(selectedRow, selectedCol));
+        return ((game.board[selectedRow][selectedCol].charAt(1) >= game.board[row][col].charAt(1) || isFriendlyTrap(row, col)) && !isWater(selectedRow, selectedCol) && !isEnemyTrap(selectedRow, selectedCol));
     }
 
     private boolean isLionOrTiger(int row, int col){
@@ -108,8 +108,21 @@ class Move {
         return (row == 3 || row == 4 || row == 5) && (col == 1 || col == 2 || col == 4 || col == 5);
     }
 
-    private boolean isTrap(int row, int col){
-        // returns true if the tile at row, col contains a trap, else returns false.
-        return (((row == 0 || row == 8) && (col == 2 || col == 4)) || ((row == 1 || row == 7) && (col == 3)));
+    private boolean isFriendlyTrap(int row, int col){
+        // returns true if the tile at row, col contains a friendly trap, else returns false.
+        if(game.turn.equals("blue")){
+            return (row == 8 && (col == 2 || col == 4)) || (row == 7 && col == 3);
+        }
+        else
+            return (row == 0 && (col == 2 || col == 4) || (row == 1 && col == 3));
+    }
+
+    private boolean isEnemyTrap(int row, int col){
+        // returns true if the tile at row, col contains an enemy trap, else returns false.
+        if(game.turn.equals("red")){
+            return (row == 8 && (col == 2 || col == 4)) || (row == 7 && col == 3);
+        }
+        else
+            return (row == 0 && (col == 2 || col == 4) || (row == 1 && col == 3));
     }
 }

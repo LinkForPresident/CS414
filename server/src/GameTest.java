@@ -13,21 +13,22 @@ public class GameTest extends TestCase {
 
     public void testGamePieces(){
         // Tests that the game pieces are placed on to the board in the correct positions after the game is created.
-        assert(game.board[0][0].equals("r7"));
-        assert(game.board[8][6].equals("b7"));
+        assertEquals("r7", game.board[0][0]);
+        assertEquals("b7", game.board[8][6]);
     }
 
     public void testTurn(){
         // Tests that the turn changes properly
-        assert(game.turn.equals("blue"));
+        assertEquals("blue", game.turn);
         game.sendInput("Bob", 6, 8);
-        assert(game.turn.equals("blue"));
+        assertEquals("blue", game.turn);
         game.sendInput("Bob", 6, 7);
-        assert(game.turn.equals("red"));
+        assertEquals("red", game.turn);
         game.sendInput("Sally", 0, 2);
-        assert(game.turn.equals("red"));
+        assertEquals("red", game.turn);
+        assertEquals("red", game.turn);
         game.sendInput("Sally", 0, 3);
-        assert(game.turn.equals("blue"));
+        assertEquals("blue", game.turn);
     }
 
     public void testMakeValidMove(){
@@ -35,13 +36,13 @@ public class GameTest extends TestCase {
 
         game.sendInput("Bob", 6, 8);
         game.sendInput("Bob", 6, 7);
-        assert(game.board[6][8].equals("__"));
-        assert(game.board[6][7].equals("b7"));
+        assertEquals("__", game.board[8][6]);
+        assertEquals("b7", game.board[7][6]);
 
         game.sendInput("Sally", 0, 2);
         game.sendInput("Sally", 0, 3);
-        assert(game.board[0][2].equals("__"));
-        assert(game.board[0][3].equals("r1"));
+        assertEquals("__", game.board[2][0]);
+        assertEquals("r1", game.board[3][0]);
     }
 
     public void testMakeInvalidMove(){
@@ -65,23 +66,91 @@ public class GameTest extends TestCase {
         // making a move when it isn't your turn
         game.sendInput("Sally", 0,3);
         game.sendInput("Sally", 0,2);
-        assert(game.board[0][3].equals("r7"));
-        assert(game.board[0][2].equals("__"));
+        assertEquals("r7", game.board[3][0]);
+        assertEquals("__", game.board[2][0]);
 
         // moving in to an enemy unit that is stronger than you
         game.sendInput("Bob",0,4);
         game.sendInput("Bob",0,3);
-        assert(game.board[0][4].equals("b3"));
-        assert(game.board[0][3].equals("r7"));
+        assertEquals("b3", game.board[4][0]);
+        assertEquals("r7", game.board[3][0]);
 
         // moving in to a friendly unit
         game.sendInput("Bob",0,5);
         game.sendInput("Bob",0,4);
-        assert(game.board[0][5].equals("b1"));
-        assert(game.board[0][4].equals("b3"));
+        assertEquals("b1", game.board[5][0]);
+        assertEquals("b3", game.board[4][0]);
 
+    }
+
+    public void testTrap(){
+        // Tests that traps work
+        System.out.println("Trap Test: Tests that traps work");
+
+        String newBoard[][] = {
+                {"__","__","r7","__","__","__","__"},
+                {"__","__","r1","b3","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"}};
+
+        game.board = newBoard;
         game.printBoard();
+        game.sendInput("Bob",3,1);
+        game.sendInput("Bob",2,1);
 
+        assertEquals("b3", game.board[1][3]);
+        assertEquals("r1", game.board[1][2]);
+
+        game.turn = "red";
+
+        game.sendInput("Sally",2,1);
+        game.sendInput("Sally",3,1);
+
+    }
+
+    public void testWin_1(){
+        System.out.println("Win test 1: Tests that you can win by capturing all enemy units");
+        String newBoard[][] = {
+                {"__","__","__","__","__","__","__"},
+                {"__","r3","b6","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"}};
+
+        game.board = newBoard;
+
+        game.sendInput("Bob", 2, 1);
+        game.sendInput("Bob", 1, 1);
+        assertEquals("Bob", game.winner);
+    }
+
+    public void testWin_2(){
+        System.out.println("Win test 1: Tests that you can win by capturing all enemy units");
+        String newBoard[][] = {
+                {"__","__","__","__","__","__","__"},
+                {"__","r3","__","b6","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"}};
+
+        game.board = newBoard;
+
+        game.sendInput("Bob", 3, 1);
+        game.sendInput("Bob", 3, 0);
+        assertEquals("Bob", game.winner);
     }
 
 
