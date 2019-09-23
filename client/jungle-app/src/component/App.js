@@ -57,13 +57,12 @@ class Games extends React.Component {
         this.state = {
             activeGames: this.props.activeGames,
             completedGames: this.props.completedGames,
-            selectedGame: this.props.activeGames,
         };
     }
 
     render() {
-        const activeGamesList = this.state.activeGames.map((game) => <li><Button onclick={this.handleClick.bind(game)}>{game}</Button> request json</li>);
-        const completedGamesList = this.state.completedGames.map((game) => <li><Button onclick={this.handleClick.bind(game)}>{game}</Button> request json</li>);
+        const activeGamesList = this.state.activeGames.map((game) => <li><Button>{game}</Button> request json</li>);
+        const completedGamesList = this.state.completedGames.map((game) => <li><Button>{game}</Button> request json</li>);
         return (
             <div className={'GamesPage'}>
                 <h2>Active Games</h2>
