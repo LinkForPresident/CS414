@@ -29,6 +29,7 @@ public class Request extends GameConnector{
 
     protected int parseRequest() throws IOException, ArrayIndexOutOfBoundsException, NullPointerException{
         // parse the request for various arguments and parameters.
+        System.out.println(INFO_TAG + "Attempting to parse the request for parameters.");
         clientIP = clientSocket.getRemoteSocketAddress().toString().split(":")[0];
         method = DEFAULT_METHOD; // GET, POST, etc.
         path = DEFAULT_PAGE; // used for GET requests.
@@ -38,8 +39,13 @@ public class Request extends GameConnector{
             method = parts[0];
             path = parts[1];
 
+            System.out.println(String.format(DEBUG_TAG + "The request method is: %s.", method));
+            System.out.println(String.format(DEBUG_TAG + "The request path is: %s.", path));
+
+
             if (path.equals("/")) {
                 path = DEFAULT_PAGE;
+                System.out.println(String.format(DEBUG_TAG + "The request path has been changed to: %s.", path));
             }
             if (path.equals("/css/common.css")) {
                 return -2; // browsers automatically send a request for this file, which does not exist and wastes server resources.
@@ -50,15 +56,16 @@ public class Request extends GameConnector{
             while ((line = bufferedReader.readLine()).length() != 0) {
                 if (line.contains("Content-Length")) {
                     length = Integer.parseInt(line.split(" ")[1]);
+                    System.out.println(String.format(DEBUG_TAG + "The content length of the request is: %d.", length));
                 }
                 if(line.contains("Cookie")){
                     cookie = Double.parseDouble(line.split("=")[1]);
+                    System.out.println(String.format(DEBUG_TAG + "The cookies of the request are: %s.", cookie));
                 }
             }
 
             if (method.equals("POST")) {
                 // TODO: Refactor, there has got to be an easier way of doing this!
-                System.out.println(String.format("==DEBUG==:: The request method is %s.", method));
                 char[] temp = new char[length];
                 bufferedReader.read(temp);
                 String[] kv_arr = new String(temp).split("&"); // split by key-value pair, which are separated by &;
@@ -71,18 +78,15 @@ public class Request extends GameConnector{
 
                 }
                 action = args.get("action"); // whatever the client is trying to do: "login", "move_piece", etc.
+                System.out.println(String.format(DEBUG_TAG + "The action of the POST request is: %s.", action));
                 if(action.equals("login") || action.equals("user_registration")) {
                     username = args.get("username");
                     double username_hash = username.hashCode() % HASH_KEY;
                     password = args.get("password");
                     double password_hash = password.hashCode() % HASH_KEY;
                     user_hash = (username_hash % password_hash) % HASH_KEY;   // calculate the hash that acts as the primary key in the User table.
-                    System.out.println(String.format("==DEBUG==:: Username, Password and User_Hash: %s, %s, %f", username, password, user_hash));
+                    System.out.println(String.format(DEBUG_TAG + "The username, password and user_hash from the POST request are: %s, %s, %f", username, password, user_hash));
                 }
-            }
-            else{
-                System.out.println(String.format("==DEBUG==:: The request method is %s.", method));
-                System.out.println(String.format("==DEBUG==:: The request path is %s.", path));
             }
         }catch(NullPointerException | ArrayIndexOutOfBoundsException e){
             return -1;

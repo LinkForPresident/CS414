@@ -27,20 +27,48 @@ class GameConnector extends Server{
     }
 
     @Override
-    public void run(){
+    public void run() {
         // overrides the thread run() methods.
         // set up the connection with the client.
         try {
             setUpConnection();
-        } catch(NullPointerException | IOException e){
-            // in case of an error in set up, tear down the connection.
+
+        }catch(FileNotFoundException f){
             try {
-                System.out.println("==ERROR==:: Encountered an error while trying to set up connection; tearing down connection.");
-                e.printStackTrace();
+                System.out.println(WARNING_TAG + "Client automatically requested '/css/common.css', which does not exist.");
                 tearDownConnection();
+                System.out.println(INFO_TAG + "Connection has been torn down.");
                 return;
             } catch (IOException ee) {
-                System.out.println("==ERROR==:: Encountered an error while trying to set up connection, and encountered an error while tearing down the connection as well.");
+                System.out.println(ERROR_TAG + "Encountered an error while trying to set up connection (/css/common.css does not exist), " +
+                        "and encountered an error while tearing down the connection as well.");
+                ee.printStackTrace();
+                return;
+            }
+        }
+        catch(IOException e){
+            try{
+                System.out.println(WARNING_TAG + "This was not a real request by the user, but an automatic request by the browser.");
+                tearDownConnection();
+                System.out.println(INFO_TAG + "Connection has been torn down.");
+                return;
+            } catch (IOException ee) {
+                System.out.println(ERROR_TAG + "Encountered an error while trying to set up connection (automatic request by browser), " +
+                        "and encountered an error while tearing down the connection as well.");
+                ee.printStackTrace();
+                return;
+            }
+        }
+        catch(NullPointerException n){
+            // in case of an error in set up, tear down the connection.
+            try {
+                System.out.println(ERROR_TAG + "Encountered an error while trying to set up connection; tearing down connection.");
+                n.printStackTrace();
+                tearDownConnection();
+                System.out.println(INFO_TAG + "Connection has been torn down.");
+                return;
+            } catch (IOException ee) {
+                System.out.println(ERROR_TAG + "Encountered an error while trying to set up connection, and encountered an error while tearing down the connection as well.");
                 ee.printStackTrace();
                 return;
             }
@@ -53,12 +81,13 @@ class GameConnector extends Server{
                     handleRequest();
                 } catch (IOException e) {
                     try {
-                        System.out.println("==ERROR==:: Encountered an error while attempting to handle the request; tearing down connection.");
+                        System.out.println(ERROR_TAG + "Encountered an error while attempting to handle the request; tearing down connection.");
                         e.printStackTrace();
                         tearDownConnection();
+                        System.out.println(INFO_TAG + "Connection has been torn down.");
                         return;
                     } catch (IOException ee) {
-                        System.out.println("==ERROR==:: Encountered an error while attempting to handle the request, and encountered an error while tearing down connection as well.");
+                        System.out.println(ERROR_TAG + "Encountered an error while attempting to handle the request, and encountered an error while tearing down connection as well.");
                         ee.printStackTrace();
                         return;
                     }
@@ -66,15 +95,25 @@ class GameConnector extends Server{
             } else {
                 // client is not authenticated, deny access and redirect to the login page.
                 try {
-                    System.out.println("==DEBUG==:: Client is not authenticated, redirecting to login page.");
+                    System.out.println(DEBUG_TAG + "Client is not authenticated, redirecting to login page.");
                     redirectTo("/login.html");
                 } catch (IOException e) {
-                    System.out.println("==ERROR==:: Encountered an error while attempting to redirect client to login page after failed authentication check.");
-                    e.printStackTrace();
+                    try {
+                        System.out.println(ERROR_TAG + "Encountered an error while attempting to redirect client to login page after failed authentication check.");
+                        tearDownConnection();
+                        System.out.println(INFO_TAG + "Connection has been torn down.");
+                        e.printStackTrace();
+                    }
+                    catch(IOException ee){
+                        System.out.println(ERROR_TAG + "Encountered an error while attempting to redirect client after failed authentication check, " +
+                                "and encountered an error while tearing down connection as well.");
+                        ee.printStackTrace();
+                        return;
+                    }
                 }
             }
         } catch(SQLNonTransientConnectionException sql){
-            System.out.println("==ERROR==:: Encountered an error while attempting verify authenticity due to a problem connecting to the database. " +
+            System.out.println(ERROR_TAG + "Encountered an error while attempting verify authenticity due to a problem connecting to the database. " +
                     "(HINT: the proxy server is likely different than what is set.)");
             sql.printStackTrace();
         }
@@ -82,9 +121,10 @@ class GameConnector extends Server{
         try {
             tearDownConnection();
         } catch (IOException e) {
-            System.out.println("==ERROR==:: Encountered an error while attempting to tear down the connection after the client's request has been fulfilled.");
+            System.out.println(ERROR_TAG + "Encountered an error while attempting to tear down the connection after the client's request has been fulfilled.");
             e.printStackTrace();
         }
+        System.out.println(SUCCESS_TAG + "Request has been served and connection successfully torn down.");
     }
 
     private void setUpConnection() throws IOException, NullPointerException{
@@ -95,23 +135,23 @@ class GameConnector extends Server{
         request = new Request(bufferedReader, clientSocket); // create request object
         int flag = request.parseRequest();
         if(flag == -1){
-            throw new IOException("==DEBUG==:: This was not a real request by the user, but an automatic request by the browser.");
+            throw new IOException();
         }
         else if(flag == -2){
             outputStream.println(HEADER + "\r\n\r\n");
-            throw new FileNotFoundException("==DEBUG==:: Client automatically requested '/css/common.css', which does not exist.");
+            throw new FileNotFoundException();
         }
         try{
             establishDatabaseProxyAddress();
         }catch(InterruptedException | ClassNotFoundException | SQLException e){
-            System.out.println("==ERROR==:: Encountered an error while attempting to curl proxy server credentials for the database.");
+            System.out.println(ERROR_TAG + "Encountered an error while attempting to curl proxy server credentials for the database.");
             e.printStackTrace();
         }
     }
 
     private void handleRequest() throws IOException{
         // handle the client requests, GET aor POST.
-        System.out.println("==INFO==:: Handling request!");
+        System.out.println(INFO_TAG + "Handling request!");
         switch(request.method){
             case "GET":
                 handleGETRequest(request.path);
@@ -129,13 +169,13 @@ class GameConnector extends Server{
 
     private void handleGETRequest(String path) throws IOException {
         // handle a client GET request.
-        System.out.println("==INFO==:: Handling GET request!");
+        System.out.println(INFO_TAG + "Handling GET request!");
         String htmlResponse = HEADER + "\r\n\r\n";
         try {
             htmlResponse += getHTMLPage(path);  // get the HTML source.
             outputStream.println(htmlResponse); // send the response to the client.
         }catch(FileNotFoundException e){
-            System.out.println(String.format("==DEBUG==:: 404 file %s not found", path));
+            System.out.println(String.format(WARNING_TAG + "404 file %s not found", path));
             e.printStackTrace();
             outputStream.println("404 file not found.");
         }
@@ -145,7 +185,7 @@ class GameConnector extends Server{
         // handle a client POST request.
         switch (request.action) {
             case "user_registration":
-                System.out.println("==INFO==:: User is trying to register!");
+                System.out.println(INFO_TAG + "User is trying to register!");
                 handleUserRegistration();
                 break;
             case "login":
@@ -174,23 +214,23 @@ class GameConnector extends Server{
 
     private void handleLogin() throws IOException{
         // handle a client requesting to log in.
-        System.out.println(String.format("==INFO==:: Attempting to log in user %s", request.username));
+        System.out.println(String.format(INFO_TAG + "Attempting to log in user %s", request.username));
         try {
             login(request.user_hash);
             HEADER += String.format("Set-Cookie: user_hash=%f\r\n\r\n", request.user_hash);
             // automatically redirect to the home page.
-            System.out.println(String.format("==INFO==:: User '%s' has been logged in.", request.username));
+            System.out.println(String.format(INFO_TAG + "User '%s' has been logged in.", request.username));
             redirectTo("/index.html");
         }catch(NoSuchElementException e) {
             // user with the username-password pair does not exist in the database.
-            System.out.println(String.format("==DEBUG==:: User with username %s , password %s , and user_hash %s does " +
+            System.out.println(String.format(DEBUG_TAG + "User with username %s , password %s , and user_hash %s does " +
                     "not exist in database. Attempting to redirect to login.html", request.username, request.password,
                     request.user_hash));
             e.printStackTrace();
             redirectTo("/login.html");
         }
         catch(SQLNonTransientConnectionException sql){
-            System.out.println("==ERROR==:: Encountered an error while attempting handle a login attempt due to a " +
+            System.out.println(ERROR_TAG + "Encountered an error while attempting handle a login attempt due to a " +
                     "problem connecting to the database. (HINT: the proxy server is likely different than what is set.)" +
                     "Redirecting to login.html.");
             sql.printStackTrace();
@@ -200,13 +240,13 @@ class GameConnector extends Server{
 
     private void handleLogout() throws IOException{
         // handle a client requesting to log out.
-        System.out.println(String.format("==INFO==:: Attempting to log out user %s", request.username));
+        System.out.println(String.format(INFO_TAG + "Attempting to log out user %s", request.username));
         try {
             logout(request.cookie);
-            System.out.println(String.format("==INFO==:: User %s has been logged out", request.username));
+            System.out.println(String.format(INFO_TAG + "User %s has been logged out", request.username));
             redirectTo("/login.html");
         }catch(SQLNonTransientConnectionException sql){
-            System.out.println("==ERROR==:: Encountered an error while attempting handle a logout attempt due to a " +
+            System.out.println(ERROR_TAG + "Encountered an error while attempting handle a logout attempt due to a " +
                     "problem connecting to the database. (HINT: the proxy server is likely different than what is set.)" +
                     "Redirecting to login.html.");
             sql.printStackTrace();
@@ -216,13 +256,13 @@ class GameConnector extends Server{
 
     private void handleUserRegistration() throws IOException{
         // handle a client requesting to register a new account.
-        System.out.println(String.format("==INFO==:: Attempting to register user %s", request.username));
+        System.out.println(String.format(INFO_TAG + "Attempting to register user %s", request.username));
         try {
             registerUser(request.username, request.password, request.user_hash);
-            System.out.println(String.format("==INFO==:: New user %s has been registered", request.username));
+            System.out.println(String.format(INFO_TAG + "New user %s has been registered", request.username));
             redirectTo("/login.html");
         }catch(SQLNonTransientConnectionException sql){
-            System.out.println("==ERROR==:: Encountered an error while attempting handle a user registration attempt due to a " +
+            System.out.println(ERROR_TAG + "Encountered an error while attempting handle a user registration attempt due to a " +
                     "problem connecting to the database. (HINT: the proxy server is likely different than what is set.)" +
                     "Redirecting to login.html.");
             sql.printStackTrace();
@@ -232,11 +272,13 @@ class GameConnector extends Server{
 
     private void redirectTo(String path) throws IOException{
         // helper method for making it more explicit when a redirect is happening.
+        System.out.println(String.format(INFO_TAG + "Redirecting to: %s", path));
         handleGETRequest(path);
     }
 
     private void tearDownConnection() throws IOException{
         // tear down the connection with the client.
+        System.out.println(INFO_TAG + "Attempting to tear down the Connection.");
         bufferedReader.close();
         outputStream.close();
     }
