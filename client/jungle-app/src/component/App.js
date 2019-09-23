@@ -1,30 +1,19 @@
 
 import React from "react";
 import {Tabs, TabList, Tab, TabPanel} from 'react-tabs';
-import { Button } from 'react-bootstrap';
+import {Button} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default class App extends React.Component {
     state = {
-        total: null,
-        next: null,
-        operation: null,
+        loggedIn: true,
+        activeGames : ["0001", "0002", "0005"],
+        completedGames: ["0003", "0004"],
     };
 
     // handleClick = buttonName => {
     //
     // };
-
-    render() {
-        return (
-            <div className="component-app">
-                <Header />
-            </div>
-        );
-    }
-}
-
-class Header extends React.Component {
 
     render() {
         return (
@@ -39,7 +28,7 @@ class Header extends React.Component {
                         <Tab>User</Tab>
                     </TabList>
                     <TabPanel><Home/></TabPanel>
-                    <TabPanel><Game/></TabPanel>
+                    <TabPanel><Games activeGames={this.state.activeGames} completedGames={this.state.completedGames}/></TabPanel>
                     <TabPanel><History/></TabPanel>
                     <TabPanel><Invite/></TabPanel>
                     <TabPanel><Login/></TabPanel>
@@ -49,6 +38,7 @@ class Header extends React.Component {
         )
     }
 }
+
 
 
 class Home extends React.Component {
@@ -61,11 +51,48 @@ class Home extends React.Component {
     }
 }
 
-class Game extends React.Component {
+class Games extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            activeGames: this.props.activeGames,
+            completedGames: this.props.completedGames,
+            selectedGame: this.props.activeGames,
+        };
+    }
+
     render() {
+        const activeGamesList = this.state.activeGames.map((game) => <li><Button onclick={this.handleClick.bind(game)}>{game}</Button> request json</li>);
+        const completedGamesList = this.state.completedGames.map((game) => <li><Button onclick={this.handleClick.bind(game)}>{game}</Button> request json</li>);
         return (
-            <div className={'GamePage'}>
-                <p>Game Goes here</p>
+            <div className={'GamesPage'}>
+                <h2>Active Games</h2>
+                <ul>
+                    {activeGamesList}
+                </ul>
+                <h2>Completed Games</h2>
+                <ul>
+                    {completedGamesList}
+                </ul>
+
+                <Board gameId={this.state.selectedGame} />
+            </div>
+        )
+    }
+}
+
+
+class Board extends Games {
+    constructor(props) {
+        super(props);
+        this.state = {
+            gameId: this.props.gameId,
+        }
+    }
+    render() {
+        return(
+            <div className={'Board'}>
+                <p>Put the actual board here for game ({this.state.gameId})</p>
             </div>
         )
     }
