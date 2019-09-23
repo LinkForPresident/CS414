@@ -64,7 +64,7 @@ public class Game {
     }
 
 
-    void sendInput(String player, int col, int row){
+    void sendInput(String player, int row, int col){
         // send input to the game in the format (player sending move, column selected, row selected)
         if(isTurn(player)){
             if(move.selectedCol == col && move.selectedRow == row){ // if the second half of the move is the same as the first half (re-selecting the same tile)
