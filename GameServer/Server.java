@@ -25,14 +25,14 @@ public class Server extends Thread{
     private static String deviceAddress = "80:00:00:00:01:01:38:E9";
 
     static final String RESET_TEXT_COLOR = "\u001B[0m";
-    static final String RED_TEXT = "\u001B[31;1m";
-    static final String BLUE_TEXT = "\u001B[34;1m";
-    static final String CYAN_TEXT = "\u001B[36;1m";
-    static final String GREEN_TEXT = "\u001B[32;1m";
-    static final String YELLOW_TEXT = "\u001B[33;1m";
+    static final String RED_TEXT = "\u001B[38;5;196m";
+    static final String BLUE_TEXT = "\u001B[38;5;14m";
+    static final String GRAY_TEXT = "\u001B[38;5;7m";
+    static final String GREEN_TEXT = "\u001B[38;5;82m";
+    static final String YELLOW_TEXT = "\u001B[38;5;11m";
 
     static final String INFO_TAG = BLUE_TEXT + "==INFO==:: " + RESET_TEXT_COLOR;
-    static final String DEBUG_TAG = CYAN_TEXT + "==DEBUG==:: " + RESET_TEXT_COLOR;
+    static final String DEBUG_TAG = GRAY_TEXT + "==DEBUG==:: " + RESET_TEXT_COLOR;
     static final String ERROR_TAG = RED_TEXT + "==ERROR==:: " + RESET_TEXT_COLOR;
     static final String WARNING_TAG = YELLOW_TEXT + "==WARNING==:: " + RESET_TEXT_COLOR;
     static final String SUCCESS_TAG = GREEN_TEXT + "==SUCCESS==:: " + RESET_TEXT_COLOR;
