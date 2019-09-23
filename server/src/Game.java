@@ -1,5 +1,7 @@
 package src;
 
+import src.exception.PlayerNameException;
+
 import java.util.Arrays;
 import java.lang.*;
 
@@ -12,7 +14,19 @@ public class Game {
     public Move move = new Move(this);
     public String winner = "";
 
-    public Game(String playerOneName, String playerTwoName){
+    GameUtils gameUtils = new GameUtils();
+
+    public Game(String playerOneName, String playerTwoName) throws PlayerNameException{
+
+        if(playerOneName.isEmpty()) {
+            throw new PlayerNameException("Player One Name must not be empty!");
+        }
+        else if(playerTwoName.isEmpty()) {
+            throw new PlayerNameException("Player Two Name must not be empty!");
+        }
+        else if(playerOneName.equals(playerTwoName)) {
+            throw new PlayerNameException("Player One Name cannot be same as Player Two Name!");
+        }
 
         playerOne = playerOneName;
         playerTwo = playerTwoName;
@@ -69,8 +83,12 @@ public class Game {
 
     private void makeMove(int row, int col){
         // once a valid move has been constructed, make it.
+        String pieceName = gameUtils.getRealPieceName(board[move.selectedRow][move.selectedCol]);
         board[row][col] = board[move.selectedRow][move.selectedCol];
         board[move.selectedRow][move.selectedCol] = "__";
+
+        System.out.println(turn + " moved " + pieceName + " from " + row + "," + col
+                + " to " + move.selectedRow +"," + move.selectedCol);
 
         if(turn.equals("blue")) turn = "red";
         else turn = "blue";
@@ -82,7 +100,7 @@ public class Game {
         checkIfWinner();
 
         System.out.println("");
-        printBoard();
+        //printBoard();
     }
 
     private boolean isTurn(String player){

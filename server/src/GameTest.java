@@ -87,17 +87,21 @@ public class GameTest extends TestCase {
         // Test that you cannot move Lion onto your own Blue Mouse,
         // Blue Lion should stay at (6,7) when we try to move it to (6,6),
         // and it should remain Blue's turn after he tries to do this
+        System.out.println("It is " + game.turn +"'s turn");
         gameUtils.printBoardVeryVerbose(game.board);
-        game.sendInput("Bob", 6, 8);
-        game.sendInput("Bob", 6, 7);
+        game.sendInput("Bob", 8, 6);
+        game.sendInput("Bob", 7, 6);
+        System.out.println("It is " + game.turn +"'s turn");
         gameUtils.printBoardVeryVerbose(game.board);
-        game.sendInput("Sally", 6, 0);
-        game.sendInput("Sally", 6, 1);
+        game.sendInput("Sally", 0, 6);
+        game.sendInput("Sally", 1, 6);
+        System.out.println("It is " + game.turn +"'s turn");
         gameUtils.printBoardVeryVerbose(game.board);
-        game.sendInput("Bob", 6, 7);
+        game.sendInput("Bob", 7, 6);
         game.sendInput("Bob", 6, 6);
         gameUtils.printBoardVeryVerbose(game.board);
         System.out.println("It is " + game.turn +"'s turn");
+        assertEquals(game.turn, "blue");
     }
 
     @Test
