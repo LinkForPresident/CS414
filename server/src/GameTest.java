@@ -32,14 +32,14 @@ public class GameTest extends TestCase {
         System.out.println("Turn test: Tests that the turn changes properly");
 
         assertEquals("blue", game.turn);
-        game.sendInput("Bob", 6, 8);
+        game.sendInput("Bob", 8, 6);
         assertEquals("blue", game.turn);
-        game.sendInput("Bob", 6, 7);
+        game.sendInput("Bob", 7, 6);
         assertEquals("red", game.turn);
-        game.sendInput("Sally", 0, 2);
+        game.sendInput("Sally", 2, 0);
         assertEquals("red", game.turn);
         assertEquals("red", game.turn);
-        game.sendInput("Sally", 0, 3);
+        game.sendInput("Sally", 3, 0);
         assertEquals("blue", game.turn);
     }
 
@@ -48,13 +48,13 @@ public class GameTest extends TestCase {
         // Tests that valid moves can be made
         System.out.println("Valid move test: Tests that valid moves can be made");
 
-        game.sendInput("Bob", 6, 8);
-        game.sendInput("Bob", 6, 7);
+        game.sendInput("Bob", 8, 6);
+        game.sendInput("Bob", 7, 6);
         assertEquals("__", game.board[8][6]);
         assertEquals("b7", game.board[7][6]);
 
-        game.sendInput("Sally", 0, 2);
-        game.sendInput("Sally", 0, 3);
+        game.sendInput("Sally", 2, 0);
+        game.sendInput("Sally", 3, 0);
         assertEquals("__", game.board[2][0]);
         assertEquals("r1", game.board[3][0]);
     }
@@ -120,20 +120,20 @@ public class GameTest extends TestCase {
         game.printBoard();
 
         // making a move when it isn't your turn
-        game.sendInput("Sally", 0,3);
-        game.sendInput("Sally", 0,2);
+        game.sendInput("Sally", 3,0);
+        game.sendInput("Sally", 2,0);
         assertEquals("r7", game.board[3][0]);
         assertEquals("__", game.board[2][0]);
 
         // moving in to an enemy unit that is stronger than you
-        game.sendInput("Bob",0,4);
-        game.sendInput("Bob",0,3);
+        game.sendInput("Bob",4,0);
+        game.sendInput("Bob",3,0);
         assertEquals("b3", game.board[4][0]);
         assertEquals("r7", game.board[3][0]);
 
         // moving in to a friendly unit
-        game.sendInput("Bob",0,5);
-        game.sendInput("Bob",0,4);
+        game.sendInput("Bob",5,0);
+        game.sendInput("Bob",4,0);
         assertEquals("b1", game.board[5][0]);
         assertEquals("b3", game.board[4][0]);
     }
@@ -156,16 +156,16 @@ public class GameTest extends TestCase {
 
         game.board = newBoard;
         game.printBoard();
-        game.sendInput("Bob",3,1);
-        game.sendInput("Bob",2,1);
+        game.sendInput("Bob",1,3);
+        game.sendInput("Bob",1,2);
 
         assertEquals("b3", game.board[1][3]);
         assertEquals("r1", game.board[1][2]);
 
         game.turn = "red";
 
-        game.sendInput("Sally",2,1);
-        game.sendInput("Sally",3,1);
+        game.sendInput("Sally",1,2);
+        game.sendInput("Sally",1,3);
 
     }
 
@@ -186,7 +186,7 @@ public class GameTest extends TestCase {
 
         game.board = newBoard;
 
-        game.sendInput("Bob", 2, 1);
+        game.sendInput("Bob", 1, 2);
         game.sendInput("Bob", 1, 1);
         assertEquals("Bob", game.winner);
     }
@@ -207,8 +207,8 @@ public class GameTest extends TestCase {
 
         game.board = newBoard;
 
-        game.sendInput("Bob", 3, 1);
-        game.sendInput("Bob", 3, 0);
+        game.sendInput("Bob", 1, 3);
+        game.sendInput("Bob", 0, 3);
         assertEquals("Bob", game.winner);
     }
 }
