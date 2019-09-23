@@ -8,6 +8,7 @@ import src.exception.PlayerNameException;
 public class GameTest extends TestCase {
 
     private Game game;
+    GameUtils gameUtils = new GameUtils();
 
     @BeforeClass
     public void setUp() throws PlayerNameException {
@@ -82,9 +83,21 @@ public class GameTest extends TestCase {
     }
 
     @Test
-    public void testRiverJump() {
-        // Test that only Lion and Tiger piece can jump over river
-        game.printBoard();
+    public void testBlueLionNotAbleToCrossItsOwnPieces() {
+        // Test that you cannot move Lion onto your own Blue Mouse,
+        // Blue Lion should stay at (6,7) when we try to move it to (6,6),
+        // and it should remain Blue's turn after he tries to do this
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Bob", 6, 8);
+        game.sendInput("Bob", 6, 7);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Sally", 6, 0);
+        game.sendInput("Sally", 6, 1);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Bob", 6, 7);
+        game.sendInput("Bob", 6, 6);
+        gameUtils.printBoardVeryVerbose(game.board);
+        System.out.println("It is " + game.turn +"'s turn");
     }
 
     @Test

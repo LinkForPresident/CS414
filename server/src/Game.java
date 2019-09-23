@@ -14,6 +14,8 @@ public class Game {
     public Move move = new Move(this);
     public String winner = "";
 
+    GameUtils gameUtils = new GameUtils();
+
     public Game(String playerOneName, String playerTwoName) throws PlayerNameException{
 
         if(playerOneName.isEmpty()) {
@@ -61,18 +63,6 @@ public class Game {
         System.out.println("");
     }
 
-    void printBoardVerbose(){
-        // prints out the board in a readable fashion, including Trap and River squares
-        for(int i=0; i<board.length; i++) {
-            for(int j = 0; j<board[i].length; i++) {
-                String space = board[i][j];
-                System.out.print(space);
-            }
-            System.out.println();
-        }
-        System.out.println("");
-    }
-
 
     void sendInput(String player, int col, int row){
         // send input to the game in the format (player sending move, column selected, row selected)
@@ -94,8 +84,12 @@ public class Game {
 
     private void makeMove(int row, int col){
         // once a valid move has been constructed, make it.
+        String piece = board[row][col];
         board[row][col] = board[move.selectedRow][move.selectedCol];
         board[move.selectedRow][move.selectedCol] = "__";
+
+        System.out.println(turn + " moved piece from " + row + "," + col
+                + " to " + move.selectedRow +"," + move.selectedCol);
 
         if(turn.equals("blue")) turn = "red";
         else turn = "blue";
@@ -107,7 +101,7 @@ public class Game {
         checkIfWinner();
 
         System.out.println("");
-        printBoard();
+        //printBoard();
     }
 
     private boolean isTurn(String player){
