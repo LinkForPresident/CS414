@@ -87,7 +87,7 @@ public class Server extends Thread{
         }
         // System.out.println("==DEBUG==:: getSessionToken.sh response: " + response);
         String sessionToken = response.split(":")[2].replace("\"", "").split(",")[0];
-        System.out.println(DEBUG_TAG + "sessionToken: " + sessionToken);
+        System.out.println(DEBUG_TAG + "Parsed remote proxy session token: " + sessionToken);
 
         String getProxyAddress = String.format("curl -X POST -H \"token:%s\" -H \"developerkey\":\"%s\" -d \'{\"wait\":\"true\", " +
                 "\"deviceaddress\":\"\'%s\'\"}' https://api.remot3.it/apv/v27/device/connect", sessionToken, devAPIKey, deviceAddress);
@@ -118,7 +118,7 @@ public class Server extends Thread{
             }
         }
         PROXY_ADDRESS = "jdbc:mariadb://" + PROXY_ADDRESS + "/cs414";
-        // System.out.println("==DEBUG==:: Database proxy address: "+PROXY_ADDRESS);
+        System.out.println(DEBUG_TAG + "Parsed remote proxy database address: " + PROXY_ADDRESS);
 
     }
 
