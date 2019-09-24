@@ -1,0 +1,56 @@
+/*To assure site wide consistency, please only use colors specified here.
+https://brand.colostate.edu/color/ */
+html body {
+    background: #333333;
+    color: #FFFFFF
+}
+
+.game-buttons {
+    list-style-type: none;
+}
+
+.react-tabs_tab-panel--selected {
+    background: #333333;
+}
+
+.react-tabs {
+    -webkit-tap-highlight-color: transparent;
+}
+
+
+.react-tabs__tab-list {
+    border-bottom: 1px solid #C8C372;
+    margin: 0 0 1px;
+    padding: 0;
+    color: #C8C372;
+    background: #333333;
+}
+
+.react-tabs__tab {
+    display: inline-block;
+    border: 1px solid transparent;
+    border-bottom: none;
+    bottom: -1px;
+    position: relative;
+    list-style: none;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+.react-tabs__tab--selected {
+    background: #1E4D2B;
+    border-color: #aaa;
+    color: white;
+    border-radius: 5px 5px 0 0;
+}
+
+.react-tabs__tab--disabled {
+    color: GrayText;
+    cursor: default;
+}
+
+.react-tabs__tab:hover {
+    background: #C9D845;
+    border-radius: 5px 5px 0 0;
+    color: #1E4D2B;
+}
