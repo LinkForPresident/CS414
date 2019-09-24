@@ -1,9 +1,10 @@
 package src;
 
 import src.exception.PlayerNameException;
-
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.lang.*;
+import java.time.*;
 
 public class Game {
 
@@ -13,6 +14,8 @@ public class Game {
     public String[][] board = new String[9][7];
     public Move move = new Move(this);
     public String winner = "";
+    public String startTime;
+    public String endTime = "";
 
     GameUtils gameUtils = new GameUtils();
 
@@ -27,6 +30,9 @@ public class Game {
         else if(playerOneName.equals(playerTwoName)) {
             throw new PlayerNameException("Player One Name cannot be same as Player Two Name!");
         }
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
+        startTime = dtf.format(LocalDateTime.now()).toString();
 
         playerOne = playerOneName;
         playerTwo = playerTwoName;
@@ -63,22 +69,29 @@ public class Game {
         System.out.println("");
     }
 
-    void sendInput(String player, int row, int col){
+    boolean sendInput(String player, int row, int col){
         // send input to the game in the format (player sending move, column selected, row selected)
-        if(isTurn(player)){
+        // returns true if the game state has changed, else returns false
+        if(isTurn(player) && winner.length() == 0){
             if(move.selectedCol == col && move.selectedRow == row){ // if the second half of the move is the same as the first half (re-selecting the same tile)
                 move.selectedCol = -1;
                 move.selectedRow = -1;
+                move.updateValidTiles();
+                return true;
             }
             else if(move.isFriendlyUnit(row, col)){ // if the player is selecting one of their own tiles
                 move.selectedCol = col;
                 move.selectedRow = row;
+                move.updateValidTiles();
+                return true;
             }
             else if(move.validTiles[row][col].equals("*")) { // if row, col is a valid tile to move to
                 makeMove(row, col);
+                move.updateValidTiles();
+                return true;
             }
-            move.updateValidTiles();
         }
+        return false;
     }
 
     private void makeMove(int row, int col){
@@ -125,6 +138,11 @@ public class Game {
         }
         if(redPieces == 0) winner = playerOne;
         if(bluePieces == 0) winner = playerTwo;
+
+        if(winner.length() != 0){
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
+            endTime = dtf.format(LocalDateTime.now()).toString();
+        }
     }
 
     public static void main(String[] arg){
