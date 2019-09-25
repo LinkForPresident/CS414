@@ -5,6 +5,8 @@ import org.junit.Test;
 import org.junit.*;
 import src.exception.PlayerNameException;
 
+import static org.junit.Assert.assertNotEquals;
+
 public class GameTest extends TestCase {
 
     private Game game;
@@ -103,6 +105,164 @@ public class GameTest extends TestCase {
         gameUtils.printBoardVeryVerbose(game.board);
         System.out.println("It is " + game.turn +"'s turn");
         assertEquals(game.turn, "blue");
+    }
+
+    @Test
+    public void testThatBlueRatCanEnterRiver() {
+        //Test that a blue Mouse can enter river
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Bob", 6, 6);
+        game.sendInput("Bob", 6, 5);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Sally", 0, 6);
+        game.sendInput("Sally", 1, 6);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Bob", 6, 5);
+        game.sendInput("Bob", 5, 5);
+        assertTrue(gameUtils.printBoardVeryVerbose(game.board).contains("~Blue Mouse~"));
+    }
+
+    @Test
+    public void testThatBlueLionCanJumpOverRiver() {
+        //Test that a lion can jump over a river
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Bob", 8, 6);
+        game.sendInput("Bob", 8, 5);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Sally", 0, 6);
+        game.sendInput("Sally", 1, 6);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Bob", 8, 5);
+        game.sendInput("Bob", 8, 4);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Sally", 1, 6);
+        game.sendInput("Sally", 0, 6);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Bob", 8, 4);
+        game.sendInput("Bob", 7, 4);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Sally", 0, 6);
+        game.sendInput("Sally", 1, 6);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Bob", 7, 4);
+        game.sendInput("Bob", 7, 3);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Sally", 1, 6);
+        game.sendInput("Sally", 0, 6);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Bob", 7, 3);
+        game.sendInput("Bob", 6, 3);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Sally", 0, 6);
+        game.sendInput("Sally", 1, 6);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Bob", 6, 3);
+        game.sendInput("Bob", 5, 3);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Sally", 1, 6);
+        game.sendInput("Sally", 0, 6);
+        gameUtils.printBoardVeryVerbose(game.board);
+        System.out.println("It is " + game.turn +"'s turn");
+
+        game.sendInput("Bob", 5, 3);
+        game.sendInput("Bob", 5, 6);  //lion is pushed right, towards the river
+        gameUtils.printBoardVeryVerbose(game.board);
+
+        //Assert that Lion properly is on other side of river
+        game.printBoard();
+        assertEquals("b7", game.board[5][6]);
+    }
+
+    @Test
+    public void testFullGameWithBlueWinning() {
+        //Simulate the method calls that will play a full game, from start to
+        // the entering of the Enemy Den by Blue
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Bob", 8, 6);
+        game.sendInput("Bob", 8, 5);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Sally", 0, 6);
+        game.sendInput("Sally", 1, 6);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Bob", 8, 5);
+        game.sendInput("Bob", 8, 4);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Sally", 1, 6);
+        game.sendInput("Sally", 0, 6);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Bob", 8, 4);
+        game.sendInput("Bob", 7, 4);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Sally", 0, 6);
+        game.sendInput("Sally", 1, 6);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Bob", 7, 4);
+        game.sendInput("Bob", 7, 3);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Sally", 1, 6);
+        game.sendInput("Sally", 0, 6);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Bob", 7, 3);
+        game.sendInput("Bob", 6, 3);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Sally", 0, 6);
+        game.sendInput("Sally", 1, 6);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Bob", 6, 3);
+        game.sendInput("Bob", 5, 3);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Sally", 1, 6);
+        game.sendInput("Sally", 0, 6);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Bob", 5, 3);
+        game.sendInput("Bob", 4, 3);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Sally", 0, 6);
+        game.sendInput("Sally", 1, 6);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Bob", 4, 3);
+        game.sendInput("Bob", 3, 3);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Sally", 1, 6);
+        game.sendInput("Sally", 0, 6);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Bob", 3, 3);
+        game.sendInput("Bob", 2, 3);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Sally", 0, 6);
+        game.sendInput("Sally", 1, 6);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Bob", 2, 3);
+        game.sendInput("Bob", 1, 3);
+        gameUtils.printBoardVeryVerbose(game.board);
+        game.sendInput("Sally", 1, 6);
+        game.sendInput("Sally", 0, 6);
+        gameUtils.printBoardVeryVerbose(game.board);
+
+        //At this point no one has won yet
+        assertNotEquals("Sally", game.winner);
+        assertNotEquals("Bob", game.winner);
+
+        game.sendInput("Bob", 1, 3);
+        game.sendInput("Bob", 0, 3);
+        gameUtils.printBoardVeryVerbose(game.board);
+
+        //At this point Bob's Blue Lion has entered Sally's Den, meaning he should have won
+        assertEquals("Bob", game.winner);
+        assertNotEquals("Sally", game.winner);
+
+        //assert that no more moves can be made and that pieces stay on current squares and current turn remains on Blue
+        assertEquals(game.turn, "blue");
+        game.sendInput("Sally", 0, 6);
+        game.sendInput("Sally", 1, 6);
+        gameUtils.printBoardVeryVerbose(game.board);
+
+        //Even after Bob tries to send in another move, since winner has been declared, his Blue Lion should stay on (0,3) and not move
+        game.sendInput("Bob", 0, 3);
+        game.sendInput("Bob", 1, 3);
+        gameUtils.printBoardVeryVerbose(game.board);
+        //Lion should have stayed on 0,3 and not have been moved to 1,3
+        assertEquals("b7", game.board[0][3]);
     }
 
     @Test
