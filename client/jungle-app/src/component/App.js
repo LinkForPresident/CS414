@@ -3,17 +3,20 @@ import React from "react";
 import {Tabs, TabList, Tab, TabPanel} from 'react-tabs';
 import {Button} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
 export default class App extends React.Component {
     state = {
         loggedIn: true,
         activeGames : ["0001", "0002", "0005"],
         completedGames: ["0003", "0004"],
+        selectedGame: null,
     };
 
-    // handleClick = buttonName => {
-    //
-    // };
+
+    setSelectedGame(e) {
+        this.setState({
+            selectedGame: e.target.value
+        });
+    }
 
     render() {
         return (
@@ -28,7 +31,14 @@ export default class App extends React.Component {
                         <Tab>User</Tab>
                     </TabList>
                     <TabPanel><Home/></TabPanel>
-                    <TabPanel><Games activeGames={this.state.activeGames} completedGames={this.state.completedGames}/></TabPanel>
+                    <TabPanel>
+                        <Games
+                            activeGames={this.state.activeGames}
+                            completedGames={this.state.completedGames}
+                            setSelectedGame={this.setSelectedGame.bind(this)}/>
+                        <Board selectedGame={this.state.selectedGame} />
+                    </TabPanel>
+                    <TabPanel></TabPanel>
                     <TabPanel><History/></TabPanel>
                     <TabPanel><Invite/></TabPanel>
                     <TabPanel><Login/></TabPanel>
@@ -58,13 +68,22 @@ class Games extends React.Component {
             activeGames: this.props.activeGames,
             completedGames: this.props.completedGames,
         };
+
     }
 
     render() {
         const activeGamesList = this.state.activeGames.map((game) =>
-            <li className={'list-group-item list-group-item-dark'}><Button>Game Id: {game}</Button> request json</li>);
+            <li className={'list-group-item list-group-item-dark'}>
+                <Button onClick={this.props.setSelectedGame} value={game}
+                >
+                    Game Id: {game}
+                </Button> request json</li>);
         const completedGamesList = this.state.completedGames.map((game) =>
-            <li className={'list-group-item list-group-item-dark'}><Button>Game Id: {game}</Button> request json</li>);
+            <li className={'list-group-item list-group-item-dark'}>
+                <Button onClick={this.props.setSelectedGame} value={game}
+                >
+                    Game Id: {game}
+                </Button> request json</li>);
         return (
             <div className={'GamesPage'}>
                 <h2>Active Games</h2>
@@ -76,7 +95,6 @@ class Games extends React.Component {
                     {completedGamesList}
                 </ul>
 
-                <Board gameId={this.state.selectedGame} />
             </div>
         )
     }
@@ -87,13 +105,15 @@ class Board extends Games {
     constructor(props) {
         super(props);
         this.state = {
-            gameId: this.props.gameId,
-        }
+            background_src: "images/dou_shou_qi_jungle_game-board.jpg",
+        };
+
     }
     render() {
         return(
             <div className={'Board'}>
-                <p>Put the actual board here for game ({this.state.gameId})</p>
+                <p>Put the actual board here for game ({this.props.selectedGame})</p>
+                <img src={this.state.background_src} />
             </div>
         )
     }
