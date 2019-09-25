@@ -9,12 +9,24 @@
     </head>
     <body>
         <header id="navbar">
-            <a href="index.html">Home</a>
-            <a href="invite.html">Invite</a>
-            <a href="user.html">My Profile</a>
-            <a href="game.html">Game</a>
-            <a href="login.html" >Login</a>
         </header>
-        <h1>Login page</h1>
+
+        <h1>Login:</h1>
+
+        <form id="login" action="" method="post">
+            <input name="action" value="login" hidden>
+            <label for="login_username">Username: </label><input type="text" id="login_username" name="username" style="display:block;">
+            <label for="login_password">Password: </label><input type="password" id="login_password" name="password" style="display:block;">
+            <input type="submit" name="submit" value="Login" style="display:block">
+        </form>
+
+        <h1>...or Register a new account:</h1>
+        <form id="register" action="" method="post">
+            <input name="action" value="user_registration" hidden>
+            <label for="register_username">Username: </label><input type="text" id="register_username" name="username" style="display:block;">
+            <label for="register_password">Password: </label><input type="password" id="register_password" name="password" style="display:block;">
+            <input type="submit" name="submit" value="Register" style="display:block">
+        </form>
+
     </body>
 </html>
