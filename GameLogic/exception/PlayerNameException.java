@@ -1,4 +1,4 @@
-package src.exception;
+package GameLogic.exception;
 
 public class PlayerNameException extends Exception{
     public PlayerNameException(String msg) {

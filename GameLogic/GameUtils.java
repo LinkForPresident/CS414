@@ -1,4 +1,4 @@
-package src;
+package GameLogic;
 
 public class GameUtils {
     // This class contains methods that are useful to be used with Game object

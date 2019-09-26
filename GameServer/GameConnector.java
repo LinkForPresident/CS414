@@ -1,5 +1,7 @@
 package GameServer;
 
+// import GameLogic.exception.PlayerNameException;
+
 import java.io.*;
 import java.net.Socket;
 import java.sql.SQLException;
@@ -195,7 +197,9 @@ class GameConnector extends Server{
                 handleLogout();
                 break;
             case "create_game":
-                // createGame();
+               // try {
+               //     createGame(request.playerOne, request.playerTwo);
+              //  }catch(PlayerNameException | SQLNonTransientConnectionException e){}
                 break;
             case "enter_game":
                 // enterGame();
@@ -207,7 +211,7 @@ class GameConnector extends Server{
                 // movePiece();
                 break;
             case "view_stats":
-                // viewStats();
+                // viewPlayerStats();
                 break;
         }
     }

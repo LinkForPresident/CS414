@@ -4,7 +4,13 @@ import java.net.*;
 import java.io.*;
 import java.lang.*;
 import java.sql.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.NoSuchElementException;
+//import GameLogic.*;
+//import GameLogic.exception.PlayerNameException;
 
 public class Server extends Thread{
 
@@ -44,7 +50,6 @@ public class Server extends Thread{
     protected void serve(){
 
         try{
-            //connectToDatabase();
             serverListener = new ServerSocket(PORT_NUMBER); // Set up server to listen at PORT_NUMBER.
             System.out.println(INFO_TAG + "GameServer listening.");
 
@@ -60,7 +65,6 @@ public class Server extends Thread{
                 thread.start();
             }
         }catch(IOException e){}
-
     }
 
     protected void establishDatabaseProxyAddress() throws IOException, InterruptedException, ClassNotFoundException, SQLException {
@@ -119,7 +123,6 @@ public class Server extends Thread{
         }
         PROXY_ADDRESS = "jdbc:mariadb://" + PROXY_ADDRESS + "/cs414";
         System.out.println(DEBUG_TAG + "Parsed remote proxy database address: " + PROXY_ADDRESS);
-
     }
 
     String getHTMLPage(String path) throws IOException{
@@ -146,7 +149,6 @@ public class Server extends Thread{
         Connection connection;
         Statement statement;
         try {
-            //connectToDatabase();
             Class.forName(JDBC_DRIVER); // register the JDBC driver.
             connection = DriverManager.getConnection(
                     PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
@@ -175,7 +177,6 @@ public class Server extends Thread{
         Connection connection;
         Statement statement;
         try {
-            //connectToDatabase();
             Class.forName(JDBC_DRIVER); // register the JDBC driver.
             connection = DriverManager.getConnection(
                     PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
@@ -206,7 +207,6 @@ public class Server extends Thread{
         Connection connection;
         Statement statement;
         try {
-          //  connectToDatabase();
             Class.forName(JDBC_DRIVER); // register the JDBC driver.
             connection = DriverManager.getConnection(
                     PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
@@ -228,7 +228,6 @@ public class Server extends Thread{
         Connection connection;
         Statement statement;
         try {
-            //connectToDatabase();
             Class.forName(JDBC_DRIVER); // register the JDBC driver.
             connection = DriverManager.getConnection(
                     PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
@@ -243,6 +242,57 @@ public class Server extends Thread{
         } catch (SQLException | ClassNotFoundException  e) {
             e.printStackTrace();
         }
+    }
+
+  /*  void createGame(String playerOne, String playerTwo) throws PlayerNameException, SQLNonTransientConnectionException {
+        // handle a POST request to register a new game in the system.
+        System.out.println(String.format(INFO_TAG + "Attempting to create a new game with Player One: %s and Player Two: %s .", playerOne, playerTwo));
+        Game newGame = new Game(playerOne, playerTwo);
+        String activePlayer = playerOne;
+        String boardState = Arrays.deepToString(newGame.board);
+        String gameState = "Created";
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        String startDate = dateFormat.format(new Date());
+        Connection connection;
+        Statement statement;
+        try {
+            Class.forName(JDBC_DRIVER); // register the JDBC driver.
+            connection = DriverManager.getConnection(
+                    PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
+            statement = connection.createStatement();
+            String createGame = String.format("INSERT INTO Game(player_one, player_two, active_player," +
+                    "board_state, game_state, start_date) VALUES('%s', '%s', '%s', '%s', '%s', '%s')",
+                    playerOne, playerTwo, activePlayer, boardState, gameState, startDate);
+            statement.executeQuery(createGame);
+
+        } catch(SQLNonTransientConnectionException e){
+            throw new SQLNonTransientConnectionException();
+
+        } catch (SQLException | ClassNotFoundException  e) {
+            e.printStackTrace();
+        }
+    }
+    */
+
+
+    void movePiece(){
+
+    }
+
+    void invitePlayer(){
+
+    }
+
+    void forfeitGame(){
+
+    }
+
+    void tearDownGame(){
+
+    }
+
+    void viewPlayerStats(){
+
     }
 
     public static void main(String[] args){

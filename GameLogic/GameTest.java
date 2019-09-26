@@ -1,9 +1,9 @@
-package src;
+package GameLogic;
 
 import junit.framework.*;
 import org.junit.Test;
 import org.junit.*;
-import src.exception.PlayerNameException;
+import GameLogic.exception.PlayerNameException;
 
 public class GameTest extends TestCase {
 

@@ -1,6 +1,5 @@
-package src;
+package GameLogic;
 
-import java.nio.channels.SelectableChannel;
 import java.util.Arrays;
 
 class Move {

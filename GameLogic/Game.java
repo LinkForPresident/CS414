@@ -1,6 +1,7 @@
-package src;
+package GameLogic;
 
-import src.exception.PlayerNameException;
+import GameLogic.exception.PlayerNameException;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.lang.*;
