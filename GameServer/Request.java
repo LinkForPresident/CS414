@@ -23,7 +23,7 @@ public class Request extends GameConnector{
     protected String playerOne;
     protected String playerTwo;
 
-    public Request(BufferedReader bufferedReader, Socket clientSocket) throws IOException, ArrayIndexOutOfBoundsException, NullPointerException{
+    public Request(BufferedReader bufferedReader, Socket clientSocket) throws ArrayIndexOutOfBoundsException, NullPointerException{
         // constructor
         this.bufferedReader = bufferedReader;
         this.clientSocket = clientSocket;

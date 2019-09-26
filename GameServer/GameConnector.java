@@ -1,10 +1,7 @@
 package GameServer;
 
-// import GameLogic.exception.PlayerNameException;
-
 import java.io.*;
 import java.net.Socket;
-import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.util.NoSuchElementException;
 
@@ -247,17 +244,9 @@ class GameConnector extends Server{
     private void handleLogout() throws IOException{
         // handle a client requesting to log out.
         System.out.println(String.format(INFO_TAG + "Attempting to log out user %s", request.username));
-        try {
             logout(request.cookie);
             System.out.println(String.format(INFO_TAG + "User %s has been logged out", request.username));
             redirectTo("/login.html");
-        }catch(SQLNonTransientConnectionException sql){
-            System.out.println(ERROR_TAG + "Encountered an error while attempting handle a logout attempt due to a " +
-                    "problem connecting to the database. (HINT: the proxy server is likely different than what is set.)" +
-                    "Redirecting to login.html.");
-            sql.printStackTrace();
-            redirectTo("/login.html");
-        }
     }
 
     private void handleUserRegistration() throws IOException{

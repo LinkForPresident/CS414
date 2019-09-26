@@ -15,6 +15,7 @@ public class GameTest extends TestCase {
         // This will run before every method
         System.out.println("\nSTART OF TEST\n===================");
         game = new Game("Bob", "Sally");
+        System.out.println("Start Time: "+ game.startTime);
     }
 
     @Test
@@ -191,8 +192,14 @@ public class GameTest extends TestCase {
         game.board = newBoard;
 
         game.sendInput("Bob", 1, 2);
+        try {
+            Thread.sleep(4000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         game.sendInput("Bob", 1, 1);
         assertEquals("Bob", game.winner);
+        System.out.println("End Time: " + game.endTime);
     }
 
     @Test
