@@ -143,17 +143,17 @@ class GameConnector extends Server{
             outputStream.println(HEADER + "\r\n\r\n");
             throw new FileNotFoundException();
         }
-        try{
-            establishDatabaseProxyAddress();
-        }catch(InterruptedException | ClassNotFoundException | SQLException e){
-            System.out.println(ERROR_TAG + "Encountered an error while attempting to curl proxy server credentials for the database.");
-            e.printStackTrace();
-        }
+        //try{
+         //   establishDatabaseProxyAddress();
+       // }catch(InterruptedException | ClassNotFoundException | SQLException e){
+          //  System.out.println(ERROR_TAG + "Encountered an error while attempting to curl proxy server credentials for the database.");
+           // e.printStackTrace();
+       // }
     }
 
     private void handleRequest() throws IOException{
         // handle the client requests, GET aor POST.
-        System.out.println(INFO_TAG + "Handling request!");
+        System.out.println(INFO_TAG + "Handling request.");
         switch(request.method){
             case "GET":
                 handleGETRequest(request.path);
@@ -166,18 +166,19 @@ class GameConnector extends Server{
 
     private boolean clientIsAuthenticated() throws SQLNonTransientConnectionException{
         // check if client is logged in, or is trying to either register, login or logout.
+        System.out.println(INFO_TAG + "Checking is client is authenticated for this action.");
         return request.action.equals("user_registration") || request.action.equals("login") || request.action.equals("logout") || isLoggedIn(request.cookie);
     }
 
     private void handleGETRequest(String path) throws IOException {
         // handle a client GET request.
-        System.out.println(INFO_TAG + "Handling GET request!");
+        System.out.println(INFO_TAG + "Handling GET request.");
         String htmlResponse = HEADER + "\r\n\r\n";
         try {
             htmlResponse += getHTMLPage(path);  // get the HTML source.
             outputStream.println(htmlResponse); // send the response to the client.
         }catch(FileNotFoundException e){
-            System.out.println(String.format(WARNING_TAG + "404 file %s not found", path));
+            System.out.println(String.format(WARNING_TAG + "404 file %s not found.", path));
             e.printStackTrace();
             outputStream.println("404 file not found.");
         }
@@ -185,9 +186,10 @@ class GameConnector extends Server{
 
     private void handlePOSTRequest() throws IOException{
         // handle a client POST request.
+        System.out.println(INFO_TAG + "Handling POST request.");
         switch (request.action) {
             case "user_registration":
-                System.out.println(INFO_TAG + "User is trying to register!");
+                System.out.println(INFO_TAG + "User is trying to register.");
                 handleUserRegistration();
                 break;
             case "login":

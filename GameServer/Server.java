@@ -6,9 +6,8 @@ import java.lang.*;
 import java.sql.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
+import java.util.*;
 import java.util.Date;
-import java.util.NoSuchElementException;
 //import GameLogic.*;
 //import GameLogic.exception.PlayerNameException;
 
@@ -23,9 +22,11 @@ public class Server extends Thread{
     private ServerSocket serverListener;
 
     private static final String JDBC_DRIVER = "org.mariadb.jdbc.Driver";
-    private String PROXY_ADDRESS = "jdbc:mariadb://proxy19.rt3.io:39136/cs414";
+    private static String PROXY_ADDRESS = "jdbc:mariadb://proxy19.rt3.io:39136/cs414";
     private static final String DB_USERNAME = "user";
     private static final String DB_PASSWORD = "the_password_123";
+
+    private static List<Double> loggedInUsers = new ArrayList<>();
 
     private static String devAPIKey = "MTA2M0FGNDUtM0M1QS00ODMyLUFDNDgtOEVBQ0E1Q0JBRUU1";
     private static String deviceAddress = "80:00:00:00:01:01:38:E9";
@@ -146,32 +147,20 @@ public class Server extends Thread{
     // check whether a client is logged in, i.e. the client IP address is an entry in the Logged_In table.
         System.out.println(String.format(INFO_TAG + "Checking if user with user_hash: %f is logged in.", user_hash));
         boolean loggedIn = false;
-        Connection connection;
-        Statement statement;
-        try {
-            Class.forName(JDBC_DRIVER); // register the JDBC driver.
-            connection = DriverManager.getConnection(
-                    PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
-            statement = connection.createStatement();
-            String checkAuth = String.format("SELECT 1 FROM Logged_in WHERE user_hash='%f'", user_hash);
-            ResultSet resultSet = statement.executeQuery(checkAuth);
-
-            if(resultSet.next()){ // User exists and has been authenticated, the request handling can continue.
-                loggedIn = true;
-            }
-            else{   // User does not exist. Stop the request handling.
-                loggedIn = false;
-            }
-        } catch(SQLNonTransientConnectionException e){
-            throw new SQLNonTransientConnectionException();
-
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
+        if(loggedInUsers.contains(user_hash)){
+            loggedIn = true;
         }
         return loggedIn;
     }
 
     void login(double user_hash) throws SQLNonTransientConnectionException {
+
+        try{
+            establishDatabaseProxyAddress();
+        }catch(InterruptedException | ClassNotFoundException | SQLException | IOException e){
+            System.out.println(ERROR_TAG + "Encountered an error while attempting to curl proxy server credentials for the database.");
+            e.printStackTrace();
+        }
         System.out.println(String.format(INFO_TAG + "Attempting to log in user with user_hash: %f.", user_hash));
         // Handle a POST request to login a client.
         Connection connection;
@@ -185,9 +174,8 @@ public class Server extends Thread{
             String checkAuth = String.format("SELECT 1 FROM User WHERE hash_code='%f'", user_hash);
             ResultSet resultSet = statement.executeQuery(checkAuth);
 
-            if (resultSet.next()) { // User exists and has been authenticated, place IP into Logged_In table.
-                String addToLoggedIn = String.format("INSERT INTO Logged_in VALUES ('%f');", user_hash);
-                statement.executeQuery(addToLoggedIn);
+            if (resultSet.next()) { // User exists and has been authenticated, place user_hash into loggedInUsers list.
+                loggedInUsers.add(user_hash);
             } else {   // User does not exist. Stop the request handling.
                 throw new NoSuchElementException(String.format(DEBUG_TAG + "User %f does not exist!", user_hash));
             }
@@ -201,29 +189,21 @@ public class Server extends Thread{
         }
     }
 
-    void logout(double user_hash) throws SQLNonTransientConnectionException{
+    void logout(double user_hash){
         // Handle a POST request to logout a client.
-        System.out.println(String.format(INFO_TAG + "Attempting to log out user with user_hash: %f.", user_hash));
-        Connection connection;
-        Statement statement;
-        try {
-            Class.forName(JDBC_DRIVER); // register the JDBC driver.
-            connection = DriverManager.getConnection(
-                    PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
-            statement = connection.createStatement();
-            String logOut = String.format("DELETE FROM Logged_in WHERE user_hash='%f'", user_hash);
-            statement.executeQuery(logOut);
-
-        } catch(SQLNonTransientConnectionException e){
-            throw new SQLNonTransientConnectionException();
-
-        } catch (SQLException | ClassNotFoundException  e) {
-            e.printStackTrace();
-        }
+        // Remove user_hash from loggedInUsers list.
+       loggedInUsers.remove(user_hash);
     }
 
     void registerUser(String username, String password, double user_hash) throws SQLNonTransientConnectionException{
         // handle a POST request to register a new user in the system.
+
+        try{
+            establishDatabaseProxyAddress();
+        }catch(InterruptedException | ClassNotFoundException | SQLException | IOException e){
+            System.out.println(ERROR_TAG + "Encountered an error while attempting to curl proxy server credentials for the database.");
+            e.printStackTrace();
+        }
         System.out.println(String.format(INFO_TAG + "Attempting to register new user with username: %s , password: %s , user_hash: %f.", username, password, user_hash));
         Connection connection;
         Statement statement;

@@ -33,7 +33,7 @@ public class Request extends GameConnector{
     protected int parseRequest() throws IOException, ArrayIndexOutOfBoundsException, NullPointerException{
         // parse the request for various arguments and parameters.
         System.out.println(INFO_TAG + "Attempting to parse the request for parameters.");
-        clientIP = clientSocket.getRemoteSocketAddress().toString().split(":")[0];
+        // clientIP = clientSocket.getRemoteSocketAddress().toString().split(":")[0];
         method = DEFAULT_METHOD; // GET, POST, etc.
         path = DEFAULT_PAGE; // used for GET requests.
 
