@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@csstools/normalize.css": "^10.1.0",
+    "axios": "^0.19.0",
     "bootstrap": "^4.3.1",
     "jquery": "^3.4.1",
     "react": "^16.9.0",
