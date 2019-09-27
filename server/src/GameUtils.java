@@ -16,8 +16,9 @@ public class GameUtils {
         System.out.println("");
     }
 
-    void printBoardVeryVerbose(String[][] board){
+    String printBoardVeryVerbose(String[][] board){
         // prints out the board in a readable fashion, including Trap and River squares, and full piece names
+        String fullOut = "";
         for(int x=0; x<board.length; x++) {
             for(int y = 0; y<board[x].length; y++) {
                 String out = getSquare(x,y,getRealPieceName(board[x][y]));
@@ -25,10 +26,12 @@ public class GameUtils {
                     out += " ";
                 }
                 System.out.print(out);
+                fullOut += out;
             }
             System.out.println();
         }
         System.out.println("\n");
+        return fullOut;
     }
 
     String getSquare(int x, int y, String piece) {
