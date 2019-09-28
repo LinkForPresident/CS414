@@ -4,7 +4,7 @@ import java.net.*;
 import java.io.*;
 import java.lang.*;
 import java.sql.*;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 public class Server extends Thread{
 
@@ -17,9 +17,11 @@ public class Server extends Thread{
     private ServerSocket serverListener;
 
     private static final String JDBC_DRIVER = "org.mariadb.jdbc.Driver";
-    private String PROXY_ADDRESS = "jdbc:mariadb://proxy19.rt3.io:39136/cs414";
+    private static String PROXY_ADDRESS = "jdbc:mariadb://proxy19.rt3.io:39136/cs414";
     private static final String DB_USERNAME = "user";
     private static final String DB_PASSWORD = "the_password_123";
+
+    private static List<Double> loggedInUsers = new ArrayList<>();
 
     private static String devAPIKey = "MTA2M0FGNDUtM0M1QS00ODMyLUFDNDgtOEVBQ0E1Q0JBRUU1";
     private static String deviceAddress = "80:00:00:00:01:01:38:E9";
@@ -44,7 +46,6 @@ public class Server extends Thread{
     protected void serve(){
 
         try{
-            //connectToDatabase();
             serverListener = new ServerSocket(PORT_NUMBER); // Set up server to listen at PORT_NUMBER.
             System.out.println(INFO_TAG + "GameServer listening.");
 
@@ -60,7 +61,6 @@ public class Server extends Thread{
                 thread.start();
             }
         }catch(IOException e){}
-
     }
 
     protected void establishDatabaseProxyAddress() throws IOException, InterruptedException, ClassNotFoundException, SQLException {
@@ -119,7 +119,6 @@ public class Server extends Thread{
         }
         PROXY_ADDRESS = "jdbc:mariadb://" + PROXY_ADDRESS + "/cs414";
         System.out.println(DEBUG_TAG + "Parsed remote proxy database address: " + PROXY_ADDRESS);
-
     }
 
     String getHTMLPage(String path) throws IOException{
@@ -143,39 +142,25 @@ public class Server extends Thread{
     // check whether a client is logged in, i.e. the client IP address is an entry in the Logged_In table.
         System.out.println(String.format(INFO_TAG + "Checking if user with user_hash: %f is logged in.", user_hash));
         boolean loggedIn = false;
-        Connection connection;
-        Statement statement;
-        try {
-            //connectToDatabase();
-            Class.forName(JDBC_DRIVER); // register the JDBC driver.
-            connection = DriverManager.getConnection(
-                    PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
-            statement = connection.createStatement();
-            String checkAuth = String.format("SELECT 1 FROM Logged_in WHERE user_hash='%f'", user_hash);
-            ResultSet resultSet = statement.executeQuery(checkAuth);
-
-            if(resultSet.next()){ // User exists and has been authenticated, the request handling can continue.
-                loggedIn = true;
-            }
-            else{   // User does not exist. Stop the request handling.
-                loggedIn = false;
-            }
-        } catch(SQLNonTransientConnectionException e){
-            throw new SQLNonTransientConnectionException();
-
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
+        if(loggedInUsers.contains(user_hash)){
+            loggedIn = true;
         }
         return loggedIn;
     }
 
     void login(double user_hash) throws SQLNonTransientConnectionException {
+
+        try{
+            establishDatabaseProxyAddress();
+        }catch(InterruptedException | ClassNotFoundException | SQLException | IOException e){
+            System.out.println(ERROR_TAG + "Encountered an error while attempting to curl proxy server credentials for the database.");
+            e.printStackTrace();
+        }
         System.out.println(String.format(INFO_TAG + "Attempting to log in user with user_hash: %f.", user_hash));
         // Handle a POST request to login a client.
         Connection connection;
         Statement statement;
         try {
-            //connectToDatabase();
             Class.forName(JDBC_DRIVER); // register the JDBC driver.
             connection = DriverManager.getConnection(
                     PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
@@ -184,9 +169,8 @@ public class Server extends Thread{
             String checkAuth = String.format("SELECT 1 FROM User WHERE hash_code='%f'", user_hash);
             ResultSet resultSet = statement.executeQuery(checkAuth);
 
-            if (resultSet.next()) { // User exists and has been authenticated, place IP into Logged_In table.
-                String addToLoggedIn = String.format("INSERT INTO Logged_in VALUES ('%f');", user_hash);
-                statement.executeQuery(addToLoggedIn);
+            if (resultSet.next()) { // User exists and has been authenticated, place user_hash into loggedInUsers list.
+                loggedInUsers.add(user_hash);
             } else {   // User does not exist. Stop the request handling.
                 throw new NoSuchElementException(String.format(DEBUG_TAG + "User %f does not exist!", user_hash));
             }
@@ -200,35 +184,25 @@ public class Server extends Thread{
         }
     }
 
-    void logout(double user_hash) throws SQLNonTransientConnectionException{
+    void logout(double user_hash){
         // Handle a POST request to logout a client.
-        System.out.println(String.format(INFO_TAG + "Attempting to log out user with user_hash: %f.", user_hash));
-        Connection connection;
-        Statement statement;
-        try {
-          //  connectToDatabase();
-            Class.forName(JDBC_DRIVER); // register the JDBC driver.
-            connection = DriverManager.getConnection(
-                    PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
-            statement = connection.createStatement();
-            String logOut = String.format("DELETE FROM Logged_in WHERE user_hash='%f'", user_hash);
-            statement.executeQuery(logOut);
-
-        } catch(SQLNonTransientConnectionException e){
-            throw new SQLNonTransientConnectionException();
-
-        } catch (SQLException | ClassNotFoundException  e) {
-            e.printStackTrace();
-        }
+        // Remove user_hash from loggedInUsers list.
+       loggedInUsers.remove(user_hash);
     }
 
     void registerUser(String username, String password, double user_hash) throws SQLNonTransientConnectionException{
         // handle a POST request to register a new user in the system.
+
+        try{
+            establishDatabaseProxyAddress();
+        }catch(InterruptedException | ClassNotFoundException | SQLException | IOException e){
+            System.out.println(ERROR_TAG + "Encountered an error while attempting to curl proxy server credentials for the database.");
+            e.printStackTrace();
+        }
         System.out.println(String.format(INFO_TAG + "Attempting to register new user with username: %s , password: %s , user_hash: %f.", username, password, user_hash));
         Connection connection;
         Statement statement;
         try {
-            //connectToDatabase();
             Class.forName(JDBC_DRIVER); // register the JDBC driver.
             connection = DriverManager.getConnection(
                     PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
@@ -243,6 +217,57 @@ public class Server extends Thread{
         } catch (SQLException | ClassNotFoundException  e) {
             e.printStackTrace();
         }
+    }
+
+  /*  void createGame(String playerOne, String playerTwo) throws PlayerNameException, SQLNonTransientConnectionException {
+        // handle a POST request to register a new game in the system.
+        System.out.println(String.format(INFO_TAG + "Attempting to create a new game with Player One: %s and Player Two: %s .", playerOne, playerTwo));
+        Game newGame = new Game(playerOne, playerTwo);
+        String activePlayer = playerOne;
+        String boardState = Arrays.deepToString(newGame.board);
+        String gameState = "Created";
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        String startDate = dateFormat.format(new Date());
+        Connection connection;
+        Statement statement;
+        try {
+            Class.forName(JDBC_DRIVER); // register the JDBC driver.
+            connection = DriverManager.getConnection(
+                    PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
+            statement = connection.createStatement();
+            String createGame = String.format("INSERT INTO Game(player_one, player_two, active_player," +
+                    "board_state, game_state, start_date) VALUES('%s', '%s', '%s', '%s', '%s', '%s')",
+                    playerOne, playerTwo, activePlayer, boardState, gameState, startDate);
+            statement.executeQuery(createGame);
+
+        } catch(SQLNonTransientConnectionException e){
+            throw new SQLNonTransientConnectionException();
+
+        } catch (SQLException | ClassNotFoundException  e) {
+            e.printStackTrace();
+        }
+    }
+    */
+
+
+    void movePiece(){
+
+    }
+
+    void invitePlayer(){
+
+    }
+
+    void forfeitGame(){
+
+    }
+
+    void tearDownGame(){
+
+    }
+
+    void viewPlayerStats(){
+
     }
 
     public static void main(String[] args){

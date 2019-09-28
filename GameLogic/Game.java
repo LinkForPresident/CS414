@@ -1,7 +1,13 @@
-package src;
+package GameLogic;
 
+<<<<<<< HEAD:GameLogic/Game.java
+import GameLogic.exception.PlayerNameException;
+import org.jetbrains.annotations.NotNull;
+
+=======
 import src.exception.PlayerNameException;
 import java.time.format.DateTimeFormatter;
+>>>>>>> master:server/src/Game.java
 import java.util.Arrays;
 import java.lang.*;
 import java.time.*;

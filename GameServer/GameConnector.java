@@ -2,7 +2,6 @@ package GameServer;
 
 import java.io.*;
 import java.net.Socket;
-import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.util.NoSuchElementException;
 
@@ -13,7 +12,7 @@ class GameConnector extends Server{
     private PrintWriter outputStream;
     BufferedReader bufferedReader;
     private Request request;
-    private String HEADER = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n";
+    private String HEADER = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: POST, GET, OPTIONS\r\nAccess-Control-Allow-Headers: *\r\n";
 
     GameConnector(){
         // generic constructor, needed to avoid a compilation error.
@@ -141,17 +140,17 @@ class GameConnector extends Server{
             outputStream.println(HEADER + "\r\n\r\n");
             throw new FileNotFoundException();
         }
-        try{
-            establishDatabaseProxyAddress();
-        }catch(InterruptedException | ClassNotFoundException | SQLException e){
-            System.out.println(ERROR_TAG + "Encountered an error while attempting to curl proxy server credentials for the database.");
-            e.printStackTrace();
-        }
+        //try{
+         //   establishDatabaseProxyAddress();
+       // }catch(InterruptedException | ClassNotFoundException | SQLException e){
+          //  System.out.println(ERROR_TAG + "Encountered an error while attempting to curl proxy server credentials for the database.");
+           // e.printStackTrace();
+       // }
     }
 
     private void handleRequest() throws IOException{
         // handle the client requests, GET aor POST.
-        System.out.println(INFO_TAG + "Handling request!");
+        System.out.println(INFO_TAG + "Handling request.");
         switch(request.method){
             case "GET":
                 handleGETRequest(request.path);
@@ -164,18 +163,19 @@ class GameConnector extends Server{
 
     private boolean clientIsAuthenticated() throws SQLNonTransientConnectionException{
         // check if client is logged in, or is trying to either register, login or logout.
+        System.out.println(INFO_TAG + "Checking is client is authenticated for this action.");
         return request.action.equals("user_registration") || request.action.equals("login") || request.action.equals("logout") || isLoggedIn(request.cookie);
     }
 
     private void handleGETRequest(String path) throws IOException {
         // handle a client GET request.
-        System.out.println(INFO_TAG + "Handling GET request!");
+        System.out.println(INFO_TAG + "Handling GET request.");
         String htmlResponse = HEADER + "\r\n\r\n";
         try {
             htmlResponse += getHTMLPage(path);  // get the HTML source.
             outputStream.println(htmlResponse); // send the response to the client.
         }catch(FileNotFoundException e){
-            System.out.println(String.format(WARNING_TAG + "404 file %s not found", path));
+            System.out.println(String.format(WARNING_TAG + "404 file %s not found.", path));
             e.printStackTrace();
             outputStream.println("404 file not found.");
         }
@@ -183,9 +183,10 @@ class GameConnector extends Server{
 
     private void handlePOSTRequest() throws IOException{
         // handle a client POST request.
+        System.out.println(INFO_TAG + "Handling POST request.");
         switch (request.action) {
             case "user_registration":
-                System.out.println(INFO_TAG + "User is trying to register!");
+                System.out.println(INFO_TAG + "User is trying to register.");
                 handleUserRegistration();
                 break;
             case "login":
@@ -195,7 +196,9 @@ class GameConnector extends Server{
                 handleLogout();
                 break;
             case "create_game":
-                // createGame();
+               // try {
+               //     createGame(request.playerOne, request.playerTwo);
+              //  }catch(PlayerNameException | SQLNonTransientConnectionException e){}
                 break;
             case "enter_game":
                 // enterGame();
@@ -207,7 +210,7 @@ class GameConnector extends Server{
                 // movePiece();
                 break;
             case "view_stats":
-                // viewStats();
+                // viewPlayerStats();
                 break;
         }
     }
@@ -230,7 +233,7 @@ class GameConnector extends Server{
             redirectTo("/login.html");
         }
         catch(SQLNonTransientConnectionException sql){
-            System.out.println(ERROR_TAG + "Encountered an error while attempting handle a login attempt due to a " +
+            System.out.println(ERROR_TAG + "Encountered an error while attempting happlication/jsonandle a login attempt due to a " +
                     "problem connecting to the database. (HINT: the proxy server is likely different than what is set.)" +
                     "Redirecting to login.html.");
             sql.printStackTrace();
@@ -241,17 +244,9 @@ class GameConnector extends Server{
     private void handleLogout() throws IOException{
         // handle a client requesting to log out.
         System.out.println(String.format(INFO_TAG + "Attempting to log out user %s", request.username));
-        try {
             logout(request.cookie);
             System.out.println(String.format(INFO_TAG + "User %s has been logged out", request.username));
             redirectTo("/login.html");
-        }catch(SQLNonTransientConnectionException sql){
-            System.out.println(ERROR_TAG + "Encountered an error while attempting handle a logout attempt due to a " +
-                    "problem connecting to the database. (HINT: the proxy server is likely different than what is set.)" +
-                    "Redirecting to login.html.");
-            sql.printStackTrace();
-            redirectTo("/login.html");
-        }
     }
 
     private void handleUserRegistration() throws IOException{
