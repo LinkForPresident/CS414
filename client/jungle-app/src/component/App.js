@@ -58,6 +58,7 @@ export default class App extends React.Component {
 
     postExample () {
         console.log("Making request");
+        var self = this;
         axios.post('http://129.82.44.123:8080',
             // "action=login&username=dummy_user&password=iforgot123",
             "action=move_piece&gameID=1234&username=dummy_user&row=8&column=0",
@@ -67,10 +68,37 @@ export default class App extends React.Component {
                     'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH',
                 }
             })
-            // .then(response => (updatedResponse))
-            .then(response => this.setState({
-                gameState: response.data
-            }))
+            .then (function(response) {
+                let availableMovesProto = response.data.availableMoves;
+                availableMovesProto = availableMovesProto.split("|");
+                let availableMoves = [];
+                availableMovesProto.forEach(function(element){
+                    let elems = element.split(",");
+                    let row = [];
+                    elems.forEach(function(elem){
+                        row.push(elem);
+                    });
+                    availableMoves.push(row);
+                });
+                console.log(availableMoves);
+                let boardStateProto = response.data.board;
+                boardStateProto = boardStateProto.split("|");
+                let boardState = [];
+                boardStateProto.forEach(function(element){
+                    let elems = element.split(",");
+                    let row = [];
+                    elems.forEach(function(elem){
+                        row.push(elem);
+                    });
+                    boardState.push(row);
+                });
+                console.log(boardState);
+                response.data.availableMoves = availableMoves;
+                response.data.board = boardState;
+                self.setState({
+                    gameState: response.data
+                })
+            })
             .catch();
         let board = this.state.gameState.board;
         console.log(this.state.gameState);
