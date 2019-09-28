@@ -12,7 +12,7 @@ class GameConnector extends Server{
     private PrintWriter outputStream;
     BufferedReader bufferedReader;
     private Request request;
-    private String HEADER = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n";
+    private String HEADER = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: POST, GET, OPTIONS\r\nAccess-Control-Allow-Headers: *\r\n";
 
     GameConnector(){
         // generic constructor, needed to avoid a compilation error.
@@ -233,7 +233,7 @@ class GameConnector extends Server{
             redirectTo("/login.html");
         }
         catch(SQLNonTransientConnectionException sql){
-            System.out.println(ERROR_TAG + "Encountered an error while attempting handle a login attempt due to a " +
+            System.out.println(ERROR_TAG + "Encountered an error while attempting happlication/jsonandle a login attempt due to a " +
                     "problem connecting to the database. (HINT: the proxy server is likely different than what is set.)" +
                     "Redirecting to login.html.");
             sql.printStackTrace();

@@ -72,13 +72,15 @@ public class Request extends GameConnector{
                 char[] temp = new char[length];
                 bufferedReader.read(temp);
                 String[] kv_arr = new String(temp).split("&"); // split by key-value pair, which are separated by &;
+                for (String arg : kv_arr){
+					System.out.println(arg);
+                }
                 // extract the POST request arguments.
                 for (String arg : kv_arr) {
                     String[] kv = arg.split("=");   // split by key and and value, which are separated by =
                     String key = kv[0];
                     String value = kv[1];
                     args.put(key, value);
-
                 }
                 action = args.get("action"); // whatever the client is trying to do: "login", "move_piece", etc.
                 System.out.println(String.format(DEBUG_TAG + "The action of the POST request is: %s.", action));
