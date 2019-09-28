@@ -1,16 +1,14 @@
 package GameLogic;
 
-<<<<<<< HEAD:GameLogic/Game.java
-import GameLogic.exception.PlayerNameException;
-import org.jetbrains.annotations.NotNull;
 
-=======
-import src.exception.PlayerNameException;
+import GameLogic.exception.PlayerNameException;
+
 import java.time.format.DateTimeFormatter;
->>>>>>> master:server/src/Game.java
+
 import java.util.Arrays;
 import java.lang.*;
 import java.time.*;
+import java.util.Random;
 
 public class Game {
 
@@ -22,6 +20,8 @@ public class Game {
     public String winner = "";
     public String startTime;
     public String endTime = "";
+    public int turnNumber = 0;
+    public String gameID;
 
     GameUtils gameUtils = new GameUtils();
 
@@ -40,6 +40,8 @@ public class Game {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
         startTime = dtf.format(LocalDateTime.now()).toString();
 
+        gameID = new Random(System.currentTimeMillis()).toString();
+        
         playerOne = playerOneName;
         playerTwo = playerTwoName;
         turn = "blue";
@@ -75,7 +77,7 @@ public class Game {
         System.out.println("");
     }
 
-    boolean sendInput(String player, int row, int col){
+    public boolean sendInput(String player, int row, int col){
         // send input to the game in the format (player sending move, column selected, row selected)
         // returns true if the game state has changed, else returns false
         if(isTurn(player) && winner.length() == 0){
@@ -102,6 +104,7 @@ public class Game {
 
     private void makeMove(int row, int col){
         // once a valid move has been constructed, make it.
+        turnNumber++;
         String pieceName = gameUtils.getRealPieceName(board[move.selectedRow][move.selectedCol]);
         board[row][col] = board[move.selectedRow][move.selectedCol];
         board[move.selectedRow][move.selectedCol] = "__";
