@@ -4,6 +4,7 @@ import {Tabs, TabList, Tab, TabPanel} from 'react-tabs';
 import {Button} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
+import ButtonGroup from "react-bootstrap/ButtonGroup";
 export default class App extends React.Component {
     state = {
         loggedIn: false,
@@ -12,11 +13,41 @@ export default class App extends React.Component {
         users : ['Brian', 'Dave'],
         passwords : ['Crane', 'Wells'],
         selectedGame: null,
-        boardState: {
-
-        },
+        boardState:
+            {
+                "gameID": "12345",
+                "playerOne": "Bob",
+                "playerTwo": "Sally",
+                "turn": "Bob",
+                "turnNumber": 0,
+                "board":[
+                    ["r1 ","__ ","__ ","__ ","__ ","__ ","__ "],
+                    ["__ ","__ ","__ ","__ ","__ ","__ ","__ "],
+                    ["__ ","__ ","__ ","__ ","__ ","__ ","__ "],
+                    ["__ ","__ ","__ ","__ ","__ ","__ ","__ "],
+                    ["__ ","__ ","__ ","__ ","__ ","__ ","__ "],
+                    ["__ ","__ ","__ ","__ ","__ ","__ ","__ "],
+                    ["__ ","__ ","__ ","__ ","__ ","__ ","__ "],
+                    ["__ ","__ ","__ ","__ ","__ ","__ ","__ "],
+                    ["__ ","__ ","__ ","__ ","__ ","__ ","__ "],
+                ],
+                "availableMoves":[
+                    ["__","__","__","__","__","__","__"],
+                    ["__","__","__","__","__","__","__"],
+                    ["__","__","__","__","__","__","__"],
+                    ["__","__","__","__","__","__","__"],
+                    ["__","__","__","__","__","__","__"],
+                    ["__","__","__","__","__","__","__"],
+                    ["__","__","__","__","__","__","__"],
+                    ["__","__","__","__","__","__","__"],
+                    ["__","__","__","__","__","__","__"]
+                ],
+                "winner": "",
+                "startTime": "",
+                "endTime": ""
+            },
         apiConfig:{
-            url:'http://129.82.44.122:8080',
+            url:'http://localhost:8080',
             payload: "action=login&username=dummy_user&password=iforgot123",
             headers: {
                 'Content-Type': 'application/text',
@@ -27,7 +58,7 @@ export default class App extends React.Component {
 
     postExample () {
         console.log("asdf");
-        axios.post('http://129.82.44.122:8080',
+        axios.post('http://localhost:8080',
             "action=login&username=dummy_user&password=iforgot123",
             {
                 headers: {
@@ -40,21 +71,25 @@ export default class App extends React.Component {
     }
 
 
-    postExampleNew () {
-        console.log("asdf");
-        axios.post(this.state.apiConfig.url,
-            this.state.apiConfig.payload,
-            {headers: this.state.apiConfig.headers})
-            .then(response => console.log(response))
-            .catch()
+    setGameState(gameId) {
+        console.log("calling api for game state...");
+        axios.post(
+            this.state.apiConfig.url,
+            "action=get_game&game_id=0001",
+            {headers: this.state.apiConfig.headers}
+        ).then(response => this.setState({
+            gameState: response.data
+        }));
+        console.log("Game State set.")
     }
 
 
-
     setSelectedGame(e) {
+        console.log("making request to the server for game");
         this.setState({
             selectedGame: e.target.value
         });
+        this.setGameState(e.target.value);
     }
 
     render() {
@@ -77,7 +112,7 @@ export default class App extends React.Component {
                             activeGames={this.state.activeGames}
                             completedGames={this.state.completedGames}
                             setSelectedGame={this.setSelectedGame.bind(this)}/>
-                        <Board selectedGame={this.state.selectedGame} />
+                        <Board selectedGame={this.state.selectedGame} boardState={this.state.boardState} />
                     </TabPanel>
                     <TabPanel><GameRules/></TabPanel>
                     <TabPanel><History postExample={this.postExample.bind(this)}/></TabPanel>
@@ -148,13 +183,23 @@ class Board extends Games {
         super(props);
         this.state = {
             background_src: "./images/dou_shou_qi_jungle_game-board.jpg",
+            selected_piece: null,
         };
 
     }
     render() {
-        return(
+        const gameBoard = this.props.boardState.board.map((game) =>
+                <li className={'game-row'}>{game.map((piece) =>
+                    <button className={"game-buttons"}>{piece}</button>
+                )}</li>
+            );
+
+            return(
             <div className={'Board'}>
                 <p>Put the actual board here for game ({this.props.selectedGame})</p>
+                    <ul className={"board-ul"}>
+                        {gameBoard}
+                    </ul>
                 <img src={this.state.background_src} alt={"board Image"} />
             </div>
         )
