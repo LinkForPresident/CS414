@@ -4,7 +4,7 @@
         "playerOne": "Bob",
         "playerTwo": "Sally",
         "turn": "Bob",
-        "turnNumber:" 0,
+        "turnNumber": 0,
         "board":[
                     ["__","__","__","__","__","__","__"],
                     ["__","__","__","__","__","__","__"],
