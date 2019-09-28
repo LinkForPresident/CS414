@@ -13,7 +13,7 @@ export default class App extends React.Component {
         users : ['Brian', 'Dave'],
         passwords : ['Crane', 'Wells'],
         selectedGame: null,
-        boardState:
+        gameState:
             {
                 "gameID": "12345",
                 "playerOne": "Bob",
@@ -57,17 +57,31 @@ export default class App extends React.Component {
     };
 
     postExample () {
-        console.log("asdf");
-        axios.post('http://localhost:8080',
-            "action=login&username=dummy_user&password=iforgot123",
+        console.log("Making request");
+        axios.post('http://129.82.44.123:8080',
+            // "action=login&username=dummy_user&password=iforgot123",
+            "action=move_piece&gameID=1234&username=dummy_user&row=8&column=0",
             {
                 headers: {
-                    'Content-Type': 'application/text',
-                    'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH',
                 }
             })
-            .then(response => console.log(response))
-            .catch()
+            // .then(response => (updatedResponse))
+            .then(response => this.setState({
+                gameState: response.data
+            }))
+            .catch();
+        let board = this.state.gameState.board;
+        console.log(this.state.gameState);
+    }
+
+    postRequest (action, payloads) {
+        // for(payload)
+        axios.post('http://localhost:8080',
+            "action=move_piece&game_id=1234&username=dummy_user&row=0&column=0",
+            {headers: {headers: this.state.apiConfig.headers}})
+            .then(response => console.log(response));
     }
 
 
@@ -112,7 +126,7 @@ export default class App extends React.Component {
                             activeGames={this.state.activeGames}
                             completedGames={this.state.completedGames}
                             setSelectedGame={this.setSelectedGame.bind(this)}/>
-                        <Board selectedGame={this.state.selectedGame} boardState={this.state.boardState} />
+                        <Board selectedGame={this.state.selectedGame} gameState={this.state.gameState} />
                     </TabPanel>
                     <TabPanel><GameRules/></TabPanel>
                     <TabPanel><History postExample={this.postExample.bind(this)}/></TabPanel>
@@ -185,14 +199,29 @@ class Board extends Games {
             background_src: "./images/dou_shou_qi_jungle_game-board.jpg",
             selected_piece: null,
         };
-
     }
+
+    setSelectedPiece(e) {
+        console.log("making request to the server for game");
+        this.setState({
+            selected_piece: e.target.value
+        })
+    }
+
     render() {
-        const gameBoard = this.props.boardState.board.map((game) =>
-                <li className={'game-row'}>{game.map((piece) =>
-                    <button className={"game-buttons"}>{piece}</button>
-                )}</li>
-            );
+        const gameBoard = this.props.gameState.board.map((game, game_index) =>
+            <li className={'game-row'}>
+                {game.map((piece, column_index) =>
+                    <button
+                        id={game_index.toString()+ "," + column_index.toString()}
+                        value={game_index.toString()+ "," + column_index.toString()}
+                        className={"game-buttons"}
+                        onClick={this.setSelectedPiece}
+                    >
+                        {piece}
+                    </button>
+            )}</li>
+        );
 
             return(
             <div className={'Board'}>
