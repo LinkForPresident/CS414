@@ -4,19 +4,51 @@ import {Tabs, TabList, Tab, TabPanel} from 'react-tabs';
 import {Button} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
+import ButtonGroup from "react-bootstrap/ButtonGroup";
 export default class App extends React.Component {
     state = {
         loggedIn: false,
+        userName: null,
         activeGames : ["0001", "0002", "0005"],
         completedGames: ["0003", "0004"],
         users : ['Brian', 'Dave'],
         passwords : ['Crane', 'Wells'],
         selectedGame: null,
-        boardState: {
-
-        },
+        gameState:
+            {
+                "gameID": "00000",
+                "playerOne": "Bob",
+                "playerTwo": "Sally",
+                "turn": "Bob",
+                "turnNumber": 0,
+                "board":[
+                    ["r1 ","__ ","__ ","__ ","__ ","__ ","__ "],
+                    ["__ ","__ ","__ ","__ ","__ ","__ ","__ "],
+                    ["__ ","__ ","__ ","__ ","__ ","__ ","__ "],
+                    ["__ ","__ ","__ ","__ ","__ ","__ ","__ "],
+                    ["__ ","__ ","__ ","__ ","__ ","__ ","__ "],
+                    ["__ ","__ ","__ ","__ ","__ ","__ ","__ "],
+                    ["__ ","__ ","__ ","__ ","__ ","__ ","__ "],
+                    ["__ ","__ ","__ ","__ ","__ ","__ ","__ "],
+                    ["__ ","__ ","__ ","__ ","__ ","__ ","__ "],
+                ],
+                "availableMoves":[
+                    ["__","__","__","__","__","__","__"],
+                    ["__","__","__","__","__","__","__"],
+                    ["__","__","__","__","__","__","__"],
+                    ["__","__","__","__","__","__","__"],
+                    ["__","__","__","__","__","__","__"],
+                    ["__","__","__","__","__","__","__"],
+                    ["__","__","__","__","__","__","__"],
+                    ["__","__","__","__","__","__","__"],
+                    ["__","__","__","__","__","__","__"]
+                ],
+                "winner": "",
+                "startTime": "",
+                "endTime": ""
+            },
         apiConfig:{
-            url:'http://129.82.44.122:8080',
+            url:'http://localhost:8080',
             payload: "action=login&username=dummy_user&password=iforgot123",
             headers: {
                 'Content-Type': 'application/text',
@@ -25,39 +57,90 @@ export default class App extends React.Component {
         }
     };
 
-    postExample () {
-        console.log("asdf");
-        axios.post('http://129.82.44.122:8080',
-            "action=login&username=dummy_user&password=iforgot123",
+    postExample (data) {
+        console.log("Making request");
+        var self = this;
+        axios.post('http://129.82.44.123:8080',
+            // "action=move_piece&gameID=1234&username=dummy_user&password=iforgot123&row=8&column=0",
+            data,
             {
                 headers: {
-                    'Content-Type': 'application/text',
-                    'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH',
                 }
             })
-            .then(response => console.log(response))
-            .catch()
+            .then (function(response) {
+                let availableMovesProto = response.data.availableMoves;
+                console.log(response.data);
+                if (typeof availableMovesProto == 'undefined') {
+                    return
+                }
+                availableMovesProto = availableMovesProto.split("|");
+                let availableMoves = [];
+                availableMovesProto.forEach(function(element){
+                    let elems = element.split(",");
+                    let row = [];
+                    elems.forEach(function(elem){
+                        row.push(elem);
+                    });
+                    availableMoves.push(row);
+                });
+                console.log(availableMoves);
+                let boardStateProto = response.data.board;
+                boardStateProto = boardStateProto.split("|");
+                let boardState = [];
+                boardStateProto.forEach(function(element){
+                    let elems = element.split(",");
+                    let row = [];
+                    elems.forEach(function(elem){
+                        row.push(elem);
+                    });
+                    boardState.push(row);
+                });
+                console.log(boardState);
+                response.data.availableMoves = availableMoves;
+                response.data.board = boardState;
+                self.setState({
+                    gameState: response.data
+                })
+            })
+            .catch();
+        let board = this.state.gameState.board;
+        console.log(this.state.gameState);
+    }
+
+    postRequest (action, payloads) {
+        // for(payload)
+        axios.post('http://localhost:8080',
+            "action=move_piece&game_id=1234&username=dummy_user&row=0&column=0",
+            {headers: {headers: this.state.apiConfig.headers}})
+            .then(response => console.log(response));
     }
 
 
-    postExampleNew () {
-        console.log("asdf");
-        axios.post(this.state.apiConfig.url,
-            this.state.apiConfig.payload,
-            {headers: this.state.apiConfig.headers})
-            .then(response => console.log(response))
-            .catch()
+    setGameState(gameId) {
+        console.log("calling api for game state...");
+        axios.post(
+            this.state.apiConfig.url,
+            "action=get_game&game_id=0001",
+            {headers: this.state.apiConfig.headers}
+        ).then(response => this.setState({
+            gameState: response.data
+        }));
+        console.log("Game State set.")
     }
-
 
 
     setSelectedGame(e) {
+        console.log("making request to the server for game");
         this.setState({
             selectedGame: e.target.value
         });
+        this.setGameState(e.target.value);
     }
 
     render() {
+
         return (
             <div className='menu navigation-menu'>
                 <Tabs>
@@ -72,12 +155,16 @@ export default class App extends React.Component {
                         <Tab>User</Tab>
                     </TabList>
                     <TabPanel><Home/></TabPanel>
+
                     <TabPanel>
                         <Games
                             activeGames={this.state.activeGames}
                             completedGames={this.state.completedGames}
                             setSelectedGame={this.setSelectedGame.bind(this)}/>
-                        <Board selectedGame={this.state.selectedGame} />
+                        <Board selectedGame={this.state.selectedGame}
+                               gameState={this.state.gameState}
+                               postExample={this.postExample.bind(this)}
+                        />
                     </TabPanel>
                     <TabPanel><GameRules/></TabPanel>
                     <TabPanel><History postExample={this.postExample.bind(this)}/></TabPanel>
@@ -148,13 +235,39 @@ class Board extends Games {
         super(props);
         this.state = {
             background_src: "./images/dou_shou_qi_jungle_game-board.jpg",
+            selected_piece: null,
         };
-
     }
+
+    setSelectedPiece(e) {
+        console.log("making request to the server for game");
+        this.setState({
+            selected_piece: e.target.value
+        })
+    }
+
     render() {
-        return(
+        const gameBoard = this.props.gameState.board.map((game, row_index) =>
+            <li className={'game-row'}>
+                {game.map((piece, column_index) =>
+                    <button
+                        id={row_index.toString()+ "," + column_index.toString()}
+                        value={row_index.toString()+ "," + column_index.toString()}
+                        className={"game-buttons"}
+                        onClick={() => { this.props.postExample("action=move_piece&gameID=1234&username=dummy_user&password=iforgot123&row=" + row_index + "&column=" + column_index) }}
+                        // onClick={this.props.postExample()}
+                    >
+                        {piece}
+                    </button>
+            )}</li>
+        );
+
+            return(
             <div className={'Board'}>
                 <p>Put the actual board here for game ({this.props.selectedGame})</p>
+                    <ul className={"board-ul"}>
+                        {gameBoard}
+                    </ul>
                 <img src={this.state.background_src} alt={"board Image"} />
             </div>
         )

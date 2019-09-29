@@ -7,6 +7,25 @@ html body {
 
 .game-buttons {
     list-style-type: none;
+    background-color: transparent;
+    color: white;
+    /*font family must only contain monospaced fonts*/
+    font-family: Courier, Courier New, Lucida Console, Monaco, monospace;
+    width: 4em;
+    height: 4em;
+}
+
+.game-buttons:hover {
+    background-color: #666666;
+}
+
+.game-row {
+    background-color: transparent;
+    width: auto;
+}
+
+.board-ul {
+    list-style-type: none;
 }
 
 .react-tabs_tab-panel--selected {
