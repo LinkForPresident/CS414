@@ -22,6 +22,10 @@ public class Request extends GameConnector{
 
     protected String playerOne;
     protected String playerTwo;
+    
+    protected String gameID;
+    protected String row;
+    protected String column;
 
     public Request(BufferedReader bufferedReader, Socket clientSocket) throws ArrayIndexOutOfBoundsException, NullPointerException{
         // constructor
@@ -91,6 +95,15 @@ public class Request extends GameConnector{
                     double password_hash = password.hashCode() % HASH_KEY;
                     user_hash = (username_hash % password_hash) % HASH_KEY;   // calculate the hash that acts as the primary key in the User table.
                     System.out.println(String.format(DEBUG_TAG + "The username, password and user_hash from the POST request are: %s, %s, %f", username, password, user_hash));
+                }
+                if(action.equals("move_piece")){
+					gameID = args.get("gameID");
+					username = args.get("username");
+					row = args.get("row");
+					column = args.get("column");
+                }
+                if(action.equals("view_game")){
+					gameID = args.get("gameID");
                 }
             }
         }catch(NullPointerException | ArrayIndexOutOfBoundsException e){

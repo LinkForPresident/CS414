@@ -1,5 +1,6 @@
 package GameServer;
 
+import GameLogic.exception.PlayerNameException;
 import java.io.*;
 import java.net.Socket;
 import java.sql.SQLNonTransientConnectionException;
@@ -12,7 +13,7 @@ class GameConnector extends Server{
     private PrintWriter outputStream;
     BufferedReader bufferedReader;
     private Request request;
-    private String HEADER = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: POST, GET, OPTIONS\r\nAccess-Control-Allow-Headers: *\r\n";
+    private String HEADER = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: POST, GET\r\nAccess-Control-Allow-Headers: *\r\n";
 
     GameConnector(){
         // generic constructor, needed to avoid a compilation error.
@@ -20,7 +21,6 @@ class GameConnector extends Server{
     }
 
     GameConnector(Socket clientSocket){
-        // TODO: is there a way to inherit clientSocket from Server instead of passing it as an argument?
         this.clientSocket = clientSocket;
 
     }
@@ -140,12 +140,6 @@ class GameConnector extends Server{
             outputStream.println(HEADER + "\r\n\r\n");
             throw new FileNotFoundException();
         }
-        //try{
-         //   establishDatabaseProxyAddress();
-       // }catch(InterruptedException | ClassNotFoundException | SQLException e){
-          //  System.out.println(ERROR_TAG + "Encountered an error while attempting to curl proxy server credentials for the database.");
-           // e.printStackTrace();
-       // }
     }
 
     private void handleRequest() throws IOException{
@@ -158,19 +152,27 @@ class GameConnector extends Server{
             case "POST":
                 handlePOSTRequest();
                 break;
+			case "OPTIONS":
+				handleOPTIONSRequest();
+				break;
         }
     }
 
     private boolean clientIsAuthenticated() throws SQLNonTransientConnectionException{
+		return true;
         // check if client is logged in, or is trying to either register, login or logout.
-        System.out.println(INFO_TAG + "Checking is client is authenticated for this action.");
-        return request.action.equals("user_registration") || request.action.equals("login") || request.action.equals("logout") || isLoggedIn(request.cookie);
+        //System.out.println(INFO_TAG + "Checking is client is authenticated for this action.");
+        //return request.action.equals("user_registration") || request.action.equals("login") || request.action.equals("logout") || isLoggedIn(request.cookie);
+    }
+    
+    private void handleOPTIONSRequest() throws IOException{
+		outputStream.println(HEADER);
     }
 
     private void handleGETRequest(String path) throws IOException {
         // handle a client GET request.
         System.out.println(INFO_TAG + "Handling GET request.");
-        String htmlResponse = HEADER + "\r\n\r\n";
+        String htmlResponse = HEADER + "\r\n";
         try {
             htmlResponse += getHTMLPage(path);  // get the HTML source.
             outputStream.println(htmlResponse); // send the response to the client.
@@ -195,19 +197,25 @@ class GameConnector extends Server{
             case "logout":
                 handleLogout();
                 break;
-            case "create_game":
-               // try {
-               //     createGame(request.playerOne, request.playerTwo);
-              //  }catch(PlayerNameException | SQLNonTransientConnectionException e){}
+            case "send_invite":
+                sendInvite(request.playerOne, request.playerTwo);
                 break;
-            case "enter_game":
-                // enterGame();
+			case "accept_invite":
+				try{
+					acceptInvite(request.playerOne, request.playerTwo);
+				}catch(PlayerNameException e){
+				}
+				break;
+			case "decline_invite":
+				break;
+            case "view_game":
+                viewGame(request.gameID);
                 break;
             case "forfeit_game":
                 // forfeitGame();
                 break;
             case "move_piece":
-                // movePiece();
+                handleMovePiece();
                 break;
             case "view_stats":
                 // viewPlayerStats();
@@ -264,6 +272,31 @@ class GameConnector extends Server{
             redirectTo("/login.html");
         }
     }
+    
+    
+    private void handleMovePiece() throws IOException{
+    // handle a client requesting to move a game piece.
+		String JSONResponse = "";
+		try{
+			JSONResponse = movePiece(request.gameID, request.username, request.row, request.column);
+			
+		}catch(Exception e){
+			
+		}finally{
+			sendJSONReponse(JSONResponse);
+		}
+    }
+    
+    
+    private void sendJSONReponse(String JSONResponse) throws IOException{
+    
+		// send a JSON response to the client.
+		String response = HEADER + "\r\n" + JSONResponse;
+        System.out.println(String.format(INFO_TAG + "Sending JSON response: \n %s", response));
+		outputStream.println(response); // send the response to the client.
+ 
+    }
+    
 
     private void redirectTo(String path) throws IOException{
         // helper method for making it more explicit when a redirect is happening.

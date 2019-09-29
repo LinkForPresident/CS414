@@ -1,10 +1,13 @@
 package GameServer;
 
+import GameLogic.exception.PlayerNameException;
+import GameLogic.*;
 import java.net.*;
 import java.io.*;
 import java.lang.*;
 import java.sql.*;
 import java.util.*;
+//import org.json.JSONArray;
 
 public class Server extends Thread{
 
@@ -22,6 +25,8 @@ public class Server extends Thread{
     private static final String DB_PASSWORD = "the_password_123";
 
     private static List<Double> loggedInUsers = new ArrayList<>();
+    private static List<Game> activeGames = new ArrayList<>();
+    private static List<String[]> invites = new ArrayList<>();
 
     private static String devAPIKey = "MTA2M0FGNDUtM0M1QS00ODMyLUFDNDgtOEVBQ0E1Q0JBRUU1";
     private static String deviceAddress = "80:00:00:00:01:01:38:E9";
@@ -44,6 +49,13 @@ public class Server extends Thread{
     }
 
     protected void serve(){
+    
+		try{
+			Game game = new Game("dummy_user", "the_devil_himself");
+			game.gameID = "1234";
+			activeGames.add(game);
+		}catch(PlayerNameException e){
+		}
 
         try{
             serverListener = new ServerSocket(PORT_NUMBER); // Set up server to listen at PORT_NUMBER.
@@ -218,44 +230,69 @@ public class Server extends Thread{
             e.printStackTrace();
         }
     }
-
-  /*  void createGame(String playerOne, String playerTwo) throws PlayerNameException, SQLNonTransientConnectionException {
-        // handle a POST request to register a new game in the system.
-        System.out.println(String.format(INFO_TAG + "Attempting to create a new game with Player One: %s and Player Two: %s .", playerOne, playerTwo));
-        Game newGame = new Game(playerOne, playerTwo);
-        String activePlayer = playerOne;
-        String boardState = Arrays.deepToString(newGame.board);
-        String gameState = "Created";
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        String startDate = dateFormat.format(new Date());
-        Connection connection;
-        Statement statement;
-        try {
-            Class.forName(JDBC_DRIVER); // register the JDBC driver.
-            connection = DriverManager.getConnection(
-                    PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
-            statement = connection.createStatement();
-            String createGame = String.format("INSERT INTO Game(player_one, player_two, active_player," +
-                    "board_state, game_state, start_date) VALUES('%s', '%s', '%s', '%s', '%s', '%s')",
-                    playerOne, playerTwo, activePlayer, boardState, gameState, startDate);
-            statement.executeQuery(createGame);
-
-        } catch(SQLNonTransientConnectionException e){
-            throw new SQLNonTransientConnectionException();
-
-        } catch (SQLException | ClassNotFoundException  e) {
-            e.printStackTrace();
-        }
+    
+    void sendInvite(String playerOne, String playerTwo){
+		System.out.println(String.format(INFO_TAG + "Attempting to service the invite of %s to %s", playerOne, playerTwo));
+		String[] invite = {playerOne, playerTwo};
+		invites.add(invite);
     }
-    */
-
-
-    void movePiece(){
-
+    
+    void acceptInvite(String playerOne, String playerTwo) throws PlayerNameException{
+		System.out.println(String.format(INFO_TAG + "Attempting to accept the invite of %s to %s", playerOne, playerTwo));
+		for(String[] invite : invites){
+			if(invite[0].equals(playerOne) && invite[1].equals(playerTwo)){
+				invites.remove(invite);
+				Game game = new Game(playerOne, playerTwo);
+				return;
+			}
+		}
+    }
+    
+    String viewGame(String gameID){
+		System.out.println(String.format(INFO_TAG + "Attempting to service request to view game: '%s'.", gameID));
+		for(Game game : activeGames){
+			if(game.gameID.equals(gameID)){
+				return formatGameResponse(game);
+			}
+		}
+		return "";
     }
 
-    void invitePlayer(){
-
+    String movePiece(String gameID, String playerID, String row, String column){
+		// handle a POST request to move a piece in a game instance.
+		System.out.println(String.format(INFO_TAG + "Attempting to move piece at row: '%s', column: '%s', for player: '%s' and game: '%s'.", row, column, playerID, gameID));
+		for(Game game : activeGames){
+			if(game.gameID.equals(gameID)){
+				if(game.sendInput(playerID, Integer.parseInt(row), Integer.parseInt(column))){
+					return formatGameResponse(game);
+				}
+			}
+		}
+		return "";
+    }
+    
+    String formatGameResponse(Game game){
+		String validTilesJson = formatBoardArrayResponse(game.move.validTiles);
+		String boardJson = formatBoardArrayResponse(game.board);
+		return String.format("{\"gameID\": \"%s\", \"playerOne\": \"%s\", \"playerTwo\": \"%s\", \"turn\": \"%s\", \"turnNumber\": \"%d\" , \"board\": \"%s\", \"availableMoves\": \"%s\", \"winner\": \"%s\", \"startTime\": \"%s\", \"endTime\": \"%s\"}", game.gameID, game.playerOne, game.playerTwo, game.turn, game.turnNumber, boardJson, validTilesJson, game.winner, game.startTime, game.endTime);
+    }
+    
+    String formatBoardArrayResponse(String[][] state){
+		String boardJson = "";
+		for(int i=0; i<9; i++){
+			String boardRow = "";
+			for(int j=0; j<7; j++){
+				boardRow += state[i][j];
+				if(j <= 6){
+					boardRow += ",";
+				}
+			}
+			boardJson += boardRow;
+			if(i <= 8){
+				boardJson += "|";
+			}
+		}
+		return boardJson;
     }
 
     void forfeitGame(){

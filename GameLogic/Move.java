@@ -2,12 +2,12 @@ package GameLogic;
 
 import java.util.Arrays;
 
-class Move {
+public class Move {
 
     private Game game;
     int selectedRow = -1;
     int selectedCol = -1;
-    String[][] validTiles = new String[9][7];
+    public String[][] validTiles = new String[9][7];
 
     Move(Game current_game){
         game = current_game;
