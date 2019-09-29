@@ -89,7 +89,9 @@ public class Move {
 
     private boolean canCaptureUnit(int row, int col) {
         // returns true if the piece at row, col has a lesser or equal power (or row, col is a trap) to the piece at selectedRow, SelectedCol
-        return ((game.board[selectedRow][selectedCol].charAt(1) >= game.board[row][col].charAt(1) || isFriendlyTrap(row, col)) && !isWater(selectedRow, selectedCol) && !isEnemyTrap(selectedRow, selectedCol));
+        return ((game.board[selectedRow][selectedCol].charAt(1) >= game.board[row][col].charAt(1) || isFriendlyTrap(row, col) || (isRat(row, col) && isElephant(selectedRow, selectedCol)))
+                && (!isWater(selectedRow, selectedCol) || isRat(row, col))
+                && !isEnemyTrap(selectedRow, selectedCol));
     }
 
     private boolean isLionOrTiger(int row, int col){
@@ -100,6 +102,11 @@ public class Move {
     private boolean isRat(int row, int col){
         // returns true if the piece at row, col is a rat, else returns false.
         return game.board[row][col].charAt(1) == '1';
+    }
+
+    private boolean isElephant(int row, int col){
+        // returns true if the piece at row, col is a rat, else returns false.
+        return game.board[row][col].charAt(1) == '8';
     }
 
     private boolean isWater(int row, int col){
