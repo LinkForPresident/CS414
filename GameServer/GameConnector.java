@@ -159,10 +159,10 @@ class GameConnector extends Server{
     }
 
     private boolean clientIsAuthenticated() throws SQLNonTransientConnectionException{
-		return true;
+		//return true;
         // check if client is logged in, or is trying to either register, login or logout.
-        //System.out.println(INFO_TAG + "Checking is client is authenticated for this action.");
-        //return request.action.equals("user_registration") || request.action.equals("login") || request.action.equals("logout") || isLoggedIn(request.cookie);
+        System.out.println(INFO_TAG + "Checking is client is authenticated for this action.");
+        return request.action.equals("user_registration") || request.action.equals("login") || request.action.equals("logout") || isLoggedIn(request.cookie);
     }
     
     private void handleOPTIONSRequest() throws IOException{

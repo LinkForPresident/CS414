@@ -16,7 +16,7 @@ export default class App extends React.Component {
 
         },
         apiConfig:{
-            url:'http://129.82.44.122:8080',
+            url:'localhost:8080',
             payload: "action=login&username=dummy_user&password=iforgot123",
             headers: {
                 'Content-Type': 'application/text',
@@ -26,8 +26,8 @@ export default class App extends React.Component {
     };
 
     postExample () {
-        console.log("asdf");
-        axios.post('http://129.82.44.122:8080',
+        console.log("tests");
+        axios.post('localhost:8080',
             "action=login&username=dummy_user&password=iforgot123",
             {
                 headers: {
@@ -41,7 +41,7 @@ export default class App extends React.Component {
 
 
     postExampleNew () {
-        console.log("asdf");
+        console.log("fdsa");
         axios.post(this.state.apiConfig.url,
             this.state.apiConfig.payload,
             {headers: this.state.apiConfig.headers})
