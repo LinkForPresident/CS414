@@ -7,7 +7,6 @@ import java.io.*;
 import java.lang.*;
 import java.sql.*;
 import java.util.*;
-//import org.json.JSONArray;
 
 public class Server extends Thread{
 
@@ -160,13 +159,14 @@ public class Server extends Thread{
         return loggedIn;
     }
 
-    void login(double user_hash) throws SQLNonTransientConnectionException {
+    String login(String username, double user_hash){
 
         try{
             establishDatabaseProxyAddress();
         }catch(InterruptedException | ClassNotFoundException | SQLException | IOException e){
             System.out.println(ERROR_TAG + "Encountered an error while attempting to curl proxy server credentials for the database.");
             e.printStackTrace();
+            return String.format("{\"loggedIn\": %b}", false);
         }
         System.out.println(String.format(INFO_TAG + "Attempting to log in user with user_hash: %f.", user_hash));
         // Handle a POST request to login a client.
@@ -183,26 +183,31 @@ public class Server extends Thread{
 
             if (resultSet.next()) { // User exists and has been authenticated, place user_hash into loggedInUsers list.
                 loggedInUsers.add(user_hash);
+				return String.format("{\"loggedIn\": %b}", true);
             } else {   // User does not exist. Stop the request handling.
-                throw new NoSuchElementException(String.format(DEBUG_TAG + "User %f does not exist!", user_hash));
+                System.out.println(String.format(DEBUG_TAG + "User %f does not exist!", user_hash));
+				return String.format("{\"loggedIn\": %b}", false);
             }
         } catch(SQLNonTransientConnectionException e){
-            throw new SQLNonTransientConnectionException();
+        System.out.println(ERROR_TAG + "Encountered an error while attempting handle a login attempt due to a problem connecting to the database. (HINT: the proxy server is likely different than what is set.)");
+		return String.format("{\"loggedIn\": %b}", false);
 
         } catch (SQLException | ClassNotFoundException e) {
             //Handle errors for JDBC
             e.printStackTrace();
+			return String.format("{\"loggedIn\": %b}", false);
 
         }
     }
 
-    void logout(double user_hash){
-        // Handle a POST request to logout a client.
-        // Remove user_hash from loggedInUsers list.
-       loggedInUsers.remove(user_hash);
+    String logout(double user_hash){
+	// Handle a POST request to logout a client.
+	// Remove user_hash from loggedInUsers list.
+		loggedInUsers.remove(user_hash);
+		return String.format("{\"loggedIn\": %b}", false);
     }
 
-    void registerUser(String username, String password, double user_hash) throws SQLNonTransientConnectionException{
+    String registerUser(String username, String password, double user_hash){
         // handle a POST request to register a new user in the system.
 
         try{
@@ -210,6 +215,7 @@ public class Server extends Thread{
         }catch(InterruptedException | ClassNotFoundException | SQLException | IOException e){
             System.out.println(ERROR_TAG + "Encountered an error while attempting to curl proxy server credentials for the database.");
             e.printStackTrace();
+		return String.format("{\"loggedIn\": %b}", false);
         }
         System.out.println(String.format(INFO_TAG + "Attempting to register new user with username: %s , password: %s , user_hash: %f.", username, password, user_hash));
         Connection connection;
@@ -224,17 +230,27 @@ public class Server extends Thread{
             statement.executeQuery(registerUser);
 
         } catch(SQLNonTransientConnectionException e){
-            throw new SQLNonTransientConnectionException();
+                    System.out.println(ERROR_TAG + "Encountered an error while attempting handle a user registration attempt due to a " +
+                    "problem connecting to the database. (HINT: the proxy server is likely different than what is set.)");
+			return String.format("{\"loggedIn\": %b}", false);
 
         } catch (SQLException | ClassNotFoundException  e) {
-            e.printStackTrace();
+			e.printStackTrace();
+			return String.format("{\"loggedIn\": %b}", false);
         }
+        System.out.println(String.format(INFO_TAG + "New user %s has been registered", username));
+        return String.format("{\"loggedIn\": %b}", false);
     }
     
     void sendInvite(String playerOne, String playerTwo){
 		System.out.println(String.format(INFO_TAG + "Attempting to service the invite of %s to %s", playerOne, playerTwo));
-		String[] invite = {playerOne, playerTwo};
-		invites.add(invite);
+		String[] newInvite = {playerOne, playerTwo};
+		for(String[] invite : invites){
+			if(invite[0].equals(newInvite[0]) && invite[1].equals(newInvite[1])){
+				return;	// invite already exists
+			}
+		}
+		invites.add(newInvite);
     }
     
     void acceptInvite(String playerOne, String playerTwo) throws PlayerNameException{
@@ -243,6 +259,16 @@ public class Server extends Thread{
 			if(invite[0].equals(playerOne) && invite[1].equals(playerTwo)){
 				invites.remove(invite);
 				Game game = new Game(playerOne, playerTwo);
+				return;
+			}
+		}
+    }
+    
+    void declineInvite(String playerOne, String playerTwo){
+		System.out.println(String.format(INFO_TAG + "Attempting to decline the invite of %s to %s", playerOne, playerTwo));
+		for(String[] invite : invites){
+			if(invite[0].equals(playerOne) && invite[1].equals(playerTwo)){
+				invites.remove(invite);
 				return;
 			}
 		}
