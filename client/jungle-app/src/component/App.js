@@ -8,6 +8,7 @@ import ButtonGroup from "react-bootstrap/ButtonGroup";
 export default class App extends React.Component {
     state = {
         loggedIn: false,
+        userName: null,
         activeGames : ["0001", "0002", "0005"],
         completedGames: ["0003", "0004"],
         users : ['Brian', 'Dave'],
@@ -15,7 +16,7 @@ export default class App extends React.Component {
         selectedGame: null,
         gameState:
             {
-                "gameID": "12345",
+                "gameID": "00000",
                 "playerOne": "Bob",
                 "playerTwo": "Sally",
                 "turn": "Bob",
@@ -56,12 +57,12 @@ export default class App extends React.Component {
         }
     };
 
-    postExample () {
+    postExample (data) {
         console.log("Making request");
         var self = this;
         axios.post('http://129.82.44.123:8080',
-            // "action=login&username=dummy_user&password=iforgot123",
-            "action=move_piece&gameID=1234&username=dummy_user&row=8&column=0",
+            // "action=move_piece&gameID=1234&username=dummy_user&password=iforgot123&row=8&column=0",
+            data,
             {
                 headers: {
                     'Content-Type': 'application/json',
@@ -70,6 +71,10 @@ export default class App extends React.Component {
             })
             .then (function(response) {
                 let availableMovesProto = response.data.availableMoves;
+                console.log(response.data);
+                if (typeof availableMovesProto == 'undefined') {
+                    return
+                }
                 availableMovesProto = availableMovesProto.split("|");
                 let availableMoves = [];
                 availableMovesProto.forEach(function(element){
@@ -135,6 +140,7 @@ export default class App extends React.Component {
     }
 
     render() {
+
         return (
             <div className='menu navigation-menu'>
                 <Tabs>
@@ -149,12 +155,16 @@ export default class App extends React.Component {
                         <Tab>User</Tab>
                     </TabList>
                     <TabPanel><Home/></TabPanel>
+
                     <TabPanel>
                         <Games
                             activeGames={this.state.activeGames}
                             completedGames={this.state.completedGames}
                             setSelectedGame={this.setSelectedGame.bind(this)}/>
-                        <Board selectedGame={this.state.selectedGame} gameState={this.state.gameState} />
+                        <Board selectedGame={this.state.selectedGame}
+                               gameState={this.state.gameState}
+                               postExample={this.postExample.bind(this)}
+                        />
                     </TabPanel>
                     <TabPanel><GameRules/></TabPanel>
                     <TabPanel><History postExample={this.postExample.bind(this)}/></TabPanel>
@@ -237,14 +247,15 @@ class Board extends Games {
     }
 
     render() {
-        const gameBoard = this.props.gameState.board.map((game, game_index) =>
+        const gameBoard = this.props.gameState.board.map((game, row_index) =>
             <li className={'game-row'}>
                 {game.map((piece, column_index) =>
                     <button
-                        id={game_index.toString()+ "," + column_index.toString()}
-                        value={game_index.toString()+ "," + column_index.toString()}
+                        id={row_index.toString()+ "," + column_index.toString()}
+                        value={row_index.toString()+ "," + column_index.toString()}
                         className={"game-buttons"}
-                        onClick={this.setSelectedPiece}
+                        onClick={() => { this.props.postExample("action=move_piece&gameID=1234&username=dummy_user&password=iforgot123&row=" + row_index + "&column=" + column_index) }}
+                        // onClick={this.props.postExample()}
                     >
                         {piece}
                     </button>
