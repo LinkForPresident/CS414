@@ -69,7 +69,7 @@ public class Game {
         System.out.println("");
     }
 
-    boolean sendInput(String player, int row, int col){
+    public boolean sendInput(String player, int row, int col){
         // send input to the game in the format (player sending move, column selected, row selected)
         // returns true if the game state has changed, else returns false
         if(isTurn(player) && winner.isEmpty()){
@@ -89,6 +89,9 @@ public class Game {
                 makeMove(row, col);
                 move.updateValidTiles();
                 return true;
+            }
+            else {
+                System.out.println("Invalid Move!");
             }
         }
         return false;
