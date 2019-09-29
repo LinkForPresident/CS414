@@ -160,7 +160,7 @@ class GameConnector extends Server{
 
     private boolean clientIsAuthenticated() throws SQLNonTransientConnectionException{
 		return true;
-        // check if client is logged in, or is trying to either register, login or logout.
+		// check if client is logged in, or is trying to either register, login or logout.
         //System.out.println(INFO_TAG + "Checking is client is authenticated for this action.");
         //return request.action.equals("user_registration") || request.action.equals("login") || request.action.equals("logout") || isLoggedIn(request.cookie);
     }
@@ -226,70 +226,36 @@ class GameConnector extends Server{
     private void handleLogin() throws IOException{
         // handle a client requesting to log in.
         System.out.println(String.format(INFO_TAG + "Attempting to log in user %s", request.username));
-        try {
-            login(request.user_hash);
-            HEADER += String.format("Set-Cookie: user_hash=%f\r\n\r\n", request.user_hash);
-            // automatically redirect to the home page.
-            System.out.println(String.format(INFO_TAG + "User '%s' has been logged in.", request.username));
-            redirectTo("/index.html");
-        }catch(NoSuchElementException e) {
-            // user with the username-password pair does not exist in the database.
-            System.out.println(String.format(DEBUG_TAG + "User with username %s , password %s , and user_hash %s does " +
-                    "not exist in database. Attempting to redirect to login.html", request.username, request.password,
-                    request.user_hash));
-            e.printStackTrace();
-            redirectTo("/login.html");
-        }
-        catch(SQLNonTransientConnectionException sql){
-            System.out.println(ERROR_TAG + "Encountered an error while attempting happlication/jsonandle a login attempt due to a " +
-                    "problem connecting to the database. (HINT: the proxy server is likely different than what is set.)" +
-                    "Redirecting to login.html.");
-            sql.printStackTrace();
-            redirectTo("/login.html");
-        }
+		String JSONResponse = login(request.username, request.user_hash);
+		HEADER += String.format("Set-Cookie: user_hash=%f\r\n\r\n", request.user_hash);
+		sendJSONReponse(JSONResponse);
     }
 
     private void handleLogout() throws IOException{
         // handle a client requesting to log out.
         System.out.println(String.format(INFO_TAG + "Attempting to log out user %s", request.username));
-            logout(request.cookie);
-            System.out.println(String.format(INFO_TAG + "User %s has been logged out", request.username));
-            redirectTo("/login.html");
+		String JSONResponse = logout(request.cookie);
+		System.out.println(String.format(INFO_TAG + "User %s has been logged out", request.username));
+		sendJSONReponse(JSONResponse);
     }
 
     private void handleUserRegistration() throws IOException{
         // handle a client requesting to register a new account.
         System.out.println(String.format(INFO_TAG + "Attempting to register user %s", request.username));
-        try {
-            registerUser(request.username, request.password, request.user_hash);
-            System.out.println(String.format(INFO_TAG + "New user %s has been registered", request.username));
-            redirectTo("/login.html");
-        }catch(SQLNonTransientConnectionException sql){
-            System.out.println(ERROR_TAG + "Encountered an error while attempting handle a user registration attempt due to a " +
-                    "problem connecting to the database. (HINT: the proxy server is likely different than what is set.)" +
-                    "Redirecting to login.html.");
-            sql.printStackTrace();
-            redirectTo("/login.html");
-        }
+		String JSONResponse = registerUser(request.username, request.password, request.user_hash);
+		sendJSONReponse(JSONResponse);
     }
     
     
     private void handleMovePiece() throws IOException{
     // handle a client requesting to move a game piece.
 		String JSONResponse = "";
-		try{
-			JSONResponse = movePiece(request.gameID, request.username, request.row, request.column);
-			
-		}catch(Exception e){
-			
-		}finally{
-			sendJSONReponse(JSONResponse);
-		}
+		JSONResponse = movePiece(request.gameID, request.username, request.row, request.column);
+		sendJSONReponse(JSONResponse);
     }
     
     
     private void sendJSONReponse(String JSONResponse) throws IOException{
-    
 		// send a JSON response to the client.
 		String response = HEADER + "\r\n" + JSONResponse;
         System.out.println(String.format(INFO_TAG + "Sending JSON response: \n %s", response));
