@@ -9,20 +9,23 @@ export default class App extends React.Component {
     constructor(props){
         super(props);
         this.updateLoginValue = this.updateLoginValue.bind(this);
+        this.updateInvites = this.updateInvites.bind(this);
     }
 
     state = {
         loggedIn: false,
+        username: "",
         activeGames : ["0001", "0002", "0005"],
         completedGames: ["0003", "0004"],
         users : ['Brian', 'Dave'],
         passwords : ['Crane', 'Wells'],
         selectedGame: null,
+        invites : " ",
         boardState: {
 
         },
         apiConfig:{
-            url:'http://localhost:8080',
+            url:'http://10.3.0.50:8080',
             payload: "action=login&username=dummy_user&password=iforgot123",
             headers: {
                 'Content-Type': 'application/text',
@@ -68,12 +71,61 @@ export default class App extends React.Component {
                         .catch()
                         return resp.data;
         }
+        async handleSendInvite(event, url, payload, headers){
+            var resp = await axios.post(url,
+                       payload,
+                       headers,
+                        )
+                        .then(function(response){
+                        console.log(response);
+                        return response;
+                        }
+                        )
+                        .catch()
+                        return resp.data;
+        }
+        async handleAcceptInvite(url, payload, headers){
+            var resp = await axios.post(url,
+                       payload,
+                       headers,
+                        )
+                        .then(function(response){
+                        console.log(response);
+                        return response;
+                        }
+                        )
+                        .catch()
+                        return resp.data;
+        }
+        async handleDeclineInvite(url, payload, headers){
+            var resp = await axios.post(url,
+                       payload,
+                       headers,
+                        )
+                        .then(function(response){
+                        console.log(response);
+                        return response;
+                        }
+                        )
+                        .catch()
+                        return resp.data;
+        }
 
-        updateLoginValue(loginVal){
+        updateLoginValue(loginVal, username, invites){
+        console.log(username);
+        console.log(invites);
             this.setState({
-                loggedIn: loginVal
+                loggedIn: loginVal,
+                username: username,
+                invites: invites,
             });
         }
+        updateInvites(invites){
+            this.setState({
+                invites: invites
+            });
+        }
+
 
     setSelectedGame(e) {
         this.setState({
@@ -106,7 +158,8 @@ export default class App extends React.Component {
                     </TabPanel>
                     <TabPanel><GameRules/></TabPanel>
                     <TabPanel><History postExample={this.postExample.bind(this)}/></TabPanel>
-                    <TabPanel><Invite/></TabPanel>
+                    <TabPanel><Invite apiConfig = {this.state.apiConfig} handleSendInvite = {this.handleSendInvite} handleAcceptInvite = {this.handleAcceptInvite}
+                                                          invites={this.state.invites} username={this.state.username} handleDeclineInvite = {this.handleDeclineInvite} updateInvites={this.updateInvites}/></TabPanel>
                     <TabPanel><Register users = {this.state.users} passwords = {this.state.passwords}/></TabPanel>
                     <TabPanel><Login apiConfig = {this.state.apiConfig} handleLoginRequest = {this.handleLoginRequest} loggedIn={this.state.loggedIn}
                     updateLoginValue={this.updateLoginValue}/></TabPanel>
@@ -262,13 +315,70 @@ class GameRules extends React.Component {
 }
 
 class Invite extends React.Component {
+
+    constructor(props){
+        super(props);
+        this.state = {invitedPlayer: "", apiConfig: this.props.apiConfig}
+        this.handleInvitedPlayerChange = this.handleInvitedPlayerChange.bind(this);
+        this.handleSendInvite = this.handleSendInvite.bind(this);
+        this.handleAcceptInvite = this.handleAcceptInvite.bind(this);
+        this.handleDeclineInvite = this.handleDeclineInvite.bind(this);
+    }
+
     render() {
+    console.log(this.props.invites);
+        if(typeof this.props.invites !== "undefined"){    // gotta be a better way of doing this...
+        var playerInvites = this.props.invites.split(",");
+        playerInvites.pop();
+        console.log(playerInvites);
+        var inviteButtons = playerInvites.map((elem) => <div style={{display:'block'}}>{elem}<button onClick={
+            this.handleAcceptInvite.bind(this, elem)}>Accept</button>
+            <button onClick={this.handleDeclineInvite.bind(this, elem)}>Decline</button></div>);
+        console.log(inviteButtons);
+        }
+
         return (
             <div className={'InvitePage'}>
-                <p>Invite Goes here</p>
+                <form onSubmit={(e) => this.handleSendInvite(e, this.state.apiConfig.url,
+                            "action=send_invite&playerOne=" + this.props.username + "&playerTwo=" + this.state.invitedPlayer,
+                            this.props.apiConfig.headers)}>
+                                <label>
+                                    Username of player to invite:
+                                    <input type="text" value={this.state.invitedPlayer} onChange={this.handleInvitedPlayerChange} />
+                                </label>
+                                <input type="submit" value="Submit" />
+                            </form>
+                            {inviteButtons}
+
             </div>
+
+
         )
     }
+
+    handleInvitedPlayerChange(event) {
+            event.preventDefault();
+            this.setState({invitedPlayer: event.target.value});
+        }
+    async handleSendInvite(event, url, payload, headers){
+            event.preventDefault();
+            this.props.handleSendInvite(event, url, payload, headers)
+            .then(response => this.props.updateInvites(response.invites));
+
+        }
+    async handleAcceptInvite(playerOne){
+            console.log("playerOne is: " + playerOne);
+            this.props.handleAcceptInvite(this.state.apiConfig.url, "action=accept_invite&playerOne=" + playerOne + "&playerTwo=" + this.props.username, this.props.apiConfig.headers)
+            .then(response => this.props.updateInvites(response.invites));
+
+
+        }
+    async handleDeclineInvite(playerOne){
+
+            this.props.handleAcceptInvite(this.state.apiConfig.url, "action=decline_invite&playerOne=" + playerOne + "&playerTwo=" + this.props.username, this.props.apiConfig.headers)
+            .then(response => this.props.updateInvites(response.invites));
+
+        }
 }
 
 class Login extends React.Component {
@@ -296,7 +406,7 @@ class Login extends React.Component {
     async handleLoginSubmit(event, url, payload, headers){
         event.preventDefault();
         this.props.handleLoginRequest(event, url, payload, headers)
-        .then(response => this.props.updateLoginValue(response.loggedIn));
+        .then(response => this.props.updateLoginValue(response.loggedIn, response.username, response.invites));
 
     }
 

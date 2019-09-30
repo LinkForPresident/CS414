@@ -198,15 +198,13 @@ class GameConnector extends Server{
                 handleLogout();
                 break;
             case "send_invite":
-                sendInvite(request.playerOne, request.playerTwo);
+                handleSendInvite();
                 break;
 			case "accept_invite":
-				try{
-					acceptInvite(request.playerOne, request.playerTwo);
-				}catch(PlayerNameException e){
-				}
+                handleAcceptInvite();
 				break;
 			case "decline_invite":
+			    handleDeclineInvite();
 				break;
             case "view_game":
                 viewGame(request.gameID);
@@ -253,7 +251,28 @@ class GameConnector extends Server{
 		JSONResponse = movePiece(request.gameID, request.username, request.row, request.column);
 		sendJSONReponse(JSONResponse);
     }
-    
+
+    private void handleSendInvite() throws IOException{
+        
+        String JSONResponse = sendInvite(request.playerOne, request.playerTwo);
+        sendJSONReponse(JSONResponse);
+
+    }
+
+    private void handleAcceptInvite() throws IOException{
+
+
+        String JSONResponse = acceptInvite(request.playerOne, request.playerTwo);
+        sendJSONReponse(JSONResponse);
+
+    }
+
+    private void handleDeclineInvite() throws IOException{
+
+        String JSONResponse = declineInvite(request.playerOne, request.playerTwo);
+        sendJSONReponse(JSONResponse);
+
+    }
     
     private void sendJSONReponse(String JSONResponse) throws IOException{
 		// send a JSON response to the client.

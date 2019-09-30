@@ -183,7 +183,13 @@ public class Server extends Thread{
 
             if (resultSet.next()) { // User exists and has been authenticated, place user_hash into loggedInUsers list.
                 loggedInUsers.add(user_hash);
-				return String.format("{\"loggedIn\": %b}", true);
+                String playerInvites = "";
+                for(String[] inv : invites){
+                    if(inv[1].equals(username)){
+                        playerInvites += inv[0] + ",";
+                    }
+                }
+				return String.format("{\"loggedIn\": %b, \"username\": \"%s\", \"invites\": \"%s\"}", true, username, playerInvites);
             } else {   // User does not exist. Stop the request handling.
                 System.out.println(String.format(DEBUG_TAG + "User %f does not exist!", user_hash));
 				return String.format("{\"loggedIn\": %b}", false);
@@ -242,36 +248,57 @@ public class Server extends Thread{
         return String.format("{\"loggedIn\": %b}", false);
     }
     
-    void sendInvite(String playerOne, String playerTwo){
+    String sendInvite(String playerOne, String playerTwo){
 		System.out.println(String.format(INFO_TAG + "Attempting to service the invite of %s to %s", playerOne, playerTwo));
+		// TODO: Check if user exists in DB.
 		String[] newInvite = {playerOne, playerTwo};
 		for(String[] invite : invites){
 			if(invite[0].equals(newInvite[0]) && invite[1].equals(newInvite[1])){
-				return;	// invite already exists
+				return "";	// invite already exists
 			}
 		}
 		invites.add(newInvite);
+		return String.format("{\"invitedPlayer\": \"%s\"}", playerTwo);
     }
     
-    void acceptInvite(String playerOne, String playerTwo) throws PlayerNameException{
-		System.out.println(String.format(INFO_TAG + "Attempting to accept the invite of %s to %s", playerOne, playerTwo));
-		for(String[] invite : invites){
-			if(invite[0].equals(playerOne) && invite[1].equals(playerTwo)){
-				invites.remove(invite);
-				Game game = new Game(playerOne, playerTwo);
-				return;
-			}
-		}
+    String acceptInvite(String playerOne, String playerTwo) {
+        System.out.println(String.format(INFO_TAG + "Attempting to accept the invite of %s to %s", playerOne, playerTwo));
+        for (String[] invite : invites) {
+            if (invite[0].equals(playerOne) && invite[1].equals(playerTwo)) {
+                invites.remove(invite);
+                try {
+                    Game game = new Game(playerOne, playerTwo);
+                } catch (PlayerNameException e) {
+                }
+                String playerInvites = "";
+                for (String[] inv : invites) {
+                    if (inv[1].equals(playerTwo)) {
+                        playerInvites += inv[0] + ",";
+                    }
+                }
+                return String.format("{\"invites\": \"%s\"}", playerInvites);
+            }
+
+        }
+        return "";
     }
     
-    void declineInvite(String playerOne, String playerTwo){
-		System.out.println(String.format(INFO_TAG + "Attempting to decline the invite of %s to %s", playerOne, playerTwo));
-		for(String[] invite : invites){
-			if(invite[0].equals(playerOne) && invite[1].equals(playerTwo)){
-				invites.remove(invite);
-				return;
-			}
-		}
+    String declineInvite(String playerOne, String playerTwo) {
+        System.out.println(String.format(INFO_TAG + "Attempting to decline the invite of %s to %s", playerOne, playerTwo));
+        for (String[] invite : invites) {
+            if (invite[0].equals(playerOne) && invite[1].equals(playerTwo)) {
+                invites.remove(invite);
+                String playerInvites = "";
+                for (String[] inv : invites) {
+                    if (inv[1].equals(playerTwo)) {
+                        playerInvites += inv[0] + ",";
+                    }
+                }
+                return String.format("{\"invites\": \"%s\"}", playerInvites);
+            }
+
+        }
+        return "";
     }
     
     String viewGame(String gameID){

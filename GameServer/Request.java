@@ -105,6 +105,15 @@ public class Request extends GameConnector{
                 if(action.equals("view_game")){
 					gameID = args.get("gameID");
                 }
+                if(action.equals("send_invite")){
+                    playerOne = args.get("playerOne");
+                    playerTwo = args.get("playerTwo");
+                }
+                if(action.equals("accept_invite") || action.equals("decline_invite")){
+                    playerOne = args.get("playerOne");
+                    playerTwo = args.get("playerTwo");
+                }
+
             }
         }catch(NullPointerException | ArrayIndexOutOfBoundsException e){
             return -1;
