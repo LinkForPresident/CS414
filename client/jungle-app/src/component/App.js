@@ -5,6 +5,12 @@ import {Button} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 export default class App extends React.Component {
+
+    constructor(props){
+        super(props);
+        this.updateLoginValue = this.updateLoginValue.bind(this);
+    }
+
     state = {
         loggedIn: false,
         activeGames : ["0001", "0002", "0005"],
@@ -16,7 +22,7 @@ export default class App extends React.Component {
 
         },
         apiConfig:{
-            url:'localhost:8080',
+            url:'http://localhost:8080',
             payload: "action=login&username=dummy_user&password=iforgot123",
             headers: {
                 'Content-Type': 'application/text',
@@ -27,7 +33,7 @@ export default class App extends React.Component {
 
     postExample () {
         console.log("tests");
-        axios.post('localhost:8080',
+        axios.post('http://localhost:8080',
             "action=login&username=dummy_user&password=iforgot123",
             {
                 headers: {
@@ -49,7 +55,25 @@ export default class App extends React.Component {
             .catch()
     }
 
+        async handleLoginRequest(event, url, payload, headers){
+            var resp = await axios.post(url,
+                       payload,
+                       headers,
+                        )
+                        .then(function(response){
+                        console.log(response);
+                        return response;
+                        }
+                        )
+                        .catch()
+                        return resp.data;
+        }
 
+        updateLoginValue(loginVal){
+            this.setState({
+                loggedIn: loginVal
+            });
+        }
 
     setSelectedGame(e) {
         this.setState({
@@ -58,6 +82,7 @@ export default class App extends React.Component {
     }
 
     render() {
+        if(this.state.loggedIn){
         return (
             <div className='menu navigation-menu'>
                 <Tabs>
@@ -83,11 +108,28 @@ export default class App extends React.Component {
                     <TabPanel><History postExample={this.postExample.bind(this)}/></TabPanel>
                     <TabPanel><Invite/></TabPanel>
                     <TabPanel><Register users = {this.state.users} passwords = {this.state.passwords}/></TabPanel>
-                    <TabPanel><Login users = {this.state.users} passwords = {this.state.passwords}/></TabPanel>
+                    <TabPanel><Login apiConfig = {this.state.apiConfig} handleLoginRequest = {this.handleLoginRequest} loggedIn={this.state.loggedIn}
+                    updateLoginValue={this.updateLoginValue}/></TabPanel>
                     <TabPanel><User/></TabPanel>
                 </Tabs>
             </div>
         )
+        }else{
+        return(
+        <div className='menu navigation-menu'>
+                        <Tabs>
+                            <TabList>
+
+
+                                <Tab>Login</Tab>
+                            </TabList>
+                            <TabPanel><Login apiConfig = {this.state.apiConfig} handleLoginRequest = {this.handleLoginRequest} loggedIn={this.state.loggedIn}
+                            updateLoginValue={this.updateLoginValue}/></TabPanel>
+
+                        </Tabs>
+                    </div>
+)
+        }
     }
 }
 
@@ -232,47 +274,38 @@ class Invite extends React.Component {
 class Login extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {username: '', password: '', users: this.props.users, passwords: this.props.passwords};
+        this.state = {username: '', password: '', apiConfig: this.props.apiConfig, loggedIn: this.props.loggedIn};
+        console.log(this.state);
+        console.log(this.props);
 
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleSubmit = this.handleLoginSubmit.bind(this);
     }
 
     handleNameChange(event) {
+        event.preventDefault();
         this.setState({username: event.target.value});
     }
 
     handlePasswordChange(event) {
+        event.preventDefault();
         this.setState({password: event.target.value});
     }
 
-    handleSubmit(event) {
+    async handleLoginSubmit(event, url, payload, headers){
         event.preventDefault();
-        let users = this.state.users;
-        let passwords = this.state.passwords;
-        let i;
-        let userMatchFound = false
-        for(i = 0; i<users.length; i++) {
-            if(this.state.username === users[i]) {
-                userMatchFound = true
-                if(this.state.password === passwords[i]) {
-                    alert('Password matches for username: ' + users[i])
-                }
-                else {
-                    alert('Password DOES NOT match for username: ' + users[i])
-                }
-            }
-        }
-        if(!userMatchFound) {
-            alert('Username ' + this.state.username + ' not found in list of Registered Users! ')
-        }
-        event.preventDefault();
+        this.props.handleLoginRequest(event, url, payload, headers)
+        .then(response => this.props.updateLoginValue(response.loggedIn));
+
     }
+
 
     render() {
         return (
-            <form onSubmit={this.handleSubmit}>
+            <form onSubmit={(e) => this.handleSubmit(e, this.state.apiConfig.url,
+            "action=login&username=" + this.state.username + "&password=" + this.state.password,
+            this.props.apiConfig.headers)}>
                 <label>
                     Name:
                     <input type="text" value={this.state.username} onChange={this.handleNameChange} />
