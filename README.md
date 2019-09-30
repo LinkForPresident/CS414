@@ -10,4 +10,4 @@
 | Parker Thompson   | pt@rams.colostate.edu | Sat/Sun any time \ Mon/Wed 10:15-11:00, 5:00+ \ Tues 12:15+ \ Thurs 2:00+ \ Fri 9:00-11:00, 5:00+ |
 | Tim Rooney   |   |   |
 
-fin
+Info on instructions, planning, daily meetings, etc... may be found in the Wiki tab, the meta/planning/images/ folder, the docs/ folder, and on the Zenhub tab (Zenhub browser extension required).
