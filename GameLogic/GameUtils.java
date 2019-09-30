@@ -1,5 +1,7 @@
 package GameLogic;
 
+import GameLogic.application.Colors;
+
 public class GameUtils {
     // This class contains methods that are useful to be used with Game object
     // but are not needed for functionality of Game
@@ -16,8 +18,9 @@ public class GameUtils {
         System.out.println("");
     }
 
-    void printBoardVeryVerbose(String[][] board){
+    public String printBoardVeryVerbose(String[][] board){
         // prints out the board in a readable fashion, including Trap and River squares, and full piece names
+        String fullOut = "";
         for(int x=0; x<board.length; x++) {
             for(int y = 0; y<board[x].length; y++) {
                 String out = getSquare(x,y,getRealPieceName(board[x][y]));
@@ -25,13 +28,41 @@ public class GameUtils {
                     out += " ";
                 }
                 System.out.print(out);
+                fullOut += out;
             }
             System.out.println();
         }
         System.out.println("\n");
+        return fullOut;
     }
 
-    String getSquare(int x, int y, String piece) {
+    public String printBoardVeryVerboseWithColor(String[][] board){
+        // prints out the board in a readable fashion, including Trap and River squares, and full piece names, and COLOR!
+        String fullOut = "";
+        for(int x=0; x<board.length; x++) {
+            for(int y = 0; y<board[x].length; y++) {
+                String out = getSquare(x,y,getRealPieceName(board[x][y])) + "(" + x + "," + y + ")";
+                while(out.length() < 22) {
+                    out += " ";
+                }
+                if(out.contains("Red ")) {
+                    out = Colors.RED + out;
+                }
+                else if(out.contains("Blue ")) {
+                    out = Colors.BLUE + out;
+                }
+                else {
+                    out = Colors.WHITE + out;
+                }
+                System.out.print(out);
+                fullOut += out;
+            }
+            System.out.println();
+        }
+        return fullOut;
+    }
+
+    public String getSquare(int x, int y, String piece) {
         if(isTrapSqaure(x,y)) {
             return "{" + piece + "}";
         }
@@ -60,7 +91,7 @@ public class GameUtils {
         return false;
     }
 
-    String getRealPieceName(String shortName) {
+    public String getRealPieceName(String shortName) {
         switch (shortName) {
             case "r1":
                 return "Red Mouse";
