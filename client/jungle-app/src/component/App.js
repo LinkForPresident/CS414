@@ -4,12 +4,15 @@ import {Tabs, TabList, Tab, TabPanel} from 'react-tabs';
 import {Button} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
+import ButtonGroup from "react-bootstrap/ButtonGroup";
 export default class App extends React.Component {
 
     constructor(props){
         super(props);
         this.updateLoginValue = this.updateLoginValue.bind(this);
         this.updateInvites = this.updateInvites.bind(this);
+        this.setSelectedGame = this.setSelectedGame.bind(this);
+        this.postExampleNew = this.postExampleNew.bind(this);
     }
 
     state = {
@@ -17,8 +20,8 @@ export default class App extends React.Component {
         username: "",
         activeGames : ["0001", "0002", "0005"],
         completedGames: ["0003", "0004"],
-        users : ['Brian', 'Dave'],
-        passwords : ['Crane', 'Wells'],
+        users: ['Brian', 'Dave'],
+        passwords: ['Crane', 'Wells'],
         selectedGame: null,
         invites : " ",
         boardState: {
@@ -33,21 +36,6 @@ export default class App extends React.Component {
             }
         }
     };
-
-    postExample () {
-        console.log("tests");
-        axios.post('http://localhost:8080',
-            "action=login&username=dummy_user&password=iforgot123",
-            {
-                headers: {
-                    'Content-Type': 'application/text',
-                    'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
-                }
-            })
-            .then(response => console.log(response))
-            .catch()
-    }
-
 
     postExampleNew () {
         console.log("fdsa");
@@ -126,11 +114,41 @@ export default class App extends React.Component {
             });
         }
 
+    setGameState(gameId) {
+        console.log("calling api for game state...");
+        axios.post(
+            this.state.apiConfig.url,
+            "action=view_game&gameID=1234",
+            {headers: this.state.apiConfig.headers}
+        ).then((response) => console.log(response));
+        console.log("Game State set.")
+    }
+
 
     setSelectedGame(e) {
+        console.log("making request to the server for game");
         this.setState({
             selectedGame: e.target.value
         });
+        this.setGameState(e.target.value);
+    }
+
+    handleLogin(username, password) {
+        var self = this;
+        console.log("calling api for game state...");
+        axios.post(
+            'http://129.82.44.123:8080',
+            "action=login&username=" + username + "&password=" + password,
+            {headers: {
+            'Content-Type': 'application/json',
+                'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH',
+        }}
+        ).then(function (response) {
+            const loggeedIn = response.data.loggedIn;
+            self.setState({
+                loggedIn: response.data
+            })
+        })
     }
 
     render() {
@@ -149,15 +167,21 @@ export default class App extends React.Component {
                         <Tab>User</Tab>
                     </TabList>
                     <TabPanel><Home/></TabPanel>
+
                     <TabPanel>
                         <Games
                             activeGames={this.state.activeGames}
                             completedGames={this.state.completedGames}
-                            setSelectedGame={this.setSelectedGame.bind(this)}/>
-                        <Board selectedGame={this.state.selectedGame} />
+                            setSelectedGame={this.setSelectedGame}
+                            loggedIn={this.state.loggedIn}
+                        />
+                        <Board selectedGame={this.state.selectedGame}
+                               gameState={this.state.gameState}
+                               postExample={this.postExampleNew}
+                        />
                     </TabPanel>
                     <TabPanel><GameRules/></TabPanel>
-                    <TabPanel><History postExample={this.postExample.bind(this)}/></TabPanel>
+                    <TabPanel><History postExample={this.postExampleNew}/></TabPanel>
                     <TabPanel><Invite apiConfig = {this.state.apiConfig} handleSendInvite = {this.handleSendInvite} handleAcceptInvite = {this.handleAcceptInvite}
                                                           invites={this.state.invites} username={this.state.username} handleDeclineInvite = {this.handleDeclineInvite} updateInvites={this.updateInvites}/></TabPanel>
                     <TabPanel><Register users = {this.state.users} passwords = {this.state.passwords}/></TabPanel>
@@ -181,12 +205,10 @@ export default class App extends React.Component {
 
                         </Tabs>
                     </div>
-)
+                )
         }
     }
 }
-
-
 
 class Home extends React.Component {
     render() {
@@ -209,31 +231,37 @@ class Games extends React.Component {
     }
 
     render() {
-        const activeGamesList = this.state.activeGames.map((game) =>
-            <li className={'list-group-item list-group-item-dark'}>
-                <Button onClick={this.props.setSelectedGame} value={game}
-                >
-                    Game Id: {game}
-                </Button> request json</li>);
-        const completedGamesList = this.state.completedGames.map((game) =>
-            <li className={'list-group-item list-group-item-dark'}>
-                <Button onClick={this.props.setSelectedGame} value={game}
-                >
-                    Game Id: {game}
-                </Button> request json</li>);
-        return (
-            <div className={'GamesPage'}>
-                <h2>Active Games</h2>
-                <ul className={'list-group list-group-horizontal'}>
-                    {activeGamesList}
-                </ul>
-                <h2>Completed Games</h2>
-                <ul className={'list-group list-group-horizontal'}>
-                    {completedGamesList}
-                </ul>
+        if (this.props.loggedIn) {
 
-            </div>
-        )
+            const activeGamesList = this.state.activeGames.map((game) =>
+                <li className={'list-group-item list-group-item-dark'}>
+                    <Button onClick={this.props.setSelectedGame} value={game}
+                    >
+                        Game Id: {game}
+                    </Button> request json</li>);
+            const completedGamesList = this.state.completedGames.map((game) =>
+                <li className={'list-group-item list-group-item-dark'}>
+                    <Button onClick={this.props.setSelectedGame} value={game}
+                    >
+                        Game Id: {game}
+                    </Button> request json</li>);
+            return (
+                <div className={'GamesPage'}>
+                    <h2>Active Games</h2>
+                    <ul className={'list-group list-group-horizontal'}>
+                        {activeGamesList}
+                    </ul>
+                    <h2>Completed Games</h2>
+                    <ul className={'list-group list-group-horizontal'}>
+                        {completedGamesList}
+                    </ul>
+
+                </div>
+            )
+        }
+        else {
+            return("");
+        }
     }
 }
 
@@ -243,16 +271,49 @@ class Board extends Games {
         super(props);
         this.state = {
             background_src: "./images/dou_shou_qi_jungle_game-board.jpg",
+            selected_piece: null,
         };
-
     }
+
+    setSelectedPiece(e) {
+        console.log("making request to the server for game");
+        this.setState({
+            selected_piece: e.target.value
+        })
+    }
+
     render() {
-        return(
-            <div className={'Board'}>
-                <p>Put the actual board here for game ({this.props.selectedGame})</p>
-                <img src={this.state.background_src} alt={"board Image"} />
-            </div>
-        )
+        if (this.props.loggedIn) {
+            const gameBoard = this.props.gameState.board.map((game, row_index) =>
+                <li className={'game-row'}>
+                    {game.map((piece, column_index) =>
+                        <button
+                            id={row_index.toString() + "," + column_index.toString()}
+                            value={row_index.toString() + "," + column_index.toString()}
+                            className={"game-buttons"}
+                            onClick={() => {
+                                this.props.postExample("action=move_piece&gameID=1234&username=the_devil_himself&password=666&row=" + row_index + "&column=" + column_index)
+                            }}
+                            // onClick={this.props.postExample()}
+                        >
+                            {piece}
+                        </button>
+                    )}</li>
+            );
+
+            return (
+                <div className={'Board'}>
+                    <p>Put the actual board here for game ({this.props.selectedGame})</p>
+                    <ul className={"board-ul"}>
+                        {gameBoard}
+                    </ul>
+                    <img src={this.state.background_src} alt={"board Image"}/>
+                </div>
+            )
+        }
+        else {
+            return("");
+        }
     }
 }
 
@@ -417,12 +478,13 @@ class Login extends React.Component {
             "action=login&username=" + this.state.username + "&password=" + this.state.password,
             this.props.apiConfig.headers)}>
                 <label>
-                    Name:
+                    Username:
                     <input type="text" value={this.state.username} onChange={this.handleNameChange} />
                     Password:
-                    <input type="text" value={this.state.password} onChange={this.handlePasswordChange} />
+                    <input type="text" type="password" value={this.state.password} onChange={this.handlePasswordChange} />
+                    <input type="text" value="login" hidden />
                 </label>
-                <input type="submit" value="Submit" />
+                <input type="submit" value="Submit"/>
             </form>
         );
     }

@@ -98,6 +98,9 @@ public class Game {
                 move.updateValidTiles();
                 return true;
             }
+            else {
+                System.out.println("Invalid Move!");
+            }
         }
         return false;
     }

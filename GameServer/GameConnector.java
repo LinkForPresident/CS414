@@ -207,7 +207,7 @@ class GameConnector extends Server{
 			    handleDeclineInvite();
 				break;
             case "view_game":
-                viewGame(request.gameID);
+                handleViewGame();
                 break;
             case "forfeit_game":
                 // forfeitGame();
@@ -271,6 +271,13 @@ class GameConnector extends Server{
 
         String JSONResponse = declineInvite(request.playerOne, request.playerTwo);
         sendJSONReponse(JSONResponse);
+
+    }
+
+    private void handleViewGame() throws IOException{
+
+        String JSONresponse = viewGame(request.gameID);
+        sendJSONReponse(JSONresponse);
 
     }
     
