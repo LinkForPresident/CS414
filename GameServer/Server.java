@@ -159,110 +159,125 @@ public class Server extends Thread{
         return loggedIn;
     }
 
-    String login(String username, double user_hash){
-
-        try{
-            establishDatabaseProxyAddress();
-        }catch(InterruptedException | ClassNotFoundException | SQLException | IOException e){
-            System.out.println(ERROR_TAG + "Encountered an error while attempting to curl proxy server credentials for the database.");
-            e.printStackTrace();
-            return String.format("{\"loggedIn\": %b}", false);
-        }
-        System.out.println(String.format(INFO_TAG + "Attempting to log in user with user_hash: %f.", user_hash));
-        // Handle a POST request to login a client.
+    ResultSet executeDatabaseQuery(String query){
         Connection connection;
         Statement statement;
-        try {
+        ResultSet resultSet = null;
+        try{
+            establishDatabaseProxyAddress();
             Class.forName(JDBC_DRIVER); // register the JDBC driver.
             connection = DriverManager.getConnection(
                     PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
             statement = connection.createStatement();
+            resultSet = statement.executeQuery(query);
+        } catch(SQLNonTransientConnectionException e){
+            System.out.println(ERROR_TAG + "Encountered an error while connecting to the database. (HINT: the proxy server is likely different than what is set.)");
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch(InterruptedException | IOException e) {
+            System.out.println(ERROR_TAG + "Encountered an error while attempting to curl proxy server credentials for the database.");
+            e.printStackTrace();
+        }finally {
+            return resultSet;
+        }
+    }
 
-            String checkAuth = String.format("SELECT 1 FROM User WHERE hash_code='%f'", user_hash);
-            ResultSet resultSet = statement.executeQuery(checkAuth);
-
+    String login(String username, double user_hash){
+        // Login a client by checking if the client is registered and if so, adding client to list of logged in users.
+        System.out.println(String.format(INFO_TAG + "Attempting to log in user with username: '%s' and user_hash: '%f'.", username, user_hash));
+        String selectUser = String.format("SELECT 1 FROM User WHERE hash_code='%f'", user_hash);
+        ResultSet resultSet = executeDatabaseQuery(selectUser);
+        String JSONResponse = String.format("{\"loggedIn\": %b}", false);
+        try {
             if (resultSet.next()) { // User exists and has been authenticated, place user_hash into loggedInUsers list.
                 loggedInUsers.add(user_hash);
                 String playerInvites = "";
-                for(String[] inv : invites){
-                    if(inv[1].equals(username)){
+                for (String[] inv : invites) {
+                    if (inv[1].equals(username)) {
                         playerInvites += inv[0] + ",";
                     }
                 }
-				return String.format("{\"loggedIn\": %b, \"username\": \"%s\", \"invites\": \"%s\"}", true, username, playerInvites);
+                JSONResponse = String.format("{\"loggedIn\": %b, \"username\": \"%s\", \"invites\": \"%s\"}", true, username, playerInvites);
+                System.out.println(String.format(INFO_TAG + "User '%s' has been logged in.", username));
             } else {   // User does not exist. Stop the request handling.
-                System.out.println(String.format(DEBUG_TAG + "User %f does not exist!", user_hash));
-				return String.format("{\"loggedIn\": %b}", false);
+                System.out.println(String.format(DEBUG_TAG + "User '%s' does not exist.", username));
             }
-        } catch(SQLNonTransientConnectionException e){
-        System.out.println(ERROR_TAG + "Encountered an error while attempting handle a login attempt due to a problem connecting to the database. (HINT: the proxy server is likely different than what is set.)");
-		return String.format("{\"loggedIn\": %b}", false);
-
-        } catch (SQLException | ClassNotFoundException e) {
-            //Handle errors for JDBC
-            e.printStackTrace();
-			return String.format("{\"loggedIn\": %b}", false);
-
+        }catch(SQLException sql) {
+        }finally {
+            return JSONResponse;
         }
     }
 
     String logout(double user_hash){
-	// Handle a POST request to logout a client.
 	// Remove user_hash from loggedInUsers list.
 		loggedInUsers.remove(user_hash);
-		return String.format("{\"loggedIn\": %b}", false);
+		String JSONResponse = String.format("{\"loggedIn\": %b}", false);
+		return JSONResponse;
     }
 
     String registerUser(String username, String password, double user_hash){
         // handle a POST request to register a new user in the system.
-
-        try{
-            establishDatabaseProxyAddress();
-        }catch(InterruptedException | ClassNotFoundException | SQLException | IOException e){
-            System.out.println(ERROR_TAG + "Encountered an error while attempting to curl proxy server credentials for the database.");
-            e.printStackTrace();
-		return String.format("{\"loggedIn\": %b}", false);
-        }
         System.out.println(String.format(INFO_TAG + "Attempting to register new user with username: %s , password: %s , user_hash: %f.", username, password, user_hash));
-        Connection connection;
-        Statement statement;
+        String registerUser = String.format("INSERT INTO User VALUES('%s', '%s', '%f')", username, password, user_hash);
+        ResultSet resultSet = executeDatabaseQuery(registerUser);
+        String checkIfRegistered = String.format("SELECT 1 FROM User WHERE hash_code='%f'", user_hash);
+        resultSet = executeDatabaseQuery(checkIfRegistered);
+        String JSONResponse = String.format("{\"loggedIn\": %b}", false);
         try {
-            Class.forName(JDBC_DRIVER); // register the JDBC driver.
-            connection = DriverManager.getConnection(
-                    PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
-            statement = connection.createStatement();
-            String registerUser = String.format("INSERT INTO User VALUES('%s', '%s', '%f')",
-                    username, password, user_hash);
-            statement.executeQuery(registerUser);
-
-        } catch(SQLNonTransientConnectionException e){
-                    System.out.println(ERROR_TAG + "Encountered an error while attempting handle a user registration attempt due to a " +
-                    "problem connecting to the database. (HINT: the proxy server is likely different than what is set.)");
-			return String.format("{\"loggedIn\": %b}", false);
-
-        } catch (SQLException | ClassNotFoundException  e) {
-			e.printStackTrace();
-			return String.format("{\"loggedIn\": %b}", false);
+            if (resultSet.next()) {
+                System.out.println(String.format(INFO_TAG + "New user '%s' has been registered", username));
+            } else {
+                System.out.println(String.format(ERROR_TAG + "Encountered an error while attempting to register a new user with username '%s'.", username));
+            }
+        }catch(SQLException sql){
+            System.out.println(String.format(ERROR_TAG + "Encountered an error while attempting to register a new user with username '%s'.", username));
         }
-        System.out.println(String.format(INFO_TAG + "New user %s has been registered", username));
-        return String.format("{\"loggedIn\": %b}", false);
+        finally {
+            return JSONResponse;
+        }
+    }
+
+    String unregisterUser(String username, double user_hash){
+        System.out.println(String.format(INFO_TAG + "Attempting to unregister user: '%s'.", username));
+        String unregisterUser = String.format("DELETE FROM User WHERE has_code='%f'", user_hash);
+        ResultSet resultSet = executeDatabaseQuery(unregisterUser);
+        String checkIfUnregistered = String.format("SELECT 1 FROM user WHERE has_code='%f'", user_hash);
+        resultSet = executeDatabaseQuery(checkIfUnregistered);
+        String JSONResponse = String.format("{\"success\": %b}", false);
+        try{
+            if(resultSet.next()){
+                System.out.println(String.format(ERROR_TAG + "Encountered an error while attempting to unregister user with username '%s'.", username));
+            }
+            else{
+                String JSONResponse = String.format("{\"success\": %b}", true);
+            }
+        }catch(SQLException sql){
+            System.out.println(String.format(ERROR_TAG + "Encountered an error while attempting to unregister user with username '%s'.", username));
+        }
+        finally{
+            return JSONResponse;
+        }
+
     }
     
     String sendInvite(String playerOne, String playerTwo){
 		System.out.println(String.format(INFO_TAG + "Attempting to service the invite of %s to %s", playerOne, playerTwo));
 		// TODO: Check if user exists in DB.
 		String[] newInvite = {playerOne, playerTwo};
+		String JSONResponse = String.format("{\"invitedPlayer\": \"%s\", \"wasSuccessful\": %b}", playerTwo, false);
 		for(String[] invite : invites){
 			if(invite[0].equals(newInvite[0]) && invite[1].equals(newInvite[1])){
-				return "";	// invite already exists
+                break; // invite already exists
 			}
 		}
 		invites.add(newInvite);
-		return String.format("{\"invitedPlayer\": \"%s\"}", playerTwo);
+        JSONResponse = String.format("{\"invitedPlayer\": \"%s\", \"wasSuccessful\": %b}", playerTwo, true);
+		return JSONResponse;
     }
     
     String acceptInvite(String playerOne, String playerTwo) {
         System.out.println(String.format(INFO_TAG + "Attempting to accept the invite of %s to %s", playerOne, playerTwo));
+        String JSONResponse = "";
         for (String[] invite : invites) {
             if (invite[0].equals(playerOne) && invite[1].equals(playerTwo)) {
                 invites.remove(invite);
@@ -276,11 +291,10 @@ public class Server extends Thread{
                         playerInvites += inv[0] + ",";
                     }
                 }
-                return String.format("{\"invites\": \"%s\"}", playerInvites);
+                JSONResponse = String.format("{\"invites\": \"%s\"}", playerInvites);
             }
-
         }
-        return "";
+        return JSONResponse;
     }
     
     String declineInvite(String playerOne, String playerTwo) {
