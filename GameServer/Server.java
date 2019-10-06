@@ -250,7 +250,7 @@ public class Server extends Thread{
             }
             else{
                 System.out.println(String.format(SUCCESS_TAG + "User '%s' has been unregistered", username));
-                String JSONResponse = String.format("{\"success\": %b}", true);
+                JSONResponse = String.format("{\"success\": %b}", true);
             }
         }catch(SQLException sql){
             System.out.println(String.format(ERROR_TAG + "Encountered an error while attempting to unregister user with username '%s'.", username));
@@ -300,6 +300,7 @@ public class Server extends Thread{
     
     String declineInvite(String playerOne, String playerTwo) {
         System.out.println(String.format(INFO_TAG + "Attempting to decline the invite of %s to %s", playerOne, playerTwo));
+        String JSONResponse = "";
         for (String[] invite : invites) {
             if (invite[0].equals(playerOne) && invite[1].equals(playerTwo)) {
                 invites.remove(invite);
@@ -309,44 +310,47 @@ public class Server extends Thread{
                         playerInvites += inv[0] + ",";
                     }
                 }
-                return String.format("{\"invites\": \"%s\"}", playerInvites);
+                JSONResponse = String.format("{\"invites\": \"%s\"}", playerInvites);
             }
 
         }
-        return "";
+        return JSONResponse;
     }
     
     String viewGame(String gameID){
 		System.out.println(String.format(INFO_TAG + "Attempting to service request to view game: '%s'.", gameID));
+		String JSONResponse = "";
 		for(Game game : activeGames){
 			if(game.gameID.equals(gameID)){
-				return formatGameResponse(game);
+				JSONResponse = formatGameResponse(game);
 			}
 		}
-		return "";
+		return JSONResponse;
     }
 
     String movePiece(String gameID, String playerID, String row, String column){
 		// handle a POST request to move a piece in a game instance.
 		System.out.println(String.format(INFO_TAG + "Attempting to move piece at row: '%s', column: '%s', for player: '%s' and game: '%s'.", row, column, playerID, gameID));
+		String JSONResponse = "";
 		for(Game game : activeGames){
 			if(game.gameID.equals(gameID)){
 				if(game.sendInput(playerID, Integer.parseInt(row), Integer.parseInt(column))){
-					return formatGameResponse(game);
+					JSONResponse = formatGameResponse(game);
 				}
 			}
 		}
-		return "";
+		return JSONResponse;
     }
     
     String formatGameResponse(Game game){
-		String validTilesJson = formatBoardArrayResponse(game.move.validTiles);
-		String boardJson = formatBoardArrayResponse(game.board);
-		return String.format("{\"gameID\": \"%s\", \"playerOne\": \"%s\", \"playerTwo\": \"%s\", \"turn\": \"%s\", \"turnNumber\": \"%d\" , \"board\": \"%s\", \"availableMoves\": \"%s\", \"winner\": \"%s\", \"startTime\": \"%s\", \"endTime\": \"%s\"}", game.gameID, game.playerOne, game.playerTwo, game.turn, game.turnNumber, boardJson, validTilesJson, game.winner, game.startTime, game.endTime);
+		String validTilesJSON = formatBoardArrayResponse(game.move.validTiles);
+		String boardJSON = formatBoardArrayResponse(game.board);
+		String JSONResponse = String.format("{\"gameID\": \"%s\", \"playerOne\": \"%s\", \"playerTwo\": \"%s\", \"turn\": \"%s\", \"turnNumber\": \"%d\" , \"board\": \"%s\", \"availableMoves\": \"%s\", \"winner\": \"%s\", \"startTime\": \"%s\", \"endTime\": \"%s\"}", game.gameID, game.playerOne, game.playerTwo, game.turn, game.turnNumber, boardJSON, validTilesJSON, game.winner, game.startTime, game.endTime);
+        return JSONResponse;
     }
     
     String formatBoardArrayResponse(String[][] state){
-		String boardJson = "";
+		String boardJSON = "";
 		for(int i=0; i<9; i++){
 			String boardRow = "";
 			for(int j=0; j<7; j++){
@@ -355,12 +359,12 @@ public class Server extends Thread{
 					boardRow += ",";
 				}
 			}
-			boardJson += boardRow;
+			boardJSON += boardRow;
 			if(i <= 8){
-				boardJson += "|";
+				boardJSON += "|";
 			}
 		}
-		return boardJson;
+		return boardJSON;
     }
 
     void forfeitGame(){
