@@ -191,6 +191,10 @@ class GameConnector extends Server{
                 System.out.println(INFO_TAG + "User is trying to register.");
                 handleUserRegistration();
                 break;
+            case "user_unregistration":
+                System.out.println(INFO_TAG + "User is trying to unregister.");
+                handleUserUnregistration();
+                break;
             case "login":
                 handleLogin();
                 break;
@@ -223,7 +227,7 @@ class GameConnector extends Server{
 
     private void handleLogin() throws IOException{
         // handle a client requesting to log in.
-        System.out.println(String.format(INFO_TAG + "Attempting to log in user %s", request.username));
+        System.out.println(String.format(INFO_TAG + "Attempting to log in user '%s'", request.username));
 		String JSONResponse = login(request.username, request.user_hash);
 		HEADER += String.format("Set-Cookie: user_hash=%f\r\n\r\n", request.user_hash);
 		sendJSONReponse(JSONResponse);
@@ -231,7 +235,7 @@ class GameConnector extends Server{
 
     private void handleLogout() throws IOException{
         // handle a client requesting to log out.
-        System.out.println(String.format(INFO_TAG + "Attempting to log out user %s", request.username));
+        System.out.println(String.format(INFO_TAG + "Attempting to log out user '%s'", request.username));
 		String JSONResponse = logout(request.cookie);
 		System.out.println(String.format(INFO_TAG + "User %s has been logged out", request.username));
 		sendJSONReponse(JSONResponse);
@@ -239,9 +243,16 @@ class GameConnector extends Server{
 
     private void handleUserRegistration() throws IOException{
         // handle a client requesting to register a new account.
-        System.out.println(String.format(INFO_TAG + "Attempting to register user %s", request.username));
-		String JSONResponse = registerUser(request.username, request.password, request.user_hash);
-		sendJSONReponse(JSONResponse);
+        System.out.println(String.format(INFO_TAG + "Attempting to register new user '%s'", request.username));
+        String JSONResponse = registerUser(request.username, request.password, request.user_hash);
+        sendJSONReponse(JSONResponse);
+    }
+
+    private void handleUserUnregistration() throws IOException{
+        // handle a client requesting to register a new account.
+        System.out.println(String.format(INFO_TAG + "Attempting to unregister user '%s'", request.username));
+        String JSONResponse = unregisterUser(request.username, request.user_hash);
+        sendJSONReponse(JSONResponse);
     }
     
     

@@ -198,7 +198,7 @@ public class Server extends Thread{
                     }
                 }
                 JSONResponse = String.format("{\"loggedIn\": %b, \"username\": \"%s\", \"invites\": \"%s\"}", true, username, playerInvites);
-                System.out.println(String.format(INFO_TAG + "User '%s' has been logged in.", username));
+                System.out.println(String.format(SUCCESS_TAG + "User '%s' has been logged in.", username));
             } else {   // User does not exist. Stop the request handling.
                 System.out.println(String.format(DEBUG_TAG + "User '%s' does not exist.", username));
             }
@@ -225,7 +225,7 @@ public class Server extends Thread{
         String JSONResponse = String.format("{\"loggedIn\": %b}", false);
         try {
             if (resultSet.next()) {
-                System.out.println(String.format(INFO_TAG + "New user '%s' has been registered", username));
+                System.out.println(String.format(SUCCESS_TAG + "New user '%s' has been registered", username));
             } else {
                 System.out.println(String.format(ERROR_TAG + "Encountered an error while attempting to register a new user with username '%s'.", username));
             }
@@ -249,6 +249,7 @@ public class Server extends Thread{
                 System.out.println(String.format(ERROR_TAG + "Encountered an error while attempting to unregister user with username '%s'.", username));
             }
             else{
+                System.out.println(String.format(SUCCESS_TAG + "User '%s' has been unregistered", username));
                 String JSONResponse = String.format("{\"success\": %b}", true);
             }
         }catch(SQLException sql){
