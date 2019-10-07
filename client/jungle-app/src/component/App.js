@@ -12,18 +12,18 @@ export default class App extends React.Component {
         this.updateLoginValue = this.updateLoginValue.bind(this);
         this.updateInvites = this.updateInvites.bind(this);
         this.setSelectedGame = this.setSelectedGame.bind(this);
-        this.postExampleNew = this.postExampleNew.bind(this);
+        this.postExample = this.postExample.bind(this);
     }
 
     state = {
-        loggedIn: false,
-        username: "",
-        activeGames : ["0001", "0002", "0005"],
+        loggedIn: true,
+        username: null,
+        activeGames: ["0001", "0002", "0005"],
         completedGames: ["0003", "0004"],
         users: ['Brian', 'Dave'],
         passwords: ['Crane', 'Wells'],
         selectedGame: null,
-        invites : " ",
+        invites: " ",
         gameState:
             {
                 "gameID": "00000",
@@ -58,7 +58,7 @@ export default class App extends React.Component {
                 "endTime": ""
             },
         apiConfig:{
-            url:'http://10.3.0.50:8080',
+            url:'http://localhost:8080',
             payload: "action=login&username=dummy_user&password=iforgot123",
             headers: {
                 'Content-Type': 'application/text',
@@ -70,7 +70,7 @@ export default class App extends React.Component {
     postExample(data) {
         console.log("Making request");
         var self = this;
-        axios.post('http://129.82.44.123:8080',
+        axios.post('http://localhost:8080',
             // "action=move_piece&gameID=1234&username=dummy_user&password=iforgot123&row=8&column=0",
             data,
             {
@@ -210,7 +210,7 @@ export default class App extends React.Component {
         var self = this;
         console.log("calling api for game state...");
         axios.post(
-            'http://129.82.44.123:8080',
+            'http://localhost:8080',
             "action=login&username=" + username + "&password=" + password,
             {headers: {
             'Content-Type': 'application/json',
@@ -250,7 +250,8 @@ export default class App extends React.Component {
                         />
                         <Board selectedGame={this.state.selectedGame}
                                gameState={this.state.gameState}
-                               postExample={this.postExampleNew}
+                               postExample={this.postExample}
+                               loggedIn={this.state.loggedIn}
                         />
                     </TabPanel>
                     <TabPanel><GameRules/></TabPanel>
@@ -365,7 +366,7 @@ class Board extends Games {
                             value={row_index.toString() + "," + column_index.toString()}
                             className={"game-buttons"}
                             onClick={() => {
-                                this.props.postExample("action=move_piece&gameID=1234&username=the_devil_himself&password=666&row=" + row_index + "&column=" + column_index)
+                                this.props.postExample("action=move_piece&gameID=1234&username=dummy_user&password=iforgot123&row=" + row_index + "&column=" + column_index)
                             }}
                             // onClick={this.props.postExample()}
                         >
