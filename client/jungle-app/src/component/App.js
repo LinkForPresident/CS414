@@ -24,9 +24,39 @@ export default class App extends React.Component {
         passwords: ['Crane', 'Wells'],
         selectedGame: null,
         invites : " ",
-        boardState: {
-
-        },
+        gameState:
+            {
+                "gameID": "00000",
+                "playerOne": "Bob",
+                "playerTwo": "Sally",
+                "turn": "Bob",
+                "turnNumber": 0,
+                "board": [
+                    ["r1 ", "__ ", "__ ", "__ ", "__ ", "__ ", "__ "],
+                    ["__ ", "__ ", "__ ", "__ ", "__ ", "__ ", "__ "],
+                    ["__ ", "__ ", "__ ", "__ ", "__ ", "__ ", "__ "],
+                    ["__ ", "__ ", "__ ", "__ ", "__ ", "__ ", "__ "],
+                    ["__ ", "__ ", "__ ", "__ ", "__ ", "__ ", "__ "],
+                    ["__ ", "__ ", "__ ", "__ ", "__ ", "__ ", "__ "],
+                    ["__ ", "__ ", "__ ", "__ ", "__ ", "__ ", "__ "],
+                    ["__ ", "__ ", "__ ", "__ ", "__ ", "__ ", "__ "],
+                    ["__ ", "__ ", "__ ", "__ ", "__ ", "__ ", "__ "],
+                ],
+                "availableMoves": [
+                    ["__", "__", "__", "__", "__", "__", "__"],
+                    ["__", "__", "__", "__", "__", "__", "__"],
+                    ["__", "__", "__", "__", "__", "__", "__"],
+                    ["__", "__", "__", "__", "__", "__", "__"],
+                    ["__", "__", "__", "__", "__", "__", "__"],
+                    ["__", "__", "__", "__", "__", "__", "__"],
+                    ["__", "__", "__", "__", "__", "__", "__"],
+                    ["__", "__", "__", "__", "__", "__", "__"],
+                    ["__", "__", "__", "__", "__", "__", "__"]
+                ],
+                "winner": "",
+                "startTime": "",
+                "endTime": ""
+            },
         apiConfig:{
             url:'http://10.3.0.50:8080',
             payload: "action=login&username=dummy_user&password=iforgot123",
@@ -37,13 +67,56 @@ export default class App extends React.Component {
         }
     };
 
-    postExampleNew () {
-        console.log("fdsa");
-        axios.post(this.state.apiConfig.url,
-            this.state.apiConfig.payload,
-            {headers: this.state.apiConfig.headers})
-            .then(response => console.log(response))
-            .catch()
+    postExample(data) {
+        console.log("Making request");
+        var self = this;
+        axios.post('http://129.82.44.123:8080',
+            // "action=move_piece&gameID=1234&username=dummy_user&password=iforgot123&row=8&column=0",
+            data,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH',
+                }
+            })
+            .then(function (response) {
+                let availableMovesProto = response.data.availableMoves;
+                console.log(response.data);
+                if (typeof availableMovesProto == 'undefined') {
+                    return
+                }
+                availableMovesProto = availableMovesProto.split("|");
+                let availableMoves = [];
+                availableMovesProto.forEach(function (element) {
+                    let elems = element.split(",");
+                    let row = [];
+                    elems.forEach(function (elem) {
+                        row.push(elem);
+                    });
+                    availableMoves.push(row);
+                });
+                console.log(availableMoves);
+                let boardStateProto = response.data.board;
+                boardStateProto = boardStateProto.split("|");
+                let boardState = [];
+                boardStateProto.forEach(function (element) {
+                    let elems = element.split(",");
+                    let row = [];
+                    elems.forEach(function (elem) {
+                        row.push(elem);
+                    });
+                    boardState.push(row);
+                });
+                console.log(boardState);
+                response.data.availableMoves = availableMoves;
+                response.data.board = boardState;
+                self.setState({
+                    gameState: response.data
+                })
+            })
+            .catch();
+        let board = this.state.gameState.board;
+        console.log(this.state.gameState);
     }
 
         async handleLoginRequest(event, url, payload, headers){
