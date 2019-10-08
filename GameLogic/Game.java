@@ -80,7 +80,7 @@ public class Game {
     public boolean sendInput(String player, int row, int col){
         // send input to the game in the format (player sending move, column selected, row selected)
         // returns true if the game state has changed, else returns false
-        if(isTurn(player) && winner.length() == 0){
+        if(isTurn(player) && winner.isEmpty()){
             if(move.selectedCol == col && move.selectedRow == row){ // if the second half of the move is the same as the first half (re-selecting the same tile)
                 move.selectedCol = -1;
                 move.selectedRow = -1;
@@ -156,7 +156,7 @@ public class Game {
             if(isTurn(playerTwo)) winner = playerOne;
         }
 
-        if(winner.length() != 0){
+        if(!winner.isEmpty()){
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
             endTime = dtf.format(LocalDateTime.now()).toString();
         }
