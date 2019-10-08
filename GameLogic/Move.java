@@ -8,6 +8,7 @@ public class Move {
     int selectedRow = -1;
     int selectedCol = -1;
     public String[][] validTiles = new String[9][7];
+    public int numberOfValidTiles = 0;
 
     Move(Game current_game){
         game = current_game;
@@ -23,6 +24,7 @@ public class Move {
     }
 
     void updateValidTiles(){
+        numberOfValidTiles = 0;
         for(int i=0; i<9; i++) {
             for (int j = 0; j < 7; j++) {
                 validTiles[i][j] = "_";
@@ -40,8 +42,10 @@ public class Move {
         // checks tile conditions and puts a "*" in the corresponding location of validTiles if the tile can be moved to from location (selectedRow, selectedCol)
         if (!isFriendlyUnit(row, col)) { // if there is no friendly unit occupying the tile
             if (!isWater(row, col) || isRat(selectedRow, selectedCol)) { // if there is no water (unless the unit being moved is a rat)
-                if((isEnemyUnit(row, col) && canCaptureUnit(row, col)) || !isEnemyUnit(row, col)) // if there is an enemy unit that the unit being moved can capture, or there is no enemy
+                if((isEnemyUnit(row, col) && canCaptureUnit(row, col)) || !isEnemyUnit(row, col)) { // if there is an enemy unit that the unit being moved can capture, or there is no enemy
                     validTiles[row][col] = "*";
+                    numberOfValidTiles++;
+                }
             } else if (isLionOrTiger(selectedRow, selectedCol)) { // if the unit being moved is a lion or tiger
                 handleLionTigerMovement(row, col);
             }
@@ -58,6 +62,7 @@ public class Move {
                 if((isEnemyUnit(selectedRow, selectedCol+(colOffset*3)) && canCaptureUnit(selectedRow, selectedCol+(colOffset*3))) || // if there is an enemy unit that can be captured
                         (!isEnemyUnit(selectedRow, selectedCol+(colOffset*3)) && !isFriendlyUnit(selectedRow, selectedCol+(colOffset*3)))) { // if there is no enemy or friendly units
                     validTiles[selectedRow][selectedCol+(colOffset*3)] = "*";
+                    numberOfValidTiles++;
                 }
             }
         }
@@ -67,6 +72,7 @@ public class Move {
                 if((isEnemyUnit(selectedRow+(rowOffset*4), selectedCol) && canCaptureUnit(selectedRow+(rowOffset*4), selectedCol)) || // if there is an enemy unit that can be captured
                         (!isEnemyUnit(selectedRow+(rowOffset*4), selectedCol) && !isFriendlyUnit(selectedRow+(rowOffset*4), selectedCol))) { // if there is no enemy or friendly units
                     validTiles[selectedRow+(rowOffset*4)][selectedCol] = "*";
+                    numberOfValidTiles++;
                 }
             }
         }

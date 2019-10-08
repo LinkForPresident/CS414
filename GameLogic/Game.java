@@ -148,13 +148,36 @@ public class Game {
                 }
             }
         }
-        if(redPieces == 0) winner = playerOne;
-        if(bluePieces == 0) winner = playerTwo;
+        if(redPieces == 0) winner = playerOne; // if there are no red pieces left
+        if(bluePieces == 0) winner = playerTwo; // if there are no blue pieces left
+
+        if(!canMakeMove()){
+            if(isTurn(playerOne)) winner = playerTwo;
+            if(isTurn(playerTwo)) winner = playerOne;
+        }
 
         if(winner.length() != 0){
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
             endTime = dtf.format(LocalDateTime.now()).toString();
         }
+    }
+
+    private boolean canMakeMove(){
+        // Returns true if the current turn's player has any moves available
+
+        Move testMove = new Move(this);
+
+        for(int row = 0; row < 9; row++){
+            for(int col = 0; col < 7; col++){
+                if(testMove.isFriendlyUnit(row, col)){
+                    testMove.selectedRow = row;
+                    testMove.selectedCol = col;
+                    testMove.updateValidTiles();
+                    if(testMove.numberOfValidTiles > 0) return true;
+                }
+            }
+        }
+        return false;
     }
 
     public static void main(String[] arg){
