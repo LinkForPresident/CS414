@@ -58,7 +58,7 @@ export default class App extends React.Component {
                 "endTime": ""
             },
         apiConfig:{
-            url:'http://localhost:8080',
+            url:'http://localhost:8081',
             payload: "action=login&username=dummy_user&password=iforgot123",
             headers: {
                 'Content-Type': 'application/text',
@@ -70,7 +70,7 @@ export default class App extends React.Component {
     postExample(data) {
         console.log("Making request");
         var self = this;
-        axios.post('http://localhost:8080',
+        axios.post('http://localhost:8081',
             // "action=move_piece&gameID=1234&username=dummy_user&password=iforgot123&row=8&column=0",
             data,
             {
@@ -85,9 +85,11 @@ export default class App extends React.Component {
                 if (typeof availableMovesProto == 'undefined') {
                     return
                 }
-                availableMovesProto = availableMovesProto.split("|");
+                availableMovesProto = availableMovesProto.substring(0, availableMovesProto.length -2);
+                availableMovesProto = availableMovesProto.split(",|");
                 let availableMoves = [];
                 availableMovesProto.forEach(function (element) {
+
                     let elems = element.split(",");
                     let row = [];
                     elems.forEach(function (elem) {
@@ -97,7 +99,8 @@ export default class App extends React.Component {
                 });
                 console.log(availableMoves);
                 let boardStateProto = response.data.board;
-                boardStateProto = boardStateProto.split("|");
+                boardStateProto = boardStateProto.substring(0, boardStateProto.length -2);
+                boardStateProto = boardStateProto.split(",|");
                 let boardState = [];
                 boardStateProto.forEach(function (element) {
                     let elems = element.split(",");
@@ -129,7 +132,7 @@ export default class App extends React.Component {
                         return response;
                         }
                         )
-                        .catch()
+                        .catch();
                         return resp.data;
         }
         async handleSendInvite(event, url, payload, headers){
@@ -142,7 +145,7 @@ export default class App extends React.Component {
                         return response;
                         }
                         )
-                        .catch()
+                        .catch();
                         return resp.data;
         }
         async handleAcceptInvite(url, payload, headers){
@@ -210,7 +213,7 @@ export default class App extends React.Component {
         var self = this;
         console.log("calling api for game state...");
         axios.post(
-            'http://localhost:8080',
+            'http://localhost:8081',
             "action=login&username=" + username + "&password=" + password,
             {headers: {
             'Content-Type': 'application/json',
