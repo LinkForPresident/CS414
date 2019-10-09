@@ -1,95 +1,75 @@
-[
-    {
-        "gameID": "12345",
-        "playerOne": "Bob",
-        "playerTwo": "Sally",
-        "turn": "Bob",
-        "turnNumber": 0,
-        "board":[
-                    [
-                      {tile:{environment: null, piece: "r7", available: false}},
-                      {tile:{environment: null, piece: null, available: false}},
-                      {tile:{environment: "trap", piece: null,  available: false}},
-                      {tile:{environment: "den", piece: null,  available: false}},
-                      {tile:{environment: "trap", piece: null,  available: false}},
-                      {tile:{environment: null, piece: null,  available: false}},
-                      {tile:{environment: null, piece: "r6",  available: false}}
-                    ],
-                    [
-                      {tile:{environment: null, piece: null, available: false}},
-                      {tile:{environment: null, piece: "r4", available: false}},
-                      {tile:{environment: null, piece: null,  available: false}},
-                      {tile:{environment: "trap", piece: null,  available: false}},
-                      {tile:{environment: null, piece: null,  available: false}},
-                      {tile:{environment: null, piece: "r2",  available: false}},
-                      {tile:{environment: null, piece: null,  available: false}}
-                    ],
-                    [
-                      {tile:{environment: null, piece: "r1", available: false}},
-                      {tile:{environment: null, piece: null, available: false}},
-                      {tile:{environment: null, piece: "r5",  available: false}},
-                      {tile:{environment: null, piece: null,  available: false}},
-                      {tile:{environment: null, piece: "r3",  available: false}},
-                      {tile:{environment: null, piece: null,  available: false}},
-                      {tile:{environment: null, piece: "r8",  available: false}}
-                    ],
-                    [
-                      {tile:{environment: null, piece: null, available: false}},
-                      {tile:{environment: "river", piece: null, available: false}},
-                      {tile:{environment: "river", piece: null,  available: false}},
-                      {tile:{environment: null, piece: null,  available: false}},
-                      {tile:{environment: "river", piece: null,  available: false}},
-                      {tile:{environment: "river", piece: null,  available: false}},
-                      {tile:{environment: null, piece: null,  available: false}}
-                    ],
-                    [
-                      {tile:{environment: null, piece: null, available: false}},
-                      {tile:{environment: "river", piece: null, available: false}},
-                      {tile:{environment: "river", piece: null,  available: false}},
-                      {tile:{environment: null, piece: null,  available: false}},
-                      {tile:{environment: "river", piece: null,  available: false}},
-                      {tile:{environment: "river", piece: null,  available: false}},
-                      {tile:{environment: null, piece: null,  available: false}}
-                    ],
-                    [
-                      {tile:{environment: null, piece: null, available: false}},
-                      {tile:{environment: "river", piece: null, available: false}},
-                      {tile:{environment: "river", piece: null,  available: false}},
-                      {tile:{environment: null, piece: null,  available: false}},
-                      {tile:{environment: "river", piece: null,  available: false}},
-                      {tile:{environment: "river", piece: null,  available: false}},
-                      {tile:{environment: null, piece: null,  available: false}}
-                    ],
-                    [
-                      {tile:{environment: null, piece: "b8", available: false}},
-                      {tile:{environment: null, piece: null, available: false}},
-                      {tile:{environment: null, piece: "b3",  available: false}},
-                      {tile:{environment: null, piece: null,  available: false}},
-                      {tile:{environment: null, piece: "b5",  available: false}},
-                      {tile:{environment: null, piece: null,  available: false}},
-                      {tile:{environment: null, piece: "b1",  available: false}}
-                    ],
-                    [
-                      {tile:{environment: null, piece: null, available: true}},
-                      {tile:{environment: null, piece: "b2", available: false}},
-                      {tile:{environment: null, piece: null,  available: false}},
-                      {tile:{environment: "trap", piece: null,  available: false}},
-                      {tile:{environment: null, piece: null,  available: false}},
-                      {tile:{environment: null, piece: "b4",  available: false}},
-                      {tile:{environment: null, piece: null,  available: false}}
-                    ],
-                    [
-                      {tile:{environment: null, piece: "b6", available: false}},
-                      {tile:{environment: null, piece: null, available: true}},
-                      {tile:{environment: "trap", piece: null,  available: false}},
-                      {tile:{environment: "den", piece: null,  available: false}},
-                      {tile:{environment: "trap", piece: null,  available: false}},
-                      {tile:{environment: null, piece: null,  available: false}},
-                      {tile:{environment: null, piece: "b7",  available: false}}
-                    ],
-                ],
-        "winner": "",
-        "startTime": "",
-        "endTime": ""
-    }
-]
+{
+	"gameID": "12345",
+	"playerOne": "Bob",
+	"playerTwo": "Sally",
+	"turn": "Bob",
+	"turnNumber": 0,
+	"board": [{
+		"0": [
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false}
+		],
+		"1": [
+			{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false}
+		  ],
+		"2": [
+			{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false}
+		  ],
+		"3": [
+			{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false}
+		  ],
+		"4": [
+			{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false}
+		  ],
+		"5": [
+			{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false}
+		  ],
+		"6": [
+			{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false},
+		  	{"environment": null,"piece": null,"available": false}
+		 ]}
+	],
+	"winner": "",
+	"startTime": "",
+	"endTime": ""
+}
