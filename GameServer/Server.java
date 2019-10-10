@@ -10,7 +10,7 @@ import java.util.*;
 
 public class Server extends Thread{
 
-    private static final int PORT_NUMBER = 8081;
+    private static final int PORT_NUMBER = 8080;
     private static final String RELATIVE_PATH = "client/html";
     static final String DEFAULT_METHOD = "GET";
     static final String DEFAULT_PAGE = "/index.html";
