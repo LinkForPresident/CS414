@@ -382,4 +382,26 @@ public class GameTest extends TestCase {
         game.sendInput("Bob", 0, 3);
         assertEquals("Bob", game.winner);
     }
+
+    @Test
+    public void testLockedGameState(){
+        String newBoard[][] = {
+                {"r3","b6","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"b5","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"}};
+
+        game.board = newBoard;
+
+        game.sendInput("Bob", 2, 0);
+        game.sendInput("Bob", 1, 0);
+        game.printBoard();
+        assertEquals("Bob", game.winner);
+    }
+
 }
