@@ -29,12 +29,10 @@ export default class App extends React.Component {
     state = {
 
         loggedIn: false,
-
         username: null,
+        password: null,
         activeGames: ["0001", "0002", "0005"],
         completedGames: ["0003", "0004"],
-        users: ['Brian', 'Dave'],
-        passwords: ['Crane', 'Wells'],
         selectedGame: null,
         invites: " ",
         gameState:
@@ -71,7 +69,7 @@ export default class App extends React.Component {
                 "endTime": ""
             },
         apiConfig:{
-            url:'http://localhost:8081',
+            url:'http://localhost:8080',
             payload: "action=login&username=dummy_user&password=iforgot123",
             headers: {
                 'Content-Type': 'application/text',
@@ -272,6 +270,7 @@ export default class App extends React.Component {
                                    gameState={this.state.gameState}
                                    postExample={this.postExample}
                                    loggedIn={this.state.loggedIn}
+                                   username={this.state.username}
                             />
                         </TabPanel>
                         <TabPanel><GameRules/></TabPanel>
@@ -288,6 +287,7 @@ export default class App extends React.Component {
                         <TabPanel><User/></TabPanel>
                     </Tabs>
                 </div>
+            )
         } else {
 
             return (
