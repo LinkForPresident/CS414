@@ -6,14 +6,24 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 export default class App extends React.Component {
+
+    constructor(props){
+        super(props);
+        this.updateLoginValue = this.updateLoginValue.bind(this);
+        this.updateInvites = this.updateInvites.bind(this);
+        this.setSelectedGame = this.setSelectedGame.bind(this);
+        this.postExample = this.postExample.bind(this);
+    }
+
     state = {
-        loggedIn: false,
-        userName: null,
+        loggedIn: true,
+        username: null,
         activeGames: ["0001", "0002", "0005"],
         completedGames: ["0003", "0004"],
         users: ['Brian', 'Dave'],
         passwords: ['Crane', 'Wells'],
         selectedGame: null,
+        invites: " ",
         gameState:
             {
                 "gameID": "00000",
@@ -47,8 +57,8 @@ export default class App extends React.Component {
                 "startTime": "",
                 "endTime": ""
             },
-        apiConfig: {
-            url: 'http://localhost:8080',
+        apiConfig:{
+            url:'http://localhost:8081',
             payload: "action=login&username=dummy_user&password=iforgot123",
             headers: {
                 'Content-Type': 'application/text',
@@ -60,7 +70,7 @@ export default class App extends React.Component {
     postExample(data) {
         console.log("Making request");
         var self = this;
-        axios.post('http://129.82.44.123:8080',
+        axios.post('http://localhost:8081',
             // "action=move_piece&gameID=1234&username=dummy_user&password=iforgot123&row=8&column=0",
             data,
             {
@@ -75,9 +85,11 @@ export default class App extends React.Component {
                 if (typeof availableMovesProto == 'undefined') {
                     return
                 }
-                availableMovesProto = availableMovesProto.split("|");
+                availableMovesProto = availableMovesProto.substring(0, availableMovesProto.length -2);
+                availableMovesProto = availableMovesProto.split(",|");
                 let availableMoves = [];
                 availableMovesProto.forEach(function (element) {
+
                     let elems = element.split(",");
                     let row = [];
                     elems.forEach(function (elem) {
@@ -87,7 +99,8 @@ export default class App extends React.Component {
                 });
                 console.log(availableMoves);
                 let boardStateProto = response.data.board;
-                boardStateProto = boardStateProto.split("|");
+                boardStateProto = boardStateProto.substring(0, boardStateProto.length -2);
+                boardStateProto = boardStateProto.split(",|");
                 let boardState = [];
                 boardStateProto.forEach(function (element) {
                     let elems = element.split(",");
@@ -109,24 +122,81 @@ export default class App extends React.Component {
         console.log(this.state.gameState);
     }
 
-    postRequest(action, payloads) {
-        // for(payload)
-        axios.post('http://localhost:8080',
-            "action=move_piece&game_id=1234&username=dummy_user&row=0&column=0",
-            {headers: {headers: this.state.apiConfig.headers}})
-            .then(response => console.log(response));
-    }
+        async handleLoginRequest(event, url, payload, headers){
+            var resp = await axios.post(url,
+                       payload,
+                       headers,
+                        )
+                        .then(function(response){
+                        console.log(response);
+                        return response;
+                        }
+                        )
+                        .catch();
+                        return resp.data;
+        }
+        async handleSendInvite(event, url, payload, headers){
+            var resp = await axios.post(url,
+                       payload,
+                       headers,
+                        )
+                        .then(function(response){
+                        console.log(response);
+                        return response;
+                        }
+                        )
+                        .catch();
+                        return resp.data;
+        }
+        async handleAcceptInvite(url, payload, headers){
+            var resp = await axios.post(url,
+                       payload,
+                       headers,
+                        )
+                        .then(function(response){
+                        console.log(response);
+                        return response;
+                        }
+                        )
+                        .catch()
+                        return resp.data;
+        }
+        async handleDeclineInvite(url, payload, headers){
+            var resp = await axios.post(url,
+                       payload,
+                       headers,
+                        )
+                        .then(function(response){
+                        console.log(response);
+                        return response;
+                        }
+                        )
+                        .catch()
+                        return resp.data;
+        }
 
+        updateLoginValue(loginVal, username, invites){
+        console.log(username);
+        console.log(invites);
+            this.setState({
+                loggedIn: loginVal,
+                username: username,
+                invites: invites,
+            });
+        }
+        updateInvites(invites){
+            this.setState({
+                invites: invites
+            });
+        }
 
     setGameState(gameId) {
         console.log("calling api for game state...");
         axios.post(
             this.state.apiConfig.url,
-            "action=get_game&game_id=0001",
+            "action=view_game&gameID=1234",
             {headers: this.state.apiConfig.headers}
-        ).then(response => this.setState({
-            gameState: response.data
-        }));
+        ).then((response) => console.log(response));
         console.log("Game State set.")
     }
 
@@ -143,7 +213,7 @@ export default class App extends React.Component {
         var self = this;
         console.log("calling api for game state...");
         axios.post(
-            'http://129.82.44.123:8080',
+            'http://localhost:8081',
             "action=login&username=" + username + "&password=" + password,
             {headers: {
             'Content-Type': 'application/json',
@@ -158,7 +228,7 @@ export default class App extends React.Component {
     }
 
     render() {
-
+        if(this.state.loggedIn){
         return (
             <div className='menu navigation-menu'>
                 <Tabs>
@@ -178,32 +248,44 @@ export default class App extends React.Component {
                         <Games
                             activeGames={this.state.activeGames}
                             completedGames={this.state.completedGames}
-                            setSelectedGame={this.setSelectedGame.bind(this)}
+                            setSelectedGame={this.setSelectedGame}
                             loggedIn={this.state.loggedIn}
                         />
                         <Board selectedGame={this.state.selectedGame}
                                gameState={this.state.gameState}
-                               postExample={this.postExample.bind(this)}
+                               postExample={this.postExample}
+                               loggedIn={this.state.loggedIn}
                         />
                     </TabPanel>
                     <TabPanel><GameRules/></TabPanel>
-                    <TabPanel><History postExample={this.postExample.bind(this)}/></TabPanel>
-                    <TabPanel><Invite/></TabPanel>
-                    <TabPanel><Register users={this.state.users} passwords={this.state.passwords}/></TabPanel>
-                    <TabPanel>
-                        <Login
-                            users={this.state.users}
-                            passwords={this.state.passwords}
-                            handleLogin={this.handleLogin.bind()}/>
-                    </TabPanel>
+                    <TabPanel><History postExample={this.postExampleNew}/></TabPanel>
+                    <TabPanel><Invite apiConfig = {this.state.apiConfig} handleSendInvite = {this.handleSendInvite} handleAcceptInvite = {this.handleAcceptInvite}
+                                                          invites={this.state.invites} username={this.state.username} handleDeclineInvite = {this.handleDeclineInvite} updateInvites={this.updateInvites}/></TabPanel>
+                    <TabPanel><Register users = {this.state.users} passwords = {this.state.passwords}/></TabPanel>
+                    <TabPanel><Login apiConfig = {this.state.apiConfig} handleLoginRequest = {this.handleLoginRequest} loggedIn={this.state.loggedIn}
+                    updateLoginValue={this.updateLoginValue}/></TabPanel>
                     <TabPanel><User/></TabPanel>
                 </Tabs>
             </div>
         )
+        }else{
+        return(
+        <div className='menu navigation-menu'>
+                        <Tabs>
+                            <TabList>
+
+
+                                <Tab>Login</Tab>
+                            </TabList>
+                            <TabPanel><Login apiConfig = {this.state.apiConfig} handleLoginRequest = {this.handleLoginRequest} loggedIn={this.state.loggedIn}
+                            updateLoginValue={this.updateLoginValue}/></TabPanel>
+
+                        </Tabs>
+                    </div>
+                )
+        }
     }
 }
-
-
 
 class Home extends React.Component {
     render() {
@@ -287,7 +369,7 @@ class Board extends Games {
                             value={row_index.toString() + "," + column_index.toString()}
                             className={"game-buttons"}
                             onClick={() => {
-                                this.props.postExample("action=move_piece&gameID=1234&username=the_devil_himself&password=666&row=" + row_index + "&column=" + column_index)
+                                this.props.postExample("action=move_piece&gameID=1234&username=dummy_user&password=iforgot123&row=" + row_index + "&column=" + column_index)
                             }}
                             // onClick={this.props.postExample()}
                         >
@@ -371,59 +453,107 @@ class GameRules extends React.Component {
 }
 
 class Invite extends React.Component {
+
+    constructor(props){
+        super(props);
+        this.state = {invitedPlayer: "", apiConfig: this.props.apiConfig}
+        this.handleInvitedPlayerChange = this.handleInvitedPlayerChange.bind(this);
+        this.handleSendInvite = this.handleSendInvite.bind(this);
+        this.handleAcceptInvite = this.handleAcceptInvite.bind(this);
+        this.handleDeclineInvite = this.handleDeclineInvite.bind(this);
+    }
+
     render() {
+    console.log(this.props.invites);
+        if(typeof this.props.invites !== "undefined"){    // gotta be a better way of doing this...
+        var playerInvites = this.props.invites.split(",");
+        playerInvites.pop();
+        console.log(playerInvites);
+        var inviteButtons = playerInvites.map((elem) => <div style={{display:'block'}}>{elem}<button onClick={
+            this.handleAcceptInvite.bind(this, elem)}>Accept</button>
+            <button onClick={this.handleDeclineInvite.bind(this, elem)}>Decline</button></div>);
+        console.log(inviteButtons);
+        }
+
         return (
             <div className={'InvitePage'}>
-                <p>Invite Goes here</p>
+                <form onSubmit={(e) => this.handleSendInvite(e, this.state.apiConfig.url,
+                            "action=send_invite&playerOne=" + this.props.username + "&playerTwo=" + this.state.invitedPlayer,
+                            this.props.apiConfig.headers)}>
+                                <label>
+                                    Username of player to invite:
+                                    <input type="text" value={this.state.invitedPlayer} onChange={this.handleInvitedPlayerChange} />
+                                </label>
+                                <input type="submit" value="Submit" />
+                            </form>
+                            {inviteButtons}
+
             </div>
+
+
         )
     }
+
+    handleInvitedPlayerChange(event) {
+            event.preventDefault();
+            this.setState({invitedPlayer: event.target.value});
+        }
+    async handleSendInvite(event, url, payload, headers){
+            event.preventDefault();
+            this.props.handleSendInvite(event, url, payload, headers)
+            .then(response => this.props.updateInvites(response.invites));
+
+        }
+    async handleAcceptInvite(playerOne){
+            console.log("playerOne is: " + playerOne);
+            this.props.handleAcceptInvite(this.state.apiConfig.url, "action=accept_invite&playerOne=" + playerOne + "&playerTwo=" + this.props.username, this.props.apiConfig.headers)
+            .then(response => this.props.updateInvites(response.invites));
+
+
+        }
+    async handleDeclineInvite(playerOne){
+
+            this.props.handleAcceptInvite(this.state.apiConfig.url, "action=decline_invite&playerOne=" + playerOne + "&playerTwo=" + this.props.username, this.props.apiConfig.headers)
+            .then(response => this.props.updateInvites(response.invites));
+
+        }
 }
 
 class Login extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {username: '', password: '', users: this.props.users, passwords: this.props.passwords};
+        this.state = {username: '', password: '', apiConfig: this.props.apiConfig, loggedIn: this.props.loggedIn};
+        console.log(this.state);
+        console.log(this.props);
 
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleSubmit = this.handleLoginSubmit.bind(this);
     }
 
     handleNameChange(event) {
+        event.preventDefault();
         this.setState({username: event.target.value});
     }
 
     handlePasswordChange(event) {
+        event.preventDefault();
         this.setState({password: event.target.value});
     }
 
-    handleSubmit(event) {
+    async handleLoginSubmit(event, url, payload, headers){
         event.preventDefault();
-        let users = this.state.users;
-        let passwords = this.state.passwords;
-        let i;
-        let userMatchFound = false;
-        for(i = 0; i<users.length; i++) {
-            if(this.state.username === users[i]) {
-                userMatchFound = true;
-                if(this.state.password === passwords[i]) {
-                    alert('Password matches for username: ' + users[i])
-                }
-                else {
-                    alert('Password DOES NOT match for username: ' + users[i])
-                }
-            }
-        }
-        if(!userMatchFound) {
-            alert('Username ' + this.state.username + ' not found in list of Registered Users! ')
-        }
-        event.preventDefault();
+        this.props.handleLoginRequest(event, url, payload, headers)
+        .then(response => this.props.updateLoginValue(response.loggedIn, response.username, response.invites));
+
     }
+
 
     render() {
         return (
-            <form onSubmit={this.handleSubmit}>
+            <form onSubmit={(e) => this.handleSubmit(e, this.state.apiConfig.url,
+            "action=login&username=" + this.state.username + "&password=" + this.state.password,
+            this.props.apiConfig.headers)}>
                 <label>
                     Username:
                     <input type="text" value={this.state.username} onChange={this.handleNameChange} />
@@ -431,7 +561,7 @@ class Login extends React.Component {
                     <input type="text" type="password" value={this.state.password} onChange={this.handlePasswordChange} />
                     <input type="text" value="login" hidden />
                 </label>
-                <input type="submit" value="Submit" onClick={this.props.handleLogin(this.state.username, this.state.password)}/>
+                <input type="submit" value="Submit"/>
             </form>
         );
     }
