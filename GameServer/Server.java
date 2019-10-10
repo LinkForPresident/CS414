@@ -279,9 +279,11 @@ public class Server extends Thread{
     String acceptInvite(String playerOne, String playerTwo) {
         System.out.println(String.format(INFO_TAG + "Attempting to accept the invite of %s to %s", playerOne, playerTwo));
         String JSONResponse = "";
-        for (String[] invite : invites) {
+        Iterator<String[]> invitesIterator = invites.iterator();
+        while(invitesIterator.hasNext()) {
+            String[] invite = invitesIterator.next();
             if (invite[0].equals(playerOne) && invite[1].equals(playerTwo)) {
-                invites.remove(invite);
+                invitesIterator.remove();
                 try {
                     Game game = new Game(playerOne, playerTwo);
                 } catch (PlayerNameException e) {
@@ -301,9 +303,11 @@ public class Server extends Thread{
     String declineInvite(String playerOne, String playerTwo) {
         System.out.println(String.format(INFO_TAG + "Attempting to decline the invite of %s to %s", playerOne, playerTwo));
         String JSONResponse = "";
-        for (String[] invite : invites) {
+        Iterator<String[]> invitesIterator = invites.iterator();
+        while(invitesIterator.hasNext()) {
+            String[] invite = invitesIterator.next();
             if (invite[0].equals(playerOne) && invite[1].equals(playerTwo)) {
-                invites.remove(invite);
+                invitesIterator.remove();
                 String playerInvites = "";
                 for (String[] inv : invites) {
                     if (inv[1].equals(playerTwo)) {
@@ -343,18 +347,18 @@ public class Server extends Thread{
     }
     
     String formatGameResponse(Game game){
-		String validTilesJSON = formatBoardArrayResponse(game.move.validTiles);
 		String boardJSON = formatBoardArrayResponse(game.board);
-		String JSONResponse = String.format("{\"gameID\": \"%s\", \"playerOne\": \"%s\", \"playerTwo\": \"%s\", \"turn\": \"%s\", \"turnNumber\": \"%d\" , \"board\": \"%s\", \"availableMoves\": \"%s\", \"winner\": \"%s\", \"startTime\": \"%s\", \"endTime\": \"%s\"}", game.gameID, game.playerOne, game.playerTwo, game.turn, game.turnNumber, boardJSON, validTilesJSON, game.winner, game.startTime, game.endTime);
+		String JSONResponse = String.format("{\"gameID\": \"%s\", \"playerOne\": \"%s\", \"playerTwo\": \"%s\", \"turn\": \"%s\", \"turnNumber\": \"%d\" , \"board\": \"%s\", \"winner\": \"%s\", \"startTime\": \"%s\", \"endTime\": \"%s\"}", game.gameID, game.playerOne, game.playerTwo, game.turn, game.turnNumber, boardJSON, game.winner, game.startTime, game.endTime);
         return JSONResponse;
     }
     
-    String formatBoardArrayResponse(String[][] state){
+    String formatBoardArrayResponse(BoardSquare[][] state){
 		String boardJSON = "";
 		for(int i=0; i<9; i++){
 			String boardRow = "";
 			for(int j=0; j<7; j++){
-				boardRow += state[i][j];
+			    BoardSquare boardSquare = state[i][j];
+				boardRow += String.format("{\"environment\": {%s}, \"piece\": {%s}, \"available\": {%b}}", boardSquare.environment, boardSquare.gamePiece.ID, boardSquare.isValid);
 				if(j <= 6){
 					boardRow += ",";
 				}
