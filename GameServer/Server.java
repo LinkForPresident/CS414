@@ -349,12 +349,13 @@ public class Server extends Thread{
         return JSONResponse;
     }
     
-    String formatBoardArrayResponse(String[][] state){
+    String formatBoardArrayResponse(BoardSquare[][] state){
 		String boardJSON = "";
 		for(int i=0; i<9; i++){
 			String boardRow = "";
 			for(int j=0; j<7; j++){
-				boardRow += state[i][j];
+			    BoardSquare boardSquare = state[i][j];
+				boardRow += String.format("{\"environment\": {%s}, \"piece\": {%s}, \"available\": {%b}}", boardSquare.environment, boardSquare.gamePiece.ID, false);
 				if(j <= 6){
 					boardRow += ",";
 				}
