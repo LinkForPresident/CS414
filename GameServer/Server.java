@@ -7,11 +7,10 @@ import java.io.*;
 import java.lang.*;
 import java.sql.*;
 import java.util.*;
-//import org.json.JSONArray;
 
 public class Server extends Thread{
 
-    private static final int PORT_NUMBER = 8080;
+    private static final int PORT_NUMBER = 8081;
     private static final String RELATIVE_PATH = "client/html";
     static final String DEFAULT_METHOD = "GET";
     static final String DEFAULT_PAGE = "/index.html";
@@ -160,125 +159,198 @@ public class Server extends Thread{
         return loggedIn;
     }
 
-    void login(double user_hash) throws SQLNonTransientConnectionException {
-
-        try{
-            establishDatabaseProxyAddress();
-        }catch(InterruptedException | ClassNotFoundException | SQLException | IOException e){
-            System.out.println(ERROR_TAG + "Encountered an error while attempting to curl proxy server credentials for the database.");
-            e.printStackTrace();
-        }
-        System.out.println(String.format(INFO_TAG + "Attempting to log in user with user_hash: %f.", user_hash));
-        // Handle a POST request to login a client.
+    ResultSet executeDatabaseQuery(String query){
         Connection connection;
         Statement statement;
-        try {
+        ResultSet resultSet = null;
+        try{
+            establishDatabaseProxyAddress();
             Class.forName(JDBC_DRIVER); // register the JDBC driver.
             connection = DriverManager.getConnection(
                     PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
             statement = connection.createStatement();
+            resultSet = statement.executeQuery(query);
+        } catch(SQLNonTransientConnectionException e){
+            System.out.println(ERROR_TAG + "Encountered an error while connecting to the database. (HINT: the proxy server is likely different than what is set.)");
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch(InterruptedException | IOException e) {
+            System.out.println(ERROR_TAG + "Encountered an error while attempting to curl proxy server credentials for the database.");
+            e.printStackTrace();
+        }finally {
+            return resultSet;
+        }
+    }
 
-            String checkAuth = String.format("SELECT 1 FROM User WHERE hash_code='%f'", user_hash);
-            ResultSet resultSet = statement.executeQuery(checkAuth);
-
+    String login(String username, double user_hash){
+        // Login a client by checking if the client is registered and if so, adding client to list of logged in users.
+        System.out.println(String.format(INFO_TAG + "Attempting to log in user with username: '%s' and user_hash: '%f'.", username, user_hash));
+        String selectUser = String.format("SELECT 1 FROM User WHERE hash_code='%f'", user_hash);
+        ResultSet resultSet = executeDatabaseQuery(selectUser);
+        String JSONResponse = String.format("{\"loggedIn\": %b}", false);
+        try {
             if (resultSet.next()) { // User exists and has been authenticated, place user_hash into loggedInUsers list.
                 loggedInUsers.add(user_hash);
+                String playerInvites = "";
+                for (String[] inv : invites) {
+                    if (inv[1].equals(username)) {
+                        playerInvites += inv[0] + ",";
+                    }
+                }
+                JSONResponse = String.format("{\"loggedIn\": %b, \"username\": \"%s\", \"invites\": \"%s\"}", true, username, playerInvites);
+                System.out.println(String.format(SUCCESS_TAG + "User '%s' has been logged in.", username));
             } else {   // User does not exist. Stop the request handling.
-                throw new NoSuchElementException(String.format(DEBUG_TAG + "User %f does not exist!", user_hash));
+                System.out.println(String.format(DEBUG_TAG + "User '%s' does not exist.", username));
             }
-        } catch(SQLNonTransientConnectionException e){
-            throw new SQLNonTransientConnectionException();
-
-        } catch (SQLException | ClassNotFoundException e) {
-            //Handle errors for JDBC
-            e.printStackTrace();
-
+        }catch(SQLException sql) {
+        }finally {
+            return JSONResponse;
         }
     }
 
-    void logout(double user_hash){
-        // Handle a POST request to logout a client.
-        // Remove user_hash from loggedInUsers list.
-       loggedInUsers.remove(user_hash);
+    String logout(double user_hash){
+	// Remove user_hash from loggedInUsers list.
+		loggedInUsers.remove(user_hash);
+		String JSONResponse = String.format("{\"loggedIn\": %b}", false);
+		return JSONResponse;
     }
 
-    void registerUser(String username, String password, double user_hash) throws SQLNonTransientConnectionException{
+    String registerUser(String username, String password, double user_hash){
         // handle a POST request to register a new user in the system.
-
-        try{
-            establishDatabaseProxyAddress();
-        }catch(InterruptedException | ClassNotFoundException | SQLException | IOException e){
-            System.out.println(ERROR_TAG + "Encountered an error while attempting to curl proxy server credentials for the database.");
-            e.printStackTrace();
-        }
         System.out.println(String.format(INFO_TAG + "Attempting to register new user with username: %s , password: %s , user_hash: %f.", username, password, user_hash));
-        Connection connection;
-        Statement statement;
+        String registerUser = String.format("INSERT INTO User VALUES('%s', '%s', '%f')", username, password, user_hash);
+        ResultSet resultSet = executeDatabaseQuery(registerUser);
+        String checkIfRegistered = String.format("SELECT 1 FROM User WHERE hash_code='%f'", user_hash);
+        resultSet = executeDatabaseQuery(checkIfRegistered);
+        String JSONResponse = String.format("{\"loggedIn\": %b}", false);
         try {
-            Class.forName(JDBC_DRIVER); // register the JDBC driver.
-            connection = DriverManager.getConnection(
-                    PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
-            statement = connection.createStatement();
-            String registerUser = String.format("INSERT INTO User VALUES('%s', '%s', '%f')",
-                    username, password, user_hash);
-            statement.executeQuery(registerUser);
-
-        } catch(SQLNonTransientConnectionException e){
-            throw new SQLNonTransientConnectionException();
-
-        } catch (SQLException | ClassNotFoundException  e) {
-            e.printStackTrace();
+            if (resultSet.next()) {
+                System.out.println(String.format(SUCCESS_TAG + "New user '%s' has been registered", username));
+            } else {
+                System.out.println(String.format(ERROR_TAG + "Encountered an error while attempting to register a new user with username '%s'.", username));
+            }
+        }catch(SQLException sql){
+            System.out.println(String.format(ERROR_TAG + "Encountered an error while attempting to register a new user with username '%s'.", username));
+        }
+        finally {
+            return JSONResponse;
         }
     }
-    
-    void sendInvite(String playerOne, String playerTwo){
-		System.out.println(String.format(INFO_TAG + "Attempting to service the invite of %s to %s", playerOne, playerTwo));
-		String[] invite = {playerOne, playerTwo};
-		invites.add(invite);
+
+    String unregisterUser(String username, double user_hash){
+        System.out.println(String.format(INFO_TAG + "Attempting to unregister user: '%s'.", username));
+        String unregisterUser = String.format("DELETE FROM User WHERE has_code='%f'", user_hash);
+        ResultSet resultSet = executeDatabaseQuery(unregisterUser);
+        String checkIfUnregistered = String.format("SELECT 1 FROM user WHERE has_code='%f'", user_hash);
+        resultSet = executeDatabaseQuery(checkIfUnregistered);
+        String JSONResponse = String.format("{\"success\": %b}", false);
+        try{
+            if(resultSet.next()){
+                System.out.println(String.format(ERROR_TAG + "Encountered an error while attempting to unregister user with username '%s'.", username));
+            }
+            else{
+                System.out.println(String.format(SUCCESS_TAG + "User '%s' has been unregistered", username));
+                JSONResponse = String.format("{\"success\": %b}", true);
+            }
+        }catch(SQLException sql){
+            System.out.println(String.format(ERROR_TAG + "Encountered an error while attempting to unregister user with username '%s'.", username));
+        }
+        finally{
+            return JSONResponse;
+        }
+
     }
     
-    void acceptInvite(String playerOne, String playerTwo) throws PlayerNameException{
-		System.out.println(String.format(INFO_TAG + "Attempting to accept the invite of %s to %s", playerOne, playerTwo));
+    String sendInvite(String playerOne, String playerTwo){
+		System.out.println(String.format(INFO_TAG + "Attempting to service the invite of %s to %s", playerOne, playerTwo));
+		// TODO: Check if user exists in DB.
+		String[] newInvite = {playerOne, playerTwo};
+		String JSONResponse = String.format("{\"invitedPlayer\": \"%s\", \"wasSuccessful\": %b}", playerTwo, false);
 		for(String[] invite : invites){
-			if(invite[0].equals(playerOne) && invite[1].equals(playerTwo)){
-				invites.remove(invite);
-				Game game = new Game(playerOne, playerTwo);
-				return;
+			if(invite[0].equals(newInvite[0]) && invite[1].equals(newInvite[1])){
+                break; // invite already exists
 			}
 		}
+		invites.add(newInvite);
+        JSONResponse = String.format("{\"invitedPlayer\": \"%s\", \"wasSuccessful\": %b}", playerTwo, true);
+		return JSONResponse;
+    }
+    
+    String acceptInvite(String playerOne, String playerTwo) {
+        System.out.println(String.format(INFO_TAG + "Attempting to accept the invite of %s to %s", playerOne, playerTwo));
+        String JSONResponse = "";
+        for (String[] invite : invites) {
+            if (invite[0].equals(playerOne) && invite[1].equals(playerTwo)) {
+                invites.remove(invite);
+                try {
+                    Game game = new Game(playerOne, playerTwo);
+                } catch (PlayerNameException e) {
+                }
+                String playerInvites = "";
+                for (String[] inv : invites) {
+                    if (inv[1].equals(playerTwo)) {
+                        playerInvites += inv[0] + ",";
+                    }
+                }
+                JSONResponse = String.format("{\"invites\": \"%s\"}", playerInvites);
+            }
+        }
+        return JSONResponse;
+    }
+    
+    String declineInvite(String playerOne, String playerTwo) {
+        System.out.println(String.format(INFO_TAG + "Attempting to decline the invite of %s to %s", playerOne, playerTwo));
+        String JSONResponse = "";
+        for (String[] invite : invites) {
+            if (invite[0].equals(playerOne) && invite[1].equals(playerTwo)) {
+                invites.remove(invite);
+                String playerInvites = "";
+                for (String[] inv : invites) {
+                    if (inv[1].equals(playerTwo)) {
+                        playerInvites += inv[0] + ",";
+                    }
+                }
+                JSONResponse = String.format("{\"invites\": \"%s\"}", playerInvites);
+            }
+
+        }
+        return JSONResponse;
     }
     
     String viewGame(String gameID){
 		System.out.println(String.format(INFO_TAG + "Attempting to service request to view game: '%s'.", gameID));
+		String JSONResponse = "";
 		for(Game game : activeGames){
 			if(game.gameID.equals(gameID)){
-				return formatGameResponse(game);
+				JSONResponse = formatGameResponse(game);
 			}
 		}
-		return "";
+		return JSONResponse;
     }
 
     String movePiece(String gameID, String playerID, String row, String column){
 		// handle a POST request to move a piece in a game instance.
 		System.out.println(String.format(INFO_TAG + "Attempting to move piece at row: '%s', column: '%s', for player: '%s' and game: '%s'.", row, column, playerID, gameID));
+		String JSONResponse = "";
 		for(Game game : activeGames){
 			if(game.gameID.equals(gameID)){
 				if(game.sendInput(playerID, Integer.parseInt(row), Integer.parseInt(column))){
-					return formatGameResponse(game);
+					JSONResponse = formatGameResponse(game);
 				}
 			}
 		}
-		return "";
+		return JSONResponse;
     }
     
     String formatGameResponse(Game game){
-		String validTilesJson = formatBoardArrayResponse(game.move.validTiles);
-		String boardJson = formatBoardArrayResponse(game.board);
-		return String.format("{\"gameID\": \"%s\", \"playerOne\": \"%s\", \"playerTwo\": \"%s\", \"turn\": \"%s\", \"turnNumber\": \"%d\" , \"board\": \"%s\", \"availableMoves\": \"%s\", \"winner\": \"%s\", \"startTime\": \"%s\", \"endTime\": \"%s\"}", game.gameID, game.playerOne, game.playerTwo, game.turn, game.turnNumber, boardJson, validTilesJson, game.winner, game.startTime, game.endTime);
+		String validTilesJSON = formatBoardArrayResponse(game.move.validTiles);
+		String boardJSON = formatBoardArrayResponse(game.board);
+		String JSONResponse = String.format("{\"gameID\": \"%s\", \"playerOne\": \"%s\", \"playerTwo\": \"%s\", \"turn\": \"%s\", \"turnNumber\": \"%d\" , \"board\": \"%s\", \"availableMoves\": \"%s\", \"winner\": \"%s\", \"startTime\": \"%s\", \"endTime\": \"%s\"}", game.gameID, game.playerOne, game.playerTwo, game.turn, game.turnNumber, boardJSON, validTilesJSON, game.winner, game.startTime, game.endTime);
+        return JSONResponse;
     }
     
     String formatBoardArrayResponse(String[][] state){
-		String boardJson = "";
+		String boardJSON = "";
 		for(int i=0; i<9; i++){
 			String boardRow = "";
 			for(int j=0; j<7; j++){
@@ -287,12 +359,12 @@ public class Server extends Thread{
 					boardRow += ",";
 				}
 			}
-			boardJson += boardRow;
+			boardJSON += boardRow;
 			if(i <= 8){
-				boardJson += "|";
+				boardJSON += "|";
 			}
 		}
-		return boardJson;
+		return boardJSON;
     }
 
     void forfeitGame(){

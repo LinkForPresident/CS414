@@ -4,7 +4,7 @@ import java.lang.*;
 
 public class GameServer{
 
-    static final int PORT_NUMBER = 8080;
+    static final int PORT_NUMBER = 8081;
     static final String RELATIVE_PATH = "../client/html";
     static final String HEADER = "HTTP/1.0 200 OK\nContent-Type: text/html\n\n";
     static final String DEFAULT_METHOD = "GET";

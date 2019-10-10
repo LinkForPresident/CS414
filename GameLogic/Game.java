@@ -80,7 +80,7 @@ public class Game {
     public boolean sendInput(String player, int row, int col){
         // send input to the game in the format (player sending move, column selected, row selected)
         // returns true if the game state has changed, else returns false
-        if(isTurn(player) && winner.length() == 0){
+        if(isTurn(player) && winner.isEmpty()){
             if(move.selectedCol == col && move.selectedRow == row){ // if the second half of the move is the same as the first half (re-selecting the same tile)
                 move.selectedCol = -1;
                 move.selectedRow = -1;
@@ -148,13 +148,36 @@ public class Game {
                 }
             }
         }
-        if(redPieces == 0) winner = playerOne;
-        if(bluePieces == 0) winner = playerTwo;
+        if(redPieces == 0) winner = playerOne; // if there are no red pieces left
+        if(bluePieces == 0) winner = playerTwo; // if there are no blue pieces left
 
-        if(winner.length() != 0){
+        if(!canMakeMove()){
+            if(isTurn(playerOne)) winner = playerTwo;
+            if(isTurn(playerTwo)) winner = playerOne;
+        }
+
+        if(!winner.isEmpty()){
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
             endTime = dtf.format(LocalDateTime.now()).toString();
         }
+    }
+
+    private boolean canMakeMove(){
+        // Returns true if the current turn's player has any moves available
+
+        Move testMove = new Move(this);
+
+        for(int row = 0; row < 9; row++){
+            for(int col = 0; col < 7; col++){
+                if(testMove.isFriendlyUnit(row, col)){
+                    testMove.selectedRow = row;
+                    testMove.selectedCol = col;
+                    testMove.updateValidTiles();
+                    if(testMove.numberOfValidTiles > 0) return true;
+                }
+            }
+        }
+        return false;
     }
 
     public static void main(String[] arg){

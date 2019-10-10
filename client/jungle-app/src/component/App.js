@@ -16,7 +16,9 @@ import User from './User';
 
 export default class App extends React.Component {
 
+
     constructor(props) {
+
         super(props);
         this.updateLoginValue = this.updateLoginValue.bind(this);
         this.updateInvites = this.updateInvites.bind(this);
@@ -25,7 +27,9 @@ export default class App extends React.Component {
     }
 
     state = {
+
         loggedIn: false,
+
         username: null,
         activeGames: ["0001", "0002", "0005"],
         completedGames: ["0003", "0004"],
@@ -66,8 +70,8 @@ export default class App extends React.Component {
                 "startTime": "",
                 "endTime": ""
             },
-        apiConfig: {
-            url: 'http://localhost:8080',
+        apiConfig:{
+            url:'http://localhost:8081',
             payload: "action=login&username=dummy_user&password=iforgot123",
             headers: {
                 'Content-Type': 'application/text',
@@ -79,7 +83,9 @@ export default class App extends React.Component {
     postExample(data) {
         console.log("Making request");
         var self = this;
+
         axios.post('http://localhost:8080',
+
             // "action=move_piece&gameID=1234&username=dummy_user&password=iforgot123&row=8&column=0",
             data,
             {
@@ -94,7 +100,9 @@ export default class App extends React.Component {
                 if (typeof availableMovesProto == 'undefined') {
                     return
                 }
+
                 availableMovesProto = availableMovesProto.substring(0, availableMovesProto.length - 2);
+
                 availableMovesProto = availableMovesProto.split(",|");
                 let availableMoves = [];
                 availableMovesProto.forEach(function (element) {
@@ -108,7 +116,9 @@ export default class App extends React.Component {
                 });
                 console.log(availableMoves);
                 let boardStateProto = response.data.board;
+
                 boardStateProto = boardStateProto.substring(0, boardStateProto.length - 2);
+
                 boardStateProto = boardStateProto.split(",|");
                 let boardState = [];
                 boardStateProto.forEach(function (element) {
@@ -130,6 +140,7 @@ export default class App extends React.Component {
         // let board = this.state.gameState.board;
         console.log(this.state.gameState);
     }
+
 
     async handleGeneralRequest(event, url, payload, headers) {
         let resp = await axios.post(url,
@@ -189,6 +200,7 @@ export default class App extends React.Component {
         });
     }
 
+
     setGameState(gameId) {
         console.log(gameId);
         console.log("calling api for game state...");
@@ -213,7 +225,9 @@ export default class App extends React.Component {
         var self = this;
         console.log("calling api for game state...");
         axios.post(
+
             'http://localhost:8080',
+
             "action=login&username=" + username + "&password=" + password,
             {
                 headers: {
@@ -230,6 +244,7 @@ export default class App extends React.Component {
     }
 
     render() {
+
         if (this.state.loggedIn) {
             return (
                 <div className='menu navigation-menu'>
@@ -273,8 +288,8 @@ export default class App extends React.Component {
                         <TabPanel><User/></TabPanel>
                     </Tabs>
                 </div>
-            )
         } else {
+
             return (
                 <div className='menu navigation-menu'>
                     <Tabs>
