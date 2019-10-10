@@ -1,10 +1,11 @@
 package GameLogic;
 
 public class BoardSquare {
-    String environment = null;
+    public String environment = null;
     public GamePiece gamePiece;
     public int row;
     public int col;
+    public boolean isValid = false;
 
     public BoardSquare(int row, int col){
         this.row = row;
