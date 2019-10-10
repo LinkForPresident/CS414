@@ -99,7 +99,7 @@ public class Game {
                 move.updateValidTiles();
                 return true;
             }
-            else if(move.validTiles[row][col].equals("*")){ // selecting a square to move to
+            else if(board[row][col].isValid){ // selecting a square to move to
                 makeMove(row, col);
                 move.updateValidTiles();
                 return true;

@@ -5,21 +5,22 @@ import java.util.Arrays;
 public class Move {
 
     private Game game;
-    public String[][] validTiles = new String[9][7];
     public int numberOfValidTiles = 0;
     public BoardSquare selectedSquare;
 
     Move(Game current_game){
         game = current_game;
-        for(int i=0; i<9; i++){
-            for(int j=0; j<7; j++){
-                validTiles[i][j] = "_";
-            }
-        }
     }
 
     void printValidTiles(){
-        for(int i=0; i<9; i++) System.out.println(Arrays.toString(validTiles[i]));
+        for(int row=0; row<9; row++) {
+            for (int col = 0; col < 7; col++) {
+                if(game.board[row][col].isValid)
+                    System.out.print(" * ");
+                else System.out.print(" _ ");
+            }
+            System.out.println();
+        }
     }
 
     void updateValidTiles(){
@@ -30,7 +31,7 @@ public class Move {
             if(isFriendlyUnit(selectedSquare.row, selectedSquare.col)) {
                 for (int i = 0; i < 9; i++) {
                     for (int j = 0; j < 7; j++) {
-                        validTiles[i][j] = "_";
+                        game.board[i][j].isValid = false;
                     }
                 }
 
@@ -48,7 +49,7 @@ public class Move {
         if (!isFriendlyUnit(row, col)) { // if there is no friendly unit occupying the tile
             if (!isWater(row, col) || isRat(selectedSquare.row, selectedSquare.col)) { // if there is no water (unless the unit being moved is a rat)
                 if(!isEnemyUnit(row, col) || canCaptureUnit(row, col)) { // if there is an enemy unit that the unit being moved can capture, or there is no enemy
-                    validTiles[row][col] = "*";
+                    game.board[row][col].isValid = true;
                     numberOfValidTiles++;
                 }
             } else if (isLionOrTiger(selectedSquare.row, selectedSquare.col)) { // if the unit being moved is a lion or tiger
@@ -66,7 +67,7 @@ public class Move {
             if(!isRat(selectedSquare.row, selectedSquare.col+colOffset) && !isRat(selectedSquare.row, selectedSquare.col+(colOffset*2)) && !isRat(selectedSquare.row, selectedSquare.col+(colOffset*3))){
                 if((isEnemyUnit(selectedSquare.row, selectedSquare.col+(colOffset*3)) && canCaptureUnit(selectedSquare.row, selectedSquare.col+(colOffset*3))) || // if there is an enemy unit that can be captured
                         (!isEnemyUnit(selectedSquare.row, selectedSquare.col+(colOffset*3)) && !isFriendlyUnit(selectedSquare.row, selectedSquare.col+(colOffset*3)))) { // if there is no enemy or friendly units
-                    validTiles[selectedSquare.row][selectedSquare.col+(colOffset*3)] = "*";
+                    game.board[selectedSquare.row][selectedSquare.col+(colOffset*3)].isValid = true;
                     numberOfValidTiles++;
                 }
             }
@@ -76,7 +77,7 @@ public class Move {
             if(!isRat(selectedSquare.row+rowOffset, selectedSquare.col) && !isRat(selectedSquare.row+(rowOffset*2), selectedSquare.col) && !isRat(selectedSquare.row+(rowOffset*3), selectedSquare.col)){
                 if((isEnemyUnit(selectedSquare.row+(rowOffset*4), selectedSquare.col) && canCaptureUnit(selectedSquare.row+(rowOffset*4), selectedSquare.col)) || // if there is an enemy unit that can be captured
                         (!isEnemyUnit(selectedSquare.row+(rowOffset*4), selectedSquare.col) && !isFriendlyUnit(selectedSquare.row+(rowOffset*4), selectedSquare.col))) { // if there is no enemy or friendly units
-                    validTiles[selectedSquare.row+(rowOffset*4)][selectedSquare.col] = "*";
+                    game.board[selectedSquare.row+(rowOffset*4)][selectedSquare.col].isValid = true;
                     numberOfValidTiles++;
                 }
             }
