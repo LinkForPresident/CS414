@@ -18,17 +18,21 @@ public class GameUtils {
         System.out.println("");
     }
 
-    public String printBoardVeryVerbose(String[][] board){
+    public String printBoardVeryVerbose(BoardSquare[][] board){
         // prints out the board in a readable fashion, including Trap and River squares, and full piece names
         String fullOut = "";
         for(int x=0; x<board.length; x++) {
             for(int y = 0; y<board[x].length; y++) {
-                String out = getSquare(x,y,getRealPieceName(board[x][y]));
-                while(out.length() < 15) {
-                    out += " ";
-                }
-                System.out.print(out);
-                fullOut += out;
+                String out;
+                if(board[x][y].gamePiece != null) {
+                    out = getSquare(x, y, getRealPieceName(board[x][y].gamePiece.ID));
+                }else out = "\"__________\"";
+                    while (out.length() < 15) {
+                        out += " ";
+                    }
+                    System.out.print(out);
+                    fullOut += out;
+
             }
             System.out.println();
         }
@@ -36,12 +40,12 @@ public class GameUtils {
         return fullOut;
     }
 
-    public String printBoardVeryVerboseWithColor(String[][] board){
+    public String printBoardVeryVerboseWithColor(BoardSquare[][] board){
         // prints out the board in a readable fashion, including Trap and River squares, and full piece names, and COLOR!
         String fullOut = "";
         for(int x=0; x<board.length; x++) {
             for(int y = 0; y<board[x].length; y++) {
-                String out = getSquare(x,y,getRealPieceName(board[x][y])) + "(" + x + "," + y + ")";
+                String out = getSquare(x,y,getRealPieceName(board[x][y].gamePiece.ID)) + "(" + x + "," + y + ")";
                 while(out.length() < 22) {
                     out += " ";
                 }
