@@ -54,6 +54,7 @@ public class Server extends Thread{
 			game.gameID = "1234";
 			activeGames.add(game);
 		}catch(PlayerNameException e){
+
 		}
 
         try{

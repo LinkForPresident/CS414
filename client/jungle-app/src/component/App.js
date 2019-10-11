@@ -43,26 +43,87 @@ export default class App extends React.Component {
                 "turn": "Bob",
                 "turnNumber": 0,
                 "board": [
-                    ["r1 ", "__ ", "__ ", "__ ", "__ ", "__ ", "__ "],
-                    ["__ ", "__ ", "__ ", "__ ", "__ ", "__ ", "__ "],
-                    ["__ ", "__ ", "__ ", "__ ", "__ ", "__ ", "__ "],
-                    ["__ ", "__ ", "__ ", "__ ", "__ ", "__ ", "__ "],
-                    ["__ ", "__ ", "__ ", "__ ", "__ ", "__ ", "__ "],
-                    ["__ ", "__ ", "__ ", "__ ", "__ ", "__ ", "__ "],
-                    ["__ ", "__ ", "__ ", "__ ", "__ ", "__ ", "__ "],
-                    ["__ ", "__ ", "__ ", "__ ", "__ ", "__ ", "__ "],
-                    ["__ ", "__ ", "__ ", "__ ", "__ ", "__ ", "__ "],
-                ],
-                "availableMoves": [
-                    ["__", "__", "__", "__", "__", "__", "__"],
-                    ["__", "__", "__", "__", "__", "__", "__"],
-                    ["__", "__", "__", "__", "__", "__", "__"],
-                    ["__", "__", "__", "__", "__", "__", "__"],
-                    ["__", "__", "__", "__", "__", "__", "__"],
-                    ["__", "__", "__", "__", "__", "__", "__"],
-                    ["__", "__", "__", "__", "__", "__", "__"],
-                    ["__", "__", "__", "__", "__", "__", "__"],
-                    ["__", "__", "__", "__", "__", "__", "__"]
+                    [
+                        {"environment": null, "piece": "r7", "available": false},
+                        {"environment": null, "piece": null, "available": false},
+                        {"environment": "trap", "piece": null, "available": false},
+                        {"environment": "den", "piece": null, "available": false},
+                        {"environment": "trap", "piece": null, "available": false},
+                        {"environment": null," piece": null, "available": false},
+                        {"environment": null," piece": "r6", "available": false}
+                    ],
+                    [
+                        {"environment": null, "piece": null, "available": false},
+                        {"environment": null, "piece": "r4", "available": false},
+                        {"environment": null, "piece": null, "available": false},
+                        {"environment": "trap", "piece": null, "available": false},
+                        {"environment": null, "piece": null, "available": false},
+                        {"environment": null, "piece": "r2", "available": false},
+                        {"environment": null, "piece": null, "available": false}
+                    ],
+                    [
+                        {"environment": null, "piece": "r1", "available": false},
+                        {"environment": null, "piece": null, "available": false},
+                        {"environment": null, "piece": "r5", "available": false},
+                        {"environment": null, "piece": null, "available": false},
+                        {"environment": null, "piece": "r3", "available": false},
+                        {"environment": null, "piece": null, "available": false},
+                        {"environment": null, "piece": "r8", "available": false}
+                    ],
+                    [
+                        {"environment": null, "piece": null, "available": false},
+                        {"environment": "river", "piece": null, "available": false},
+                        {"environment": "river", "piece": null, "available": false},
+                        {"environment": null, "piece": null, "available": false},
+                        {"environment": "river", "piece": null, "available": false},
+                        {"environment": "river", "piece": null, "available": false},
+                        {"environment": null, "piece": null, "available": false}
+                    ],
+                    [
+                        {"environment": null, "piece": null, "available": false},
+                        {"environment": "river", "piece": null, "available": false},
+                        {"environment": "river", "piece": null, "available": false},
+                        {"environment": null, "piece": null, "available": false},
+                        {"environment": "river", "piece": null, "available": false},
+                        {"environment": "river", "piece": null, "available": false},
+                        {"environment": null, "piece": null, "available": false}
+                    ],
+                    [
+                        {"environment": null, "piece": null, "available": false},
+                        {"environment": "river", "piece": null, "available": false},
+                        {"environment": "river", "piece": null, "available": false},
+                        {"environment": null, "piece": null, "available": false},
+                        {"environment": "river", "piece": null, "available": false},
+                        {"environment": "river", "piece": null, "available": false},
+                        {"environment": null, "piece": null, "available": false}
+                    ],
+                    [
+                        {"environment": null, "piece": "b8", "available": false},
+                        {"environment": null, "piece": null, "available": true},
+                        {"environment": null, "piece": "b3", "available": false},
+                        {"environment": null, "piece": null, "available": false},
+                        {"environment": null, "piece": "b5", "available": false},
+                        {"environment": null, "piece": null, "available": false},
+                        {"environment": null, "piece": "b1", "available": false}
+                    ],
+                    [
+                        {"environment": null, "piece": null, "available": true},
+                        {"environment": null, "piece": "b2", "available": true},
+                        {"environment": null, "piece": null, "available": true},
+                        {"environment": "trap", "piece": null, "available": false},
+                        {"environment": null, "piece": null, "available": false},
+                        {"environment": null, "piece": "b4", "available": false},
+                        {"environment": null, "piece": null, "available": false}
+                    ],
+                    [
+                        {"environment": null, "piece": "b6", "available": false},
+                        {"environment": null, "piece": null, "available": true},
+                        {"environment": "trap", "piece": null, "available": false},
+                        {"environment": "den", "piece": null, "available": false},
+                        {"environment": "trap", "piece": null, "available": false},
+                        {"environment": null, "piece": null, "available": false},
+                        {"environment": null, "piece": "b7", "available": false}
+                    ]
                 ],
                 "winner": "",
                 "startTime": "",
@@ -94,7 +155,7 @@ export default class App extends React.Component {
             })
             .then(function (response) {
                 let availableMovesProto = response.data.availableMoves;
-                console.log(response.data);
+                console.log(response);
                 if (typeof availableMovesProto == 'undefined') {
                     return
                 }
@@ -112,7 +173,6 @@ export default class App extends React.Component {
                     });
                     availableMoves.push(row);
                 });
-                console.log(availableMoves);
                 let boardStateProto = response.data.board;
 
                 boardStateProto = boardStateProto.substring(0, boardStateProto.length - 2);
@@ -127,7 +187,6 @@ export default class App extends React.Component {
                     });
                     boardState.push(row);
                 });
-                console.log(boardState);
                 response.data.availableMoves = availableMoves;
                 response.data.board = boardState;
                 self.setState({
@@ -136,7 +195,6 @@ export default class App extends React.Component {
             })
             .catch();
         // let board = this.state.gameState.board;
-        console.log(this.state.gameState);
     }
 
 
@@ -274,7 +332,7 @@ export default class App extends React.Component {
                             />
                         </TabPanel>
                         <TabPanel><GameRules/></TabPanel>
-                        <TabPanel><History postExample={this.postExampleNew}/></TabPanel>
+                        <TabPanel><History /></TabPanel>
                         <TabPanel><Invite apiConfig={this.state.apiConfig} handleGeneralRequest={this.handleGeneralRequest}
                                           handleAcceptInvite={this.handleAcceptInvite}
                                           invites={this.state.invites} username={this.state.username}
@@ -294,16 +352,15 @@ export default class App extends React.Component {
                 <div className='menu navigation-menu'>
                     <Tabs>
                         <TabList>
-                            <Tab>Register</Tab>
                             <Tab>Login</Tab>
+                            <Tab>Register</Tab>
                         </TabList>
-                        <TabPanel><Register users={this.state.users} passwords={this.state.passwords}/></TabPanel>
                         <TabPanel>
-
                             <Login apiConfig={this.state.apiConfig} handleGeneralRequest={this.handleGeneralRequest}
                                          loggedIn={this.state.loggedIn}
                                          updateLoginValue={this.updateLoginValue}/>
                         </TabPanel>
+                        <TabPanel><Register users={this.state.users} passwords={this.state.passwords}/></TabPanel>
 
                     </Tabs>
                 </div>
