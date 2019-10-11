@@ -14,16 +14,16 @@ class Board extends React.Component {
 
         if (this.props.loggedIn) {
             const gameBoard = this.props.gameState.board.map((game, row_index) =>
-                <li className={'game-row'}>
+                <li className={'game-row col-12 col-lg-8'}>
                     {game.map((space, column_index) =>
                         <Square row={row_index} column={column_index} username={this.props.username} postExample={this.props.postExample} environment={space.environment} piece={space.piece} available={space.available} />
                         )}</li>
             );
 
             return (
-                <div className={'Board'}>
-                    <p>Put the actual board here for game ({this.props.selectedGame})</p>
-                    <ul className={"board-ul"}>
+                <div className={'Board container'}>
+
+                    <ul className={"board-ul row"}>
                         {gameBoard}
                     </ul>
                 </div>
