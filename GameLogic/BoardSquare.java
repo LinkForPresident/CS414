@@ -2,7 +2,7 @@ package GameLogic;
 
 public class BoardSquare {
     public String environment = null;
-    public GamePiece gamePiece;
+    public GamePiece gamePiece = null;
     public int row;
     public int col;
     public boolean isValid = false;

@@ -359,7 +359,11 @@ public class Server extends Thread{
 			String boardRow = "";
 			for(int j=0; j<7; j++){
 			    BoardSquare boardSquare = state[i][j];
-				boardRow += String.format("{\"environment\": {%s}, \"piece\": {%s}, \"available\": {%b}}", boardSquare.environment, boardSquare.gamePiece.ID, boardSquare.isValid);
+			    String gamePieceID = "";
+			    if(boardSquare.gamePiece == null){
+			        gamePieceID = "null";
+                }
+				boardRow += String.format("{\"environment\": {%s}, \"piece\": {%s}, \"available\": {%b}}", boardSquare.environment, gamePieceID, boardSquare.isValid);
                 boardRow += ",";
             }
 			boardJSON += boardRow;
