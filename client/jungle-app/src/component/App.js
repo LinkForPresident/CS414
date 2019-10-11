@@ -99,7 +99,7 @@ export default class App extends React.Component {
                     ],
                     [
                         {"environment": null, "piece": "b8", "available": false},
-                        {"environment": null, "piece": null, "available": false},
+                        {"environment": null, "piece": null, "available": true},
                         {"environment": null, "piece": "b3", "available": false},
                         {"environment": null, "piece": null, "available": false},
                         {"environment": null, "piece": "b5", "available": false},
@@ -108,8 +108,8 @@ export default class App extends React.Component {
                     ],
                     [
                         {"environment": null, "piece": null, "available": true},
-                        {"environment": null, "piece": "b2", "available": false},
-                        {"environment": null, "piece": null, "available": false},
+                        {"environment": null, "piece": "b2", "available": true},
+                        {"environment": null, "piece": null, "available": true},
                         {"environment": "trap", "piece": null, "available": false},
                         {"environment": null, "piece": null, "available": false},
                         {"environment": null, "piece": "b4", "available": false},
