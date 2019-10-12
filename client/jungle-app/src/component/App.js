@@ -72,29 +72,29 @@ export default class App extends React.Component {
                     ],
                     [
                         {"environment": null, "piece": null, "available": false},
-                        {"environment": "river", "piece": null, "available": false},
-                        {"environment": "river", "piece": null, "available": false},
+                        {"environment": "water", "piece": null, "available": false},
+                        {"environment": "water", "piece": null, "available": false},
                         {"environment": null, "piece": null, "available": false},
-                        {"environment": "river", "piece": null, "available": false},
-                        {"environment": "river", "piece": null, "available": false},
+                        {"environment": "water", "piece": null, "available": false},
+                        {"environment": "water", "piece": null, "available": false},
                         {"environment": null, "piece": null, "available": false}
                     ],
                     [
                         {"environment": null, "piece": null, "available": false},
-                        {"environment": "river", "piece": null, "available": false},
-                        {"environment": "river", "piece": null, "available": false},
+                        {"environment": "water", "piece": null, "available": false},
+                        {"environment": "water", "piece": null, "available": false},
                         {"environment": null, "piece": null, "available": false},
-                        {"environment": "river", "piece": null, "available": false},
-                        {"environment": "river", "piece": null, "available": false},
+                        {"environment": "water", "piece": null, "available": false},
+                        {"environment": "water", "piece": null, "available": false},
                         {"environment": null, "piece": null, "available": false}
                     ],
                     [
                         {"environment": null, "piece": null, "available": false},
-                        {"environment": "river", "piece": null, "available": false},
-                        {"environment": "river", "piece": null, "available": false},
+                        {"environment": "water", "piece": null, "available": false},
+                        {"environment": "water", "piece": null, "available": false},
                         {"environment": null, "piece": null, "available": false},
-                        {"environment": "river", "piece": null, "available": false},
-                        {"environment": "river", "piece": null, "available": false},
+                        {"environment": "water", "piece": null, "available": false},
+                        {"environment": "water", "piece": null, "available": false},
                         {"environment": null, "piece": null, "available": false}
                     ],
                     [
@@ -140,9 +140,8 @@ export default class App extends React.Component {
     };
 
     postExample(data) {
-        console.log("Making request");
         var self = this;
-
+        console.log("Making request");
         axios.post('http://localhost:8080',
 
             // "action=move_piece&gameID=1234&username=dummy_user&password=iforgot123&row=8&column=0",
@@ -154,48 +153,18 @@ export default class App extends React.Component {
                 }
             })
             .then(function (response) {
-                let availableMovesProto = response.data.availableMoves;
-                console.log(response);
-                if (typeof availableMovesProto == 'undefined') {
-                    return
+                console.log(response.data);
+                if (response.data !== "") {
+                    console.log("Setting game state");
+                    self.setState({
+                        gameState: response.data
+                    })
                 }
-
-                availableMovesProto = availableMovesProto.substring(0, availableMovesProto.length - 2);
-
-                availableMovesProto = availableMovesProto.split(",|");
-                let availableMoves = [];
-                availableMovesProto.forEach(function (element) {
-
-                    let elems = element.split(",");
-                    let row = [];
-                    elems.forEach(function (elem) {
-                        row.push(elem);
-                    });
-                    availableMoves.push(row);
-                });
-                let boardStateProto = response.data.board;
-
-                boardStateProto = boardStateProto.substring(0, boardStateProto.length - 2);
-
-                boardStateProto = boardStateProto.split(",|");
-                let boardState = [];
-                boardStateProto.forEach(function (element) {
-                    let elems = element.split(",");
-                    let row = [];
-                    elems.forEach(function (elem) {
-                        row.push(elem);
-                    });
-                    boardState.push(row);
-                });
-                response.data.availableMoves = availableMoves;
-                response.data.board = boardState;
-                self.setState({
-                    gameState: response.data
-                })
             })
-            .catch();
-        // let board = this.state.gameState.board;
+            .catch()
     }
+
+    //
 
 
     async handleGeneralRequest(event, url, payload, headers) {
@@ -368,3 +337,61 @@ export default class App extends React.Component {
         }
     }
 }
+
+// postExampleOld(data) {
+//     console.log("Making request");
+//     var self = this;
+//
+//     axios.post('http://localhost:8080',
+//
+//         // "action=move_piece&gameID=1234&username=dummy_user&password=iforgot123&row=8&column=0",
+//         data,
+//         {
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH',
+//             }
+//         })
+//         .then(function (response) {
+//             let availableMovesProto = response.data.availableMoves;
+//             console.log(response);
+//             if (typeof availableMovesProto == 'undefined') {
+//                 return
+//             }
+//
+//             availableMovesProto = availableMovesProto.substring(0, availableMovesProto.length - 2);
+//
+//             availableMovesProto = availableMovesProto.split(",|");
+//             let availableMoves = [];
+//             availableMovesProto.forEach(function (element) {
+//
+//                 let elems = element.split(",");
+//                 let row = [];
+//                 elems.forEach(function (elem) {
+//                     row.push(elem);
+//                 });
+//                 availableMoves.push(row);
+//             });
+//             let boardStateProto = response.data.board;
+//
+//             boardStateProto = boardStateProto.substring(0, boardStateProto.length - 2);
+//
+//             boardStateProto = boardStateProto.split(",|");
+//             let boardState = [];
+//             boardStateProto.forEach(function (element) {
+//                 let elems = element.split(",");
+//                 let row = [];
+//                 elems.forEach(function (elem) {
+//                     row.push(elem);
+//                 });
+//                 boardState.push(row);
+//             });
+//             response.data.availableMoves = availableMoves;
+//             response.data.board = boardState;
+//             self.setState({
+//                 gameState: response.data
+//             })
+//         })
+//         .catch();
+//     // let board = this.state.gameState.board;
+// }
