@@ -166,21 +166,22 @@ class GameConnector extends Server{
     }
     
     private void handleOPTIONSRequest() throws IOException{
+        System.out.println(INFO_TAG + "Handling OPTIONS request.");
 		outputStream.println(HEADER);
     }
 
     private void handleGETRequest(String path) throws IOException {
         // handle a client GET request.
         System.out.println(INFO_TAG + "Handling GET request.");
-        String htmlResponse = HEADER + "\r\n";
-        try {
-            htmlResponse += getHTMLPage(path);  // get the HTML source.
-            outputStream.println(htmlResponse); // send the response to the client.
-        }catch(FileNotFoundException e){
-            System.out.println(String.format(WARNING_TAG + "404 file %s not found.", path));
-            e.printStackTrace();
-            outputStream.println("404 file not found.");
+        switch(request.action){
+            case "view_game":
+                handleViewGame();
+                break;
+            case "view_stats":
+                // viewPlayerStats();
+                break;
         }
+
     }
 
     private void handlePOSTRequest() throws IOException{
@@ -210,17 +211,11 @@ class GameConnector extends Server{
 			case "decline_invite":
 			    handleDeclineInvite();
 				break;
-            case "view_game":
-                handleViewGame();
-                break;
             case "forfeit_game":
                 // forfeitGame();
                 break;
             case "move_piece":
                 handleMovePiece();
-                break;
-            case "view_stats":
-                // viewPlayerStats();
                 break;
         }
     }

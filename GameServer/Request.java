@@ -31,7 +31,6 @@ public class Request extends GameConnector{
         // constructor
         this.bufferedReader = bufferedReader;
         this.clientSocket = clientSocket;
-
     }
 
     protected int parseRequest() throws IOException, ArrayIndexOutOfBoundsException, NullPointerException{

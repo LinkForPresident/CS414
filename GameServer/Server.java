@@ -347,28 +347,28 @@ public class Server extends Thread{
 		return JSONResponse;
     }
     
-    String formatGameResponse(Game game){
+    private String formatGameResponse(Game game){
 		String boardJSON = formatBoardArrayResponse(game.board);
 		String JSONResponse = String.format("{\"gameID\": \"%s\", \"playerOne\": \"%s\", \"playerTwo\": \"%s\", \"turn\": \"%s\", \"turnNumber\": \"%d\" , \"board\": \"%s\", \"winner\": \"%s\", \"startTime\": \"%s\", \"endTime\": \"%s\"}", game.gameID, game.playerOne, game.playerTwo, game.turn, game.turnNumber, boardJSON, game.winner, game.startTime, game.endTime);
         return JSONResponse;
     }
     
-    String formatBoardArrayResponse(BoardSquare[][] state){
+    private String formatBoardArrayResponse(BoardSquare[][] state){
 		String boardJSON = "";
 		for(int i=0; i<9; i++){
 			String boardRow = "";
 			for(int j=0; j<7; j++){
 			    BoardSquare boardSquare = state[i][j];
-				boardRow += String.format("{\"environment\": {%s}, \"piece\": {%s}, \"available\": {%b}}", boardSquare.environment, boardSquare.gamePiece.ID, boardSquare.isValid);
-				if(j <= 6){
-					boardRow += ",";
-				}
-			}
+			    String gamePieceID = "";
+			    if(boardSquare.gamePiece == null){
+			        gamePieceID = "null";
+                }
+				boardRow += String.format("{\"environment\": {%s}, \"piece\": {%s}, \"available\": {%b}}", boardSquare.environment, gamePieceID, boardSquare.isValid);
+                boardRow += ",";
+            }
 			boardJSON += boardRow;
-			if(i <= 8){
-				boardJSON += "|";
-			}
-		}
+            boardJSON += "|";
+        }
 		return boardJSON;
     }
 
