@@ -255,7 +255,9 @@ class GameConnector extends Server{
     // handle a client requesting to move a game piece.
 		String JSONResponse = "";
 		JSONResponse = movePiece(request.gameID, request.username, request.row, request.column);
-		sendJSONReponse(JSONResponse);
+		if (JSONResponse.length() != 0) {
+		    sendJSONReponse(JSONResponse);
+        }
     }
 
     private void handleSendInvite() throws IOException{

@@ -349,26 +349,36 @@ public class Server extends Thread{
     
     private String formatGameResponse(Game game){
 		String boardJSON = formatBoardArrayResponse(game.board);
-		String JSONResponse = String.format("{\"gameID\": \"%s\", \"playerOne\": \"%s\", \"playerTwo\": \"%s\", \"turn\": \"%s\", \"turnNumber\": \"%d\" , \"board\": \"%s\", \"winner\": \"%s\", \"startTime\": \"%s\", \"endTime\": \"%s\"}", game.gameID, game.playerOne, game.playerTwo, game.turn, game.turnNumber, boardJSON, game.winner, game.startTime, game.endTime);
+		String JSONResponse = String.format("{\"gameID\": \"%s\", \"playerOne\": \"%s\", \"playerTwo\": \"%s\", \"turn\": \"%s\", \"turnNumber\": %d , \"board\": %s, \"winner\": \"%s\", \"startTime\": \"%s\", \"endTime\": \"%s\"}", game.gameID, game.playerOne, game.playerTwo, game.turn, game.turnNumber, boardJSON, game.winner, game.startTime, game.endTime);
         return JSONResponse;
     }
     
     private String formatBoardArrayResponse(BoardSquare[][] state){
-		String boardJSON = "";
+		String boardJSON = "[";
 		for(int i=0; i<9; i++){
-			String boardRow = "";
+			String boardRow = "[";
 			for(int j=0; j<7; j++){
 			    BoardSquare boardSquare = state[i][j];
-			    String gamePieceID = "";
-			    if(boardSquare.gamePiece == null){
-			        gamePieceID = "null";
+			    String gamePieceID = null;
+			    if(boardSquare.gamePiece != null){
+                    gamePieceID = "\"" + boardSquare.gamePiece.ID + "\"";
                 }
-				boardRow += String.format("{\"environment\": {%s}, \"piece\": {%s}, \"available\": {%b}}", boardSquare.environment, gamePieceID, boardSquare.isValid);
-                boardRow += ",";
+
+				boardRow += String.format("{\"environment\": \"%s\", \"piece\": %s, \"available\": %b}", boardSquare.environment, gamePieceID, boardSquare.isValid);
+                if (j < 6) {
+                    boardRow += ",";
+                }
             }
 			boardJSON += boardRow;
-            boardJSON += "|";
+            if (i < 8) {
+                boardJSON += "],";
+            }
+            else {
+                boardJSON += "]";
+            }
+
         }
+		boardJSON += "]";
 		return boardJSON;
     }
 
