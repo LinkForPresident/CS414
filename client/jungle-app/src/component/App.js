@@ -154,12 +154,10 @@ export default class App extends React.Component {
             })
             .then(function (response) {
                 console.log(response.data);
-                if (response.data !== "") {
-                    console.log("Setting game state");
-                    self.setState({
-                        gameState: response.data
-                    })
-                }
+                console.log("Setting game state");
+                self.setState({
+                    gameState: response.data
+                })
             })
             .catch()
     }
