@@ -209,7 +209,7 @@ class GameConnector extends Server{
 			case "decline_invite":
 				break;
             case "view_game":
-                sendJSONReponse(viewGame(request.gameID));
+                viewGame(request.gameID);
                 break;
             case "forfeit_game":
                 // forfeitGame();
