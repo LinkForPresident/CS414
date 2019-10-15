@@ -6,8 +6,7 @@ public class GamePiece {
     public int power;
     public String color;
     public String type;
-    protected Game game;
-    protected BoardSquare square;
+
 
     public GamePiece(String type, String color){
         //TODO add exception throw for invalid input
