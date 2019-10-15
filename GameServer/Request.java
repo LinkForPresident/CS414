@@ -101,9 +101,6 @@ public class Request extends GameConnector{
 					row = args.get("row");
 					column = args.get("column");
                 }
-                if(action.equals("view_game")){
-					gameID = args.get("gameID");
-                }
                 if(action.equals("send_invite")){
                     playerOne = args.get("playerOne");
                     playerTwo = args.get("playerTwo");
@@ -112,7 +109,24 @@ public class Request extends GameConnector{
                     playerOne = args.get("playerOne");
                     playerTwo = args.get("playerTwo");
                 }
-
+            }
+            else if(method.equals("GET")) {
+                String[] kv_arr = path.replace("/","").split("&"); // split by key-value pair, which are separated by &;
+                for (String arg : kv_arr){
+                    System.out.println(arg);
+                }
+                // extract the POST request arguments.
+                for (String arg : kv_arr) {
+                    String[] kv = arg.split("=");   // split by key and and value, which are separated by =
+                    String key = kv[0];
+                    String value = kv[1];
+                    args.put(key, value);
+                }
+                action = args.get("action"); // whatever the client is trying to do: "login", "move_piece", etc.
+                System.out.println(String.format(DEBUG_TAG + "The action of the GET request is: %s.", action));
+                if(action.equals("view_game")){
+                    gameID = args.get("gameID");
+                }
             }
         }catch(NullPointerException | ArrayIndexOutOfBoundsException e){
             return -1;
