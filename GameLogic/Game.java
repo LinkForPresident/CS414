@@ -5,7 +5,6 @@ import GameLogic.exception.PlayerNameException;
 
 import java.time.format.DateTimeFormatter;
 
-import java.util.Arrays;
 import java.lang.*;
 import java.time.*;
 import java.util.Random;
@@ -15,7 +14,7 @@ public class Game {
     public String playerOne;
     public String playerTwo;
     public String turn;
-    public String[][] board = new String[9][7];
+    public BoardSquare[][] board = new BoardSquare[9][7];
     public Move move = new Move(this);
     public String winner = "";
     public String startTime;
@@ -46,54 +45,61 @@ public class Game {
         playerTwo = playerTwoName;
         turn = "blue";
 
-        for(int i=0; i<9; i++){
-            for(int j=0; j<7; j++){
-                board[i][j] = "__";
+        for(int row=0; row<9; row++){
+            for(int col=0; col<7; col++){
+                board[row][col] = new BoardSquare(row, col);
             }
         }
 
-        board[0][0] = "r7"; //red team lion (power 7)
-        board[0][6] = "r6"; //red team tiger (power 6)
-        board[1][1] = "r4"; //red team dog (power 4)
-        board[1][5] = "r2"; //red team cat (power 2)
-        board[2][0] = "r1"; //red team mouse (power 1)
-        board[2][2] = "r5"; //red team leopard (power 5)
-        board[2][4] = "r3"; //red team wolf (power 3)
-        board[2][6] = "r8"; //red team elephant (power 8)
-        board[6][0] = "b8"; //blue team elephant (power 8)
-        board[6][2] = "b3"; //blue team wolf (power 3)
-        board[6][4] = "b5"; //blue team leopard (power 5)
-        board[6][6] = "b1"; //blue team mouse (power 1)
-        board[7][1] = "b2"; //blue team cat (power 2)
-        board[7][5] = "b4"; //blue team dog (power 4)
-        board[8][0] = "b6"; //blue team tiger (power 6)
-        board[8][6] = "b7"; //blue team lion (power 7)
+        initializeBoard();
+    }
 
+    private void initializeBoard(){
+        board[0][0].setPiece("lion", "red");
+        board[0][6].setPiece("tiger", "red");
+        board[1][1].setPiece("dog", "red");
+        board[1][5].setPiece("cat", "red");
+        board[2][0].setPiece("rat", "red");
+        board[2][2].setPiece("leopard", "red");
+        board[2][4].setPiece("wolf", "red");
+        board[2][6].setPiece("elephant", "red");
+        board[6][0].setPiece("elephant", "blue");
+        board[6][2].setPiece("wolf", "blue");
+        board[6][4].setPiece("leopard", "blue");
+        board[6][6].setPiece("rat", "blue");
+        board[7][1].setPiece("cat", "blue");
+        board[7][5].setPiece("dog", "blue");
+        board[8][0].setPiece("tiger", "blue");
+        board[8][6].setPiece("lion", "blue");
     }
 
     void printBoard(){
         // prints out the board in a readable fashion
-        for(int i=0; i<9; i++) System.out.println(Arrays.toString(board[i]));
-        System.out.println("");
+        for(int row=0; row<9; row++) {
+            for (int col = 0; col < 7; col++) {
+                if(board[row][col].gamePiece != null)
+                    System.out.print(board[row][col].gamePiece.ID + " ");
+                else System.out.print("__ ");
+            }
+            System.out.println();
+        }
     }
 
     public boolean sendInput(String player, int row, int col){
         // send input to the game in the format (player sending move, column selected, row selected)
         // returns true if the game state has changed, else returns false
-        if(isTurn(player) && winner.length() == 0){
-            if(move.selectedCol == col && move.selectedRow == row){ // if the second half of the move is the same as the first half (re-selecting the same tile)
-                move.selectedCol = -1;
-                move.selectedRow = -1;
+        if(isTurn(player) && winner.isEmpty()){
+            if(move.selectedSquare == null){ // selecting an empty square
+                move.selectedSquare = board[row][col];
                 move.updateValidTiles();
                 return true;
             }
-            else if(move.isFriendlyUnit(row, col)){ // if the player is selecting one of their own tiles
-                move.selectedCol = col;
-                move.selectedRow = row;
+            else if(move.selectedSquare == board[row][col]){ // re-selecting the same square
+                move.selectedSquare = null;
                 move.updateValidTiles();
                 return true;
             }
-            else if(move.validTiles[row][col].equals("*")) { // if row, col is a valid tile to move to
+            else if(board[row][col].isValid){ // selecting a square to move to
                 makeMove(row, col);
                 move.updateValidTiles();
                 return true;
@@ -108,23 +114,22 @@ public class Game {
     private void makeMove(int row, int col){
         // once a valid move has been constructed, make it.
         turnNumber++;
-        String pieceName = gameUtils.getRealPieceName(board[move.selectedRow][move.selectedCol]);
-        board[row][col] = board[move.selectedRow][move.selectedCol];
-        board[move.selectedRow][move.selectedCol] = "__";
+        String pieceName = gameUtils.getRealPieceName(board[move.selectedSquare.row][move.selectedSquare.col].gamePiece.ID);
+
+        board[row][col].gamePiece = new GamePiece(move.selectedSquare.gamePiece.type, move.selectedSquare.gamePiece.color);
+        board[move.selectedSquare.row][move.selectedSquare.col].gamePiece = null;
 
         System.out.println(turn + " moved " + pieceName + " from " + row + "," + col
-                + " to " + move.selectedRow +"," + move.selectedCol);
+                + " to " + move.selectedSquare.row +"," + move.selectedSquare.col);
 
         if(turn.equals("blue")) turn = "red";
         else turn = "blue";
 
-        move.selectedRow = -1;
-        move.selectedCol = -1;
+        move.selectedSquare = null;
         move.updateValidTiles();
 
         checkIfWinner();
 
-        System.out.println("");
         //printBoard();
     }
 
@@ -138,23 +143,47 @@ public class Game {
         int bluePieces = 0;
         for(int i=0; i<9; i++){
             for(int j=0; j<7; j++){
-                if(board[i][j].charAt(0) == 'b'){
-                    if(i == 0 && j == 3) winner = playerOne; // if there is a blue piece in the red team den
-                    bluePieces++;
-                }
-                if(board[i][j].charAt(0) == 'r'){
-                    if(i == 8 && j == 3) winner = playerTwo; // if there is a red piece in the blue team den
-                    redPieces++;
+                if(board[i][j].gamePiece != null){
+                    if(board[i][j].gamePiece.color.equals("blue")){
+                        if(i == 0 && j == 3) winner = playerOne;
+                        bluePieces++;
+                    }
+                    if(board[i][j].gamePiece.color.equals("red")){
+                        if(i == 8 && j == 3) winner = playerTwo;
+                        redPieces++;
+                    }
                 }
             }
         }
-        if(redPieces == 0) winner = playerOne;
-        if(bluePieces == 0) winner = playerTwo;
+        if(redPieces == 0) winner = playerOne; // if there are no red pieces left
+        if(bluePieces == 0) winner = playerTwo; // if there are no blue pieces left
 
-        if(winner.length() != 0){
+        if(!canMakeMove()){
+            if(isTurn(playerOne)) winner = playerTwo;
+            if(isTurn(playerTwo)) winner = playerOne;
+        }
+
+        if(!winner.isEmpty()){
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
             endTime = dtf.format(LocalDateTime.now()).toString();
         }
+    }
+
+    private boolean canMakeMove(){
+        // Returns true if the current turn's player has any moves available
+
+        Move testMove = new Move(this);
+
+        for(int row = 0; row < 9; row++){
+            for(int col = 0; col < 7; col++){
+                testMove.selectedSquare = board[row][col];
+                if (testMove.isFriendlyUnit(row, col)) {
+                    testMove.updateValidTiles();
+                    if (testMove.numberOfValidTiles > 0) return true;
+                }
+            }
+        }
+        return false;
     }
 
     public static void main(String[] arg){

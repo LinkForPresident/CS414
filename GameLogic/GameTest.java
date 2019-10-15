@@ -25,8 +25,8 @@ public class GameTest extends TestCase {
         // Tests that the game pieces are placed on to the board in the correct positions after the game is created.
         System.out.println("Game Piece Test: Tests that the game pieces are put in the correct locations");
 
-        assertEquals("r7", game.board[0][0]);
-        assertEquals("b7", game.board[8][6]);
+        assertEquals("r7", game.board[0][0].gamePiece.ID);
+        assertEquals("b7", game.board[8][6].gamePiece.ID);
     }
 
     @Test
@@ -41,7 +41,8 @@ public class GameTest extends TestCase {
         gameUtils.printBoardVeryVerbose(game.board);
         game.sendInput("Bob", 6, 5);
         game.sendInput("Bob", 5, 5);
-        assertTrue(gameUtils.printBoardVeryVerbose(game.board).contains("~Blue Mouse~"));
+        assertEquals(game.board[5][5].gamePiece.ID, "b1");
+        //assertTrue(gameUtils.printBoardVeryVerbose(game.board).contains("~Blue Mouse~"));
     }
 
     @Test
@@ -87,12 +88,13 @@ public class GameTest extends TestCase {
         System.out.println("It is " + game.turn +"'s turn");
 
         game.sendInput("Bob", 5, 3);
+        game.move.printValidTiles();
         game.sendInput("Bob", 5, 6);  //lion is pushed right, towards the river
         gameUtils.printBoardVeryVerbose(game.board);
 
         //Assert that Lion properly is on other side of river
         game.printBoard();
-        assertEquals("b7", game.board[5][6]);
+        assertEquals("b7", game.board[5][6].gamePiece.ID);
     }
 
     @Test
@@ -184,7 +186,7 @@ public class GameTest extends TestCase {
         game.sendInput("Bob", 1, 3);
         gameUtils.printBoardVeryVerbose(game.board);
         //Lion should have stayed on 0,3 and not have been moved to 1,3
-        assertEquals("b7", game.board[0][3]);
+        assertEquals("b7", game.board[0][3].gamePiece.ID);
     }
 
     @Test
@@ -211,13 +213,13 @@ public class GameTest extends TestCase {
 
         game.sendInput("Bob", 8, 6);
         game.sendInput("Bob", 7, 6);
-        assertEquals("__", game.board[8][6]);
-        assertEquals("b7", game.board[7][6]);
+        assertNull(game.board[8][6].gamePiece);
+        assertEquals("b7", game.board[7][6].gamePiece.ID);
 
         game.sendInput("Sally", 2, 0);
         game.sendInput("Sally", 3, 0);
-        assertEquals("__", game.board[2][0]);
-        assertEquals("r1", game.board[3][0]);
+        assertNull(game.board[2][0].gamePiece);
+        assertEquals("r1", game.board[3][0].gamePiece.ID);
     }
 
     @Test
@@ -281,14 +283,14 @@ public class GameTest extends TestCase {
                 {"__","__","__","__","__","__","__"},
                 {"__","__","__","__","__","__","__"}};
 
-        game.board = newBoard;
+        //game.board = newBoard;
         game.printBoard();
 
         // making a move when it isn't your turn
         game.sendInput("Sally", 3,0);
         game.sendInput("Sally", 2,0);
-        assertEquals("r7", game.board[3][0]);
-        assertEquals("__", game.board[2][0]);
+        assertEquals("r7", game.board[3][0].gamePiece.ID);
+        assertEquals("__", game.board[2][0].gamePiece.ID);
 
         // moving in to an enemy unit that is stronger than you
         game.sendInput("Bob",4,0);
@@ -319,7 +321,7 @@ public class GameTest extends TestCase {
                 {"__","__","__","__","__","__","__"},
                 {"__","__","__","__","__","__","__"}};
 
-        game.board = newBoard;
+        //game.board = newBoard;
         game.printBoard();
         game.sendInput("Bob",1,3);
         game.sendInput("Bob",1,2);
@@ -349,7 +351,7 @@ public class GameTest extends TestCase {
                 {"__","__","__","__","__","__","__"},
                 {"__","__","__","__","__","__","__"}};
 
-        game.board = newBoard;
+        //game.board = newBoard;
 
         game.sendInput("Bob", 1, 2);
         try {
@@ -376,10 +378,32 @@ public class GameTest extends TestCase {
                 {"__","__","__","__","__","__","__"},
                 {"__","__","__","__","__","__","__"}};
 
-        game.board = newBoard;
+        //game.board = newBoard;
 
         game.sendInput("Bob", 1, 3);
         game.sendInput("Bob", 0, 3);
         assertEquals("Bob", game.winner);
     }
+
+    @Test
+    public void testLockedGameState(){
+        String newBoard[][] = {
+                {"r3","b6","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"b5","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"},
+                {"__","__","__","__","__","__","__"}};
+
+        //game.board = newBoard;
+
+        game.sendInput("Bob", 2, 0);
+        game.sendInput("Bob", 1, 0);
+        game.printBoard();
+        assertEquals("Bob", game.winner);
+    }
+
 }

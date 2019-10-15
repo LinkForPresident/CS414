@@ -36,7 +36,7 @@ public class GameApp {
                 String[] coords = scanner.nextLine().split(",");
                 int x =  Integer.parseInt(coords[0]);
                 int y =  Integer.parseInt(coords[1]);
-                System.out.println(Arrays.toString(coords) + " is " + gameUtils.getSquare(x,y,gameUtils.getRealPieceName(game.board[x][y])));
+                System.out.println(Arrays.toString(coords) + " is " + gameUtils.getSquare(x,y,gameUtils.getRealPieceName(game.board[x][y].gamePiece.ID)));
                 game.sendInput(bluePlayer, x, y);
                 System.out.println("Now select your destination for this piece!");
                 coords = scanner.nextLine().split(",");
@@ -55,7 +55,7 @@ public class GameApp {
                 String[] coords = scanner.nextLine().split(",");
                 int x =  Integer.parseInt(coords[0]);
                 int y =  Integer.parseInt(coords[1]);
-                System.out.println(Arrays.toString(coords) + " is " + gameUtils.getSquare(x,y,gameUtils.getRealPieceName(game.board[x][y])));
+                System.out.println(Arrays.toString(coords) + " is " + gameUtils.getSquare(x,y,gameUtils.getRealPieceName(game.board[x][y].gamePiece.ID)));
                 game.sendInput(redPlayer, x, y);
                 System.out.println("Now select your destination for this piece!");
                 coords = scanner.nextLine().split(",");
