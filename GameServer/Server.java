@@ -75,63 +75,6 @@ public class Server extends Thread{
         }catch(IOException e){}
     }
 
-    protected void establishDatabaseProxyAddress() throws IOException, InterruptedException, ClassNotFoundException, SQLException {
-
-        try {
-            System.out.println(DEBUG_TAG + "Attempting to connect to remote database with existing proxy server address.");
-            Class.forName(JDBC_DRIVER); // register the JDBC driver.
-            DriverManager.getConnection(
-                    PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
-            System.out.println(SUCCESS_TAG + "Using the existing proxy server address was successful.");
-            return;
-        }catch(SQLNonTransientConnectionException sql){
-            System.out.println(WARNING_TAG + "Using the existing proxy server address failed;" +
-                    " executing curl commands to retrieve new proxy server address.");
-        }
-        Process process = Runtime.getRuntime().exec("GameServer/getSessionToken.sh");
-        process.waitFor();
-        InputStream inputStream = process.getInputStream();
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-        String part = "";
-        String response = "";
-        while((part = bufferedReader.readLine()) != null){
-            response += part;
-        }
-        // System.out.println("==DEBUG==:: getSessionToken.sh response: " + response);
-        String sessionToken = response.split(":")[2].replace("\"", "").split(",")[0];
-        System.out.println(DEBUG_TAG + "Parsed remote proxy session token: " + sessionToken);
-
-        String getProxyAddress = String.format("curl -X POST -H \"token:%s\" -H \"developerkey\":\"%s\" -d \'{\"wait\":\"true\", " +
-                "\"deviceaddress\":\"\'%s\'\"}' https://api.remot3.it/apv/v27/device/connect", sessionToken, devAPIKey, deviceAddress);
-        // System.out.println(getProxyAddress);
-
-        FileWriter fileWriter = new FileWriter("GameServer/getProxyAddress.sh");
-        fileWriter.write(getProxyAddress);
-        fileWriter.close();
-        process = Runtime.getRuntime().exec("chmod 775 GameServer/getProxyAddress.sh");
-        process.waitFor();
-        process = Runtime.getRuntime().exec("GameServer/getProxyAddress.sh");
-        process.waitFor();
-
-        inputStream = process.getInputStream();
-        bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-        response = "";
-        while((part = bufferedReader.readLine()) != null){
-            response += part;
-        }
-        process.destroy();
-        // System.out.println("==DEBUG==:: getProxyAddress.sh response: " + response);
-        String[] components = response.split(",");
-        for(String component: components){
-            if(component.contains("\"proxy\"")){
-                PROXY_ADDRESS = component.replace("\\", "").replace("\"", "")
-                        .split("proxy:")[1].replace("http://", "");
-                break;
-            }
-        }
-        PROXY_ADDRESS = "jdbc:mariadb://" + PROXY_ADDRESS + "/cs414";
-        System.out.println(DEBUG_TAG + "Parsed remote proxy database address: " + PROXY_ADDRESS);
-    }
 
     String getHTMLPage(String path) throws IOException{
         // Fetch an HTML page for the client.
@@ -160,34 +103,11 @@ public class Server extends Thread{
         return loggedIn;
     }
 
-    ResultSet executeDatabaseQuery(String query){
-        Connection connection;
-        Statement statement;
-        ResultSet resultSet = null;
-        try{
-            establishDatabaseProxyAddress();
-            Class.forName(JDBC_DRIVER); // register the JDBC driver.
-            connection = DriverManager.getConnection(
-                    PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(query);
-        } catch(SQLNonTransientConnectionException e){
-            System.out.println(ERROR_TAG + "Encountered an error while connecting to the database. (HINT: the proxy server is likely different than what is set.)");
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch(InterruptedException | IOException e) {
-            System.out.println(ERROR_TAG + "Encountered an error while attempting to curl proxy server credentials for the database.");
-            e.printStackTrace();
-        }finally {
-            return resultSet;
-        }
-    }
-
     String login(String username, double user_hash){
         // Login a client by checking if the client is registered and if so, adding client to list of logged in users.
         System.out.println(String.format(INFO_TAG + "Attempting to log in user with username: '%s' and user_hash: '%f'.", username, user_hash));
-        String selectUser = String.format("SELECT 1 FROM User WHERE hash_code='%f'", user_hash);
-        ResultSet resultSet = executeDatabaseQuery(selectUser);
+        String selectUser = String.format("SELECT 1 FROM User WHERE hash_code='%f';", user_hash);
+        ResultSet resultSet = Database.executeDatabaseQuery(selectUser);
         String JSONResponse = String.format("{\"loggedIn\": %b}", false);
         try {
             if (resultSet.next()) { // User exists and has been authenticated, place user_hash into loggedInUsers list.
@@ -219,10 +139,10 @@ public class Server extends Thread{
     String registerUser(String username, String password, double user_hash){
         // handle a POST request to register a new user in the system.
         System.out.println(String.format(INFO_TAG + "Attempting to register new user with username: %s , password: %s , user_hash: %f.", username, password, user_hash));
-        String registerUser = String.format("INSERT INTO User VALUES('%s', '%s', '%f')", username, password, user_hash);
-        ResultSet resultSet = executeDatabaseQuery(registerUser);
-        String checkIfRegistered = String.format("SELECT 1 FROM User WHERE hash_code='%f'", user_hash);
-        resultSet = executeDatabaseQuery(checkIfRegistered);
+        String registerUser = String.format("INSERT INTO User VALUES('%s', '%s', '%f');", username, password, user_hash);
+        ResultSet resultSet = Database.executeDatabaseQuery(registerUser);
+        String checkIfRegistered = String.format("SELECT 1 FROM User WHERE hash_code='%f';", user_hash);
+        resultSet = Database.executeDatabaseQuery(checkIfRegistered);
         String JSONResponse = String.format("{\"loggedIn\": %b}", false);
         try {
             if (resultSet.next()) {
@@ -240,10 +160,10 @@ public class Server extends Thread{
 
     String unregisterUser(String username, double user_hash){
         System.out.println(String.format(INFO_TAG + "Attempting to unregister user: '%s'.", username));
-        String unregisterUser = String.format("DELETE FROM User WHERE has_code='%f'", user_hash);
-        ResultSet resultSet = executeDatabaseQuery(unregisterUser);
-        String checkIfUnregistered = String.format("SELECT 1 FROM user WHERE has_code='%f'", user_hash);
-        resultSet = executeDatabaseQuery(checkIfUnregistered);
+        String unregisterUser = String.format("DELETE FROM User WHERE hash_code='%f';", user_hash);
+        ResultSet resultSet = Database.executeDatabaseQuery(unregisterUser);
+        String checkIfUnregistered = String.format("SELECT 1 FROM user WHERE hash_code='%f';", user_hash);
+        resultSet = Database.executeDatabaseQuery(checkIfUnregistered);
         String JSONResponse = String.format("{\"success\": %b}", false);
         try{
             if(resultSet.next()){
