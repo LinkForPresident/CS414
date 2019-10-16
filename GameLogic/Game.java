@@ -90,9 +90,14 @@ public class Game {
         // returns true if the game state has changed, else returns false
         if(isTurn(player) && winner.isEmpty()){
             if(move.selectedSquare == null){ // selecting an empty square
-                move.selectedSquare = board[row][col];
-                move.updateValidTiles();
-                return true;
+                if(board[row][col].gamePiece != null){
+                    if(board[row][col].gamePiece.color.equals(turn)){
+                        move.selectedSquare = board[row][col];
+                        move.updateValidTiles();
+                        return true;
+                    }
+                }
+                return false;
             }
             else if(move.selectedSquare == board[row][col]){ // re-selecting the same square
                 move.selectedSquare = null;
