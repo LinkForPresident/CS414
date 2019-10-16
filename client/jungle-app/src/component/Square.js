@@ -19,7 +19,9 @@ class Square extends React.Component {
                     this.props.postExample("action=move_piece&gameID=1234&username=" + this.props.username + "&password=iforgot123&row=" + this.props.row + "&column=" + this.props.column)
                 }}
                 // onClick={this.props.postExample()}
-            >{this.props.piece}.{(this.props.environment != "empty" ? this.props.environment : "")}.{this.props.available}</button>
+            >{this.props.piece}.{(this.props.environment != "empty" ? this.props.environment : "")}.{this.props.available}
+                <img src="./client/jungle-app/src/component/images/RatRed.png" alt="r1"/>
+            </button>
         );
     }
 }
