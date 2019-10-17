@@ -1,24 +1,18 @@
 package GameServer;
 
-import GameLogic.exception.PlayerNameException;
 import java.io.*;
 import java.net.Socket;
 import java.sql.SQLNonTransientConnectionException;
-import java.util.NoSuchElementException;
 
-class GameConnector extends Server{
+class GameConnector extends Thread {
 
     Socket clientSocket;
     private InputStream inputStream;
     private PrintWriter outputStream;
     BufferedReader bufferedReader;
     private Request request;
-    private String HEADER = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: POST, GET\r\nAccess-Control-Allow-Headers: *\r\n";
-
-    GameConnector(){
-        // generic constructor, needed to avoid a compilation error.
-
-    }
+    private String HEADER = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: " +
+            "*\r\nAccess-Control-Allow-Methods: POST, GET\r\nAccess-Control-Allow-Headers: *\r\n";
 
     GameConnector(Socket clientSocket){
         this.clientSocket = clientSocket;
@@ -33,44 +27,22 @@ class GameConnector extends Server{
             setUpConnection();
 
         }catch(FileNotFoundException f){
-            try {
-                System.out.println(WARNING_TAG + "Client automatically requested '/css/common.css', which does not exist.");
+                Terminal.printWarning("Client automatically requested '/css/common.css', which does not exist.");
                 tearDownConnection();
-                System.out.println(INFO_TAG + "Connection has been torn down.");
                 return;
-            } catch (IOException ee) {
-                System.out.println(ERROR_TAG + "Encountered an error while trying to set up connection (/css/common.css does not exist), " +
-                        "and encountered an error while tearing down the connection as well.");
-                ee.printStackTrace();
-                return;
-            }
         }
         catch(IOException e){
-            try{
-                System.out.println(WARNING_TAG + "This was not a real request by the user, but an automatic request by the browser.");
+                Terminal.printWarning("This was not a real request by the user, but an automatic request by the " +
+                        "browser.");
                 tearDownConnection();
-                System.out.println(INFO_TAG + "Connection has been torn down.");
                 return;
-            } catch (IOException ee) {
-                System.out.println(ERROR_TAG + "Encountered an error while trying to set up connection (automatic request by browser), " +
-                        "and encountered an error while tearing down the connection as well.");
-                ee.printStackTrace();
-                return;
-            }
         }
         catch(NullPointerException n){
             // in case of an error in set up, tear down the connection.
-            try {
-                System.out.println(ERROR_TAG + "Encountered an error while trying to set up connection; tearing down connection.");
+                Terminal.printError("Encountered an error while trying to set up connection; tearing down connection.");
                 n.printStackTrace();
                 tearDownConnection();
-                System.out.println(INFO_TAG + "Connection has been torn down.");
                 return;
-            } catch (IOException ee) {
-                System.out.println(ERROR_TAG + "Encountered an error while trying to set up connection, and encountered an error while tearing down the connection as well.");
-                ee.printStackTrace();
-                return;
-            }
         }
         // check client authentication.
         try {
@@ -79,55 +51,42 @@ class GameConnector extends Server{
                 try {
                     handleRequest();
                 } catch (IOException e) {
-                    try {
-                        System.out.println(ERROR_TAG + "Encountered an error while attempting to handle the request; tearing down connection.");
                         e.printStackTrace();
+                        Terminal.printError("Encountered an error while attempting to handle the request; tearing " +
+                                "down connection.");
                         tearDownConnection();
-                        System.out.println(INFO_TAG + "Connection has been torn down.");
                         return;
-                    } catch (IOException ee) {
-                        System.out.println(ERROR_TAG + "Encountered an error while attempting to handle the request, and encountered an error while tearing down connection as well.");
-                        ee.printStackTrace();
-                        return;
-                    }
                 }
             } else {
                 // client is not authenticated, deny access and redirect to the login page.
                 try {
-                    System.out.println(DEBUG_TAG + "Client is not authenticated, redirecting to login page.");
+                    Terminal.printDebug("Client is not authenticated, redirecting to login page.");
                     redirectTo("/login.html");
                 } catch (IOException e) {
-                    try {
-                        System.out.println(ERROR_TAG + "Encountered an error while attempting to redirect client to login page after failed authentication check.");
-                        tearDownConnection();
-                        System.out.println(INFO_TAG + "Connection has been torn down.");
                         e.printStackTrace();
-                    }
-                    catch(IOException ee){
-                        System.out.println(ERROR_TAG + "Encountered an error while attempting to redirect client after failed authentication check, " +
-                                "and encountered an error while tearing down connection as well.");
-                        ee.printStackTrace();
+                        Terminal.printError("Encountered an error while attempting to redirect client to login page" +
+                                " after failed authentication check.");
+                        tearDownConnection();
                         return;
-                    }
+
                 }
             }
         } catch(SQLNonTransientConnectionException sql){
-            System.out.println(ERROR_TAG + "Encountered an error while attempting verify authenticity due to a problem connecting to the database. " +
-                    "(HINT: the proxy server is likely different than what is set.)");
+            Terminal.printError("Encountered an error while attempting verify authenticity due to a problem " +
+                    "connecting to the database. (HINT: the proxy server is likely different than what is set.); " +
+                    "tearing down connection.");
             sql.printStackTrace();
+            tearDownConnection();
+            return;
         }
         // request has been fulfilled, tear down the connection.
-        try {
-            tearDownConnection();
-        } catch (IOException e) {
-            System.out.println(ERROR_TAG + "Encountered an error while attempting to tear down the connection after the client's request has been fulfilled.");
-            e.printStackTrace();
-        }
-        System.out.println(SUCCESS_TAG + "Request has been served and connection successfully torn down.");
+        tearDownConnection();
+        Terminal.printSuccess("Request has been served and connection successfully torn down.");
     }
 
     private void setUpConnection() throws IOException, NullPointerException{
         // set up the necessary data structures to handle a client socket connection.
+        Terminal.printDebug("Setting up connection.");
         inputStream = this.clientSocket.getInputStream(); // gets data from client.
         bufferedReader = new BufferedReader(new InputStreamReader(inputStream)); // stores data from client.
         outputStream = new PrintWriter(clientSocket.getOutputStream(), true); // sends data to client.
@@ -144,10 +103,12 @@ class GameConnector extends Server{
 
     private void handleRequest() throws IOException{
         // handle the client requests, GET aor POST.
-        System.out.println(INFO_TAG + "Handling request.");
-        switch(request.method){
+        Terminal.printDebug("Handling request.");
+        String method = request.header.get("method");
+        switch(method){
             case "GET":
-                handleGETRequest(request.path);
+                String path = request.header.get("path");
+                handleGETRequest(path);
                 break;
             case "POST":
                 handlePOSTRequest();
@@ -159,21 +120,24 @@ class GameConnector extends Server{
     }
 
     private boolean clientIsAuthenticated() throws SQLNonTransientConnectionException{
-		return true;
 		// check if client is logged in, or is trying to either register, login or logout.
-        //System.out.println(INFO_TAG + "Checking is client is authenticated for this action.");
-        //return request.action.equals("user_registration") || request.action.equals("login") || request.action.equals("logout") || isLoggedIn(request.cookie);
+        Terminal.printDebug("Checking is client is authenticated for this action.");
+        String action = request.body.get("action");
+        String cookie = request.header.get("cookie");
+        return action.equals("user_registration") || action.equals("login") || action.equals("logout") ||
+                Server.isLoggedIn(cookie);
     }
     
     private void handleOPTIONSRequest() throws IOException{
-        System.out.println(INFO_TAG + "Handling OPTIONS request.");
-		outputStream.println(HEADER);
+        Terminal.printDebug("Handling OPTIONS request.");
+		sendJSONReponse("");
     }
 
     private void handleGETRequest(String path) throws IOException {
         // handle a client GET request.
-        System.out.println(INFO_TAG + "Handling GET request.");
-        switch(request.action){
+        Terminal.printDebug("Handling GET request.");
+        String action = request.body.get("action");
+        switch(action){
             case "view_game":
                 handleViewGame();
                 break;
@@ -186,14 +150,13 @@ class GameConnector extends Server{
 
     private void handlePOSTRequest() throws IOException{
         // handle a client POST request.
-        System.out.println(INFO_TAG + "Handling POST request.");
-        switch (request.action) {
+        Terminal.printDebug("Handling POST request.");
+        String action = request.body.get("action");
+        switch(action){
             case "user_registration":
-                System.out.println(INFO_TAG + "User is trying to register.");
                 handleUserRegistration();
                 break;
             case "user_unregistration":
-                System.out.println(INFO_TAG + "User is trying to unregister.");
                 handleUserUnregistration();
                 break;
             case "login":
@@ -222,39 +185,48 @@ class GameConnector extends Server{
 
     private void handleLogin() throws IOException{
         // handle a client requesting to log in.
-        System.out.println(String.format(INFO_TAG + "Attempting to log in user '%s'", request.username));
-		String JSONResponse = login(request.username, request.user_hash);
-		HEADER += String.format("Set-Cookie: user_hash=%f\r\n\r\n", request.user_hash);
+        Terminal.printInfo(String.format("User '%s' is attempting to log in.", request.body.get("username")));
+        String username = request.body.get("username");
+        String password = request.body.get("password");
+        String userHash = Server.calculateUserHash(username, password);
+		String JSONResponse = Server.login(request.body.get("username"), userHash);
+		HEADER += String.format("Set-Cookie: user_hash=%s\r\n\r\n", userHash);
 		sendJSONReponse(JSONResponse);
     }
 
     private void handleLogout() throws IOException{
         // handle a client requesting to log out.
-        System.out.println(String.format(INFO_TAG + "Attempting to log out user '%s'", request.username));
-		String JSONResponse = logout(request.cookie);
-		System.out.println(String.format(INFO_TAG + "User %s has been logged out", request.username));
+        Terminal.printInfo(String.format("User '%s' is attempting to log out.", request.body.get("username")));
+		String JSONResponse = Server.logout(request.header.get("cookie"));
 		sendJSONReponse(JSONResponse);
     }
 
     private void handleUserRegistration() throws IOException{
         // handle a client requesting to register a new account.
-        System.out.println(String.format(INFO_TAG + "Attempting to register new user '%s'", request.username));
-        String JSONResponse = registerUser(request.username, request.password, request.user_hash);
+        Terminal.printInfo(String.format("User '%s' is attempting to register a new account.", request.body.get("username")));
+        String username = request.body.get("username");
+        String password = request.body.get("password");
+        String userHash = Server.calculateUserHash(username, password);
+        String JSONResponse = Server.registerUser(request.body.get("username"), request.body.get("password"), userHash);
         sendJSONReponse(JSONResponse);
     }
 
     private void handleUserUnregistration() throws IOException{
         // handle a client requesting to register a new account.
-        System.out.println(String.format(INFO_TAG + "Attempting to unregister user '%s'", request.username));
-        String JSONResponse = unregisterUser(request.username, request.user_hash);
+        Terminal.printInfo(String.format("User '%s' is attempting to unregister their account.", request.body.get("username")));
+        String username = request.body.get("username");
+        String password = request.body.get("password");
+        String userHash = Server.calculateUserHash(username, password);
+        String JSONResponse = Server.unregisterUser(username, userHash);
         sendJSONReponse(JSONResponse);
     }
     
     
     private void handleMovePiece() throws IOException{
-    // handle a client requesting to move a game piece.
+        // handle a client requesting to move a game piece.
+        Terminal.printInfo(String.format("User '%s' is attempting to move a piece.", request.body.get("username")));
 		String JSONResponse = "";
-		JSONResponse = movePiece(request.gameID, request.username, request.row, request.column);
+		JSONResponse = Server.movePiece(request.body.get("gameID"), request.body.get("username"), request.body.get("row"), request.body.get("column"));
 		if (JSONResponse.length() != 0) {
 		    sendJSONReponse(JSONResponse);
         }
@@ -262,7 +234,7 @@ class GameConnector extends Server{
 
     private void handleSendInvite() throws IOException{
         
-        String JSONResponse = sendInvite(request.playerOne, request.playerTwo);
+        String JSONResponse = Server.sendInvite(request.body.get("playerOne"), request.body.get("playerTwo"));
         sendJSONReponse(JSONResponse);
 
     }
@@ -270,21 +242,21 @@ class GameConnector extends Server{
     private void handleAcceptInvite() throws IOException{
 
 
-        String JSONResponse = acceptInvite(request.playerOne, request.playerTwo);
+        String JSONResponse = Server.acceptInvite(request.body.get("playerOne"), request.body.get("playerTwo"));
         sendJSONReponse(JSONResponse);
 
     }
 
     private void handleDeclineInvite() throws IOException{
 
-        String JSONResponse = declineInvite(request.playerOne, request.playerTwo);
+        String JSONResponse = Server.declineInvite(request.body.get("playerOne"), request.body.get("playerTwo"));
         sendJSONReponse(JSONResponse);
 
     }
 
     private void handleViewGame() throws IOException{
 
-        String JSONresponse = viewGame(request.gameID);
+        String JSONresponse = Server.viewGame(request.body.get("gameID"));
         sendJSONReponse(JSONresponse);
 
     }
@@ -292,7 +264,7 @@ class GameConnector extends Server{
     private void sendJSONReponse(String JSONResponse) throws IOException{
 		// send a JSON response to the client.
 		String response = HEADER + "\r\n" + JSONResponse;
-        System.out.println(String.format(INFO_TAG + "Sending JSON response: \n %s", response));
+        Terminal.printInfo(String.format("Sending JSON response: \n %s", response));
 		outputStream.println(response); // send the response to the client.
  
     }
@@ -300,15 +272,22 @@ class GameConnector extends Server{
 
     private void redirectTo(String path) throws IOException{
         // helper method for making it more explicit when a redirect is happening.
-        System.out.println(String.format(INFO_TAG + "Redirecting to: %s", path));
         handleGETRequest(path);
+
     }
 
-    private void tearDownConnection() throws IOException{
+    private void tearDownConnection(){
         // tear down the connection with the client.
-        System.out.println(INFO_TAG + "Attempting to tear down the Connection.");
-        bufferedReader.close();
-        outputStream.close();
+        Terminal.printInfo("Attempting to tear down the GameConnector instance.");
+        try {
+            bufferedReader.close();
+            outputStream.close();
+        }catch(IOException e){
+            Terminal.printError("Encountered an error while tearing down the connection.");
+            return;
+        }
+        Terminal.printInfo("Connection has been torn down.");
+
     }
 
 }
