@@ -58,17 +58,9 @@ class Handler extends Thread {
                 }
             } else {
                 // client is not authenticated, deny access and redirect to the login page.
-                try {
-                    Terminal.printDebug("Client is not authenticated, redirecting to login page.");
-                    redirectTo("/login.html");
-                } catch (IOException e) {
-                        e.printStackTrace();
-                        Terminal.printError("Encountered an error while attempting to redirect client to login page" +
-                                " after failed authentication check.");
-                        tearDownConnection();
-                        return;
-
-                }
+                Terminal.printDebug("Client is not authenticated.");
+                tearDownConnection();
+                return;
             }
         } catch(SQLNonTransientConnectionException sql){
             Terminal.printError("Encountered an error while attempting verify authenticity due to a problem " +
@@ -81,6 +73,7 @@ class Handler extends Thread {
         // request has been fulfilled, tear down the connection.
         tearDownConnection();
         Terminal.printSuccess("Request has been served and connection successfully torn down.");
+
     }
 
     private void setUpConnection() throws IOException, NullPointerException{
@@ -89,7 +82,7 @@ class Handler extends Thread {
         InputStream inputStream = this.clientSocket.getInputStream(); // gets data from client.
         bufferedReader = new BufferedReader(new InputStreamReader(inputStream)); // stores data from client.
         outputStream = new PrintWriter(clientSocket.getOutputStream(), true); // sends data to client.
-        request = new Request(bufferedReader, clientSocket); // create request object
+        request = new Request(bufferedReader); // create request object
         int flag = request.parseRequest();
         if(flag == -1){
             throw new IOException();
@@ -267,13 +260,6 @@ class Handler extends Thread {
         Terminal.printInfo(String.format("Sending JSON response: \n %s", response));
 		outputStream.println(response); // send the response to the client.
  
-    }
-    
-
-    private void redirectTo(String path) throws IOException{
-        // helper method for making it more explicit when a redirect is happening.
-        handleGETRequest(path);
-
     }
 
     private void tearDownConnection(){

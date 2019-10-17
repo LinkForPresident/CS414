@@ -11,9 +11,6 @@ import java.util.*;
 public class Server {
 
     private static final int PORT_NUMBER = 8080;
-    private static final String RELATIVE_PATH = "client/html";
-    static final String DEFAULT_METHOD = "GET";
-    static final String DEFAULT_PAGE = "/index.html";
     private static final double HASH_KEY = 47324824;    // used in the encryption process of user authentication.
 
     private ServerSocket serverListener;
@@ -54,24 +51,6 @@ public class Server {
                 thread.start();
             }
         }catch(IOException ignored){}
-    }
-
-
-    static String getHTMLPage(String path) throws IOException{
-        // Fetch an HTML page for the client.
-        Terminal.printInfo(String.format("Fetching HTML Page: %s", path));
-        File file = new File(RELATIVE_PATH + path);
-        FileReader fileReader = new FileReader(file);
-        BufferedReader fileBuffer = new BufferedReader(fileReader); // read the file into a buffer.
-        String line;
-        String response = "";
-
-        while((line = fileBuffer.readLine()) != null){ // read until end of file.
-            response += line; // append to response.
-        }
-
-        fileBuffer.close();
-        return response;
     }
 
     static String calculateUserHash(String username, String password) {

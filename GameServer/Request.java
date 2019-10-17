@@ -1,7 +1,6 @@
 package GameServer;
 
 import java.io.*;
-import java.net.Socket;
 import java.util.*;
 
 public class Request {
@@ -9,16 +8,14 @@ public class Request {
     protected Map<String, String> header = new HashMap<String, String>();
     protected Map<String, String> body = new HashMap<String, String>();
 
-    protected BufferedReader bufferedReader;
-    protected Socket clientSocket;
+    private BufferedReader bufferedReader;
 
-    public Request(BufferedReader bufferedReader, Socket clientSocket) throws ArrayIndexOutOfBoundsException, NullPointerException {
+    public Request(BufferedReader bufferedReader) throws ArrayIndexOutOfBoundsException, NullPointerException {
         // constructor
         this.bufferedReader = bufferedReader;
-        this.clientSocket = clientSocket;
     }
 
-    protected int parseRequest() throws IOException, ArrayIndexOutOfBoundsException, NullPointerException {
+    int parseRequest() throws IOException, ArrayIndexOutOfBoundsException, NullPointerException {
         // parse the request for various arguments and parameters.
         Terminal.printDebug("Attempting to parse the request for parameters.");
 
@@ -38,15 +35,11 @@ public class Request {
         return 0;
     }
 
-    private void extractRequestLine() throws FileNotFoundException, IOException {
+    private void extractRequestLine() throws IOException {
         String[] requestLine = bufferedReader.readLine().split(" ");
         header.put("method", requestLine[0]);
         header.put("path", requestLine[1]);
 
-        if (header.get("path").equals("/")) {
-            header.put("path", Server.DEFAULT_PAGE);
-            Terminal.printDebug(String.format("The request path has been changed to: %s.", header.get("path")));
-        }
         if (header.get("path").equals("/css/common.css")) {
             // browsers automatically send a request for this file, which does not exist and wastes server resources.
             throw new FileNotFoundException();
