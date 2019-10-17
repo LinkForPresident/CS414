@@ -49,7 +49,7 @@ public class Server {
 
         try {
             while (true) {
-                Thread thread = new ConnectionHandler(serverListener.accept()); // start a thread to handle the connection.
+                Thread thread = new Handler(serverListener.accept()); // start a thread to handle the connection.
                 Terminal.printSuccess("Connection accepted from client.");
                 thread.start();
             }

@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.Socket;
 import java.sql.SQLNonTransientConnectionException;
 
-class ConnectionHandler extends Thread {
+class Handler extends Thread {
 
     private Socket clientSocket;
     private PrintWriter outputStream;
@@ -13,7 +13,7 @@ class ConnectionHandler extends Thread {
     private String HEADER = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: " +
             "*\r\nAccess-Control-Allow-Methods: POST, GET\r\nAccess-Control-Allow-Headers: *\r\n";
 
-    ConnectionHandler(Socket clientSocket){
+    Handler(Socket clientSocket){
         this.clientSocket = clientSocket;
 
     }
