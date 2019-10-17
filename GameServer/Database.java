@@ -47,8 +47,9 @@ public class Database {
         String sessionToken = response.split(":")[2].replace("\"", "").split(",")[0];
         Terminal.printDebug(String.format("Parsed remote proxy session token: %s", sessionToken));
 
-        String getProxyAddress = String.format("curl -X POST -H \"token:%s\" -H \"developerkey\":\"%s\" -d \'{\"wait\":\"true\", " +
-                "\"deviceaddress\":\"\'%s\'\"}' https://api.remot3.it/apv/v27/device/connect", sessionToken, devAPIKey, deviceAddress);
+        String getProxyAddress = String.format("curl -X POST -H \"token:%s\" -H \"developerkey\":\"%s\" " +
+                "-d \'{\"wait\":\"true\", \"deviceaddress\":\"\'%s\'\"}' https://api.remot3.it/apv/v27/device/connect",
+                sessionToken, devAPIKey, deviceAddress);
         // System.out.println(getProxyAddress);
 
         FileWriter fileWriter = new FileWriter("GameServer/getProxyAddress.sh");
@@ -92,7 +93,8 @@ public class Database {
             statement = connection.createStatement();
             resultSet = statement.executeQuery(query);
         } catch(SQLNonTransientConnectionException e){
-            Terminal.printError("Encountered an error while connecting to the database. (HINT: the proxy server is likely different than what is set.)");
+            Terminal.printError("Encountered an error while connecting to the database. (HINT: the proxy server is" +
+                    " likely different than what is set.)");
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         } catch(InterruptedException | IOException e) {
@@ -103,7 +105,7 @@ public class Database {
         }
     }
     
-    public static void main(String[] args) throws InterruptedException, IOException, ClassNotFoundException, SQLException, SQLNonTransientConnectionException{
+    public static void main(String[] args) throws SQLException{
 		String query = args[0];
 		Terminal.printInfo(String.format("The following SQL query will be executed: \"%s\".", query));
 		ResultSet resultSet = executeDatabaseQuery(query);

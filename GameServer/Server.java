@@ -75,11 +75,12 @@ public class Server {
     }
 
     static String calculateUserHash(String username, String password) {
-
+        // calculate the hash that acts as the primary key in the User table.
         double username_hash = username.hashCode() % HASH_KEY;
         double password_hash = password.hashCode() % HASH_KEY;
-        String userHash = String.valueOf((username_hash % password_hash) % HASH_KEY);   // calculate the hash that acts as the primary key in the User table.
-        Terminal.printDebug(String.format("The username, password and user_hash from the POST request are: %s, %s, %s", username, password, userHash));
+        String userHash = String.valueOf((username_hash % password_hash) % HASH_KEY);
+        Terminal.printDebug(String.format("The username, password and user_hash from the POST request are: %s, %s," +
+                " %s", username, password, userHash));
         return userHash;
 
     }
@@ -99,7 +100,8 @@ public class Server {
 
     static String login(String username, String user_hash){
         // Login a client by checking if the client is registered and if so, adding client to list of logged in users.
-        Terminal.printInfo(String.format("Attempting to log in user with username: '%s' and user_hash: '%s'.", username, user_hash));
+        Terminal.printInfo(String.format("Attempting to log in user with username: '%s' and user_hash: '%s'.",
+                username, user_hash));
         String selectUser = String.format("SELECT 1 FROM User WHERE hash_code='%s';", user_hash);
         ResultSet resultSet = Database.executeDatabaseQuery(selectUser);
         String JSONResponse = String.format("{\"loggedIn\": %b}", false);
@@ -112,7 +114,8 @@ public class Server {
                         playerInvites += inv[0] + ",";
                     }
                 }
-                JSONResponse = String.format("{\"loggedIn\": %b, \"username\": \"%s\", \"invites\": \"%s\"}", true, username, playerInvites);
+                JSONResponse = String.format("{\"loggedIn\": %b, \"username\": \"%s\", \"invites\": \"%s\"}", true,
+                        username, playerInvites);
                 Terminal.printSuccess(String.format("User '%s' has been logged in.", username));
             } else {   // User does not exist. Stop the request handling.
                 Terminal.printDebug(String.format("User '%s' does not exist.", username));
@@ -134,8 +137,10 @@ public class Server {
 
     static String registerUser(String username, String password, String user_hash){
         // handle a POST request to register a new user in the system.
-        Terminal.printInfo(String.format("Attempting to register new user with username: %s , password: %s , user_hash: %s.", username, password, user_hash));
-        String registerUser = String.format("INSERT INTO User VALUES('%s', '%s', '%s');", username, password, user_hash);
+        Terminal.printInfo(String.format("Attempting to register new user with username: %s , password: %s , " +
+                "user_hash: %s.", username, password, user_hash));
+        String registerUser = String.format("INSERT INTO User VALUES('%s', '%s', '%s');", username, password,
+                user_hash);
         ResultSet resultSet = Database.executeDatabaseQuery(registerUser);
         String checkIfRegistered = String.format("SELECT 1 FROM User WHERE hash_code='%s';", user_hash);
         resultSet = Database.executeDatabaseQuery(checkIfRegistered);
@@ -144,10 +149,12 @@ public class Server {
             if (resultSet.next()) {
                 Terminal.printSuccess(String.format("New user '%s' has been registered", username));
             } else {
-                Terminal.printError(String.format("Encountered an error while attempting to register a new user with username '%s'.", username));
+                Terminal.printError(String.format("Encountered an error while attempting to register a new user with " +
+                        "username '%s'.", username));
             }
         }catch(SQLException sql){
-            Terminal.printError(String.format("Encountered an error while attempting to register a new user with username '%s'.", username));
+            Terminal.printError(String.format("Encountered an error while attempting to register a new user with " +
+                    "username '%s'.", username));
         }
         finally {
             return JSONResponse;
@@ -163,14 +170,16 @@ public class Server {
         String JSONResponse = String.format("{\"success\": %b}", false);
         try{
             if(resultSet.next()){
-                Terminal.printError(String.format("Encountered an error while attempting to unregister user with username '%s'.", username));
+                Terminal.printError(String.format("Encountered an error while attempting to unregister user with " +
+                        "username '%s'.", username));
             }
             else{
                 Terminal.printSuccess(String.format("User '%s' has been unregistered", username));
                 JSONResponse = String.format("{\"success\": %b}", true);
             }
         }catch(SQLException sql){
-            Terminal.printError(String.format("Encountered an error while attempting to unregister user with username '%s'.", username));
+            Terminal.printError(String.format("Encountered an error while attempting to unregister user with username" +
+                    " '%s'.", username));
         }
         finally{
             return JSONResponse;
@@ -194,7 +203,8 @@ public class Server {
             Terminal.printDebug(String.format("Creating invite between %s and %s.", playerOne, playerTwo));
             invites.add(newInvite);
         }
-        String JSONResponse = String.format("{\"invitedPlayer\": \"%s\", \"wasSuccessful\": %b}", playerTwo, !alreadyExists);
+        String JSONResponse = String.format("{\"invitedPlayer\": \"%s\", \"wasSuccessful\": %b}", playerTwo,
+                !alreadyExists);
 		return JSONResponse;
     }
     
@@ -255,7 +265,8 @@ public class Server {
 
     static String movePiece(String gameID, String playerID, String row, String column){
 		// handle a POST request to move a piece in a game instance.
-		Terminal.printInfo(String.format("Attempting to move piece at row: '%s', column: '%s', for player: '%s' and game: '%s'.", row, column, playerID, gameID));
+		Terminal.printInfo(String.format("Attempting to move piece at row: '%s', column: '%s', for player: '%s' and " +
+                "game: '%s'.", row, column, playerID, gameID));
 		String JSONResponse = "";
 		for(Game game : activeGames){
 			if(game.gameID.equals(gameID)){
@@ -269,7 +280,10 @@ public class Server {
     
     private static String formatGameResponse(Game game){
 		String boardJSON = formatBoardArrayResponse(game.board);
-		String JSONResponse = String.format("{\"gameID\": \"%s\", \"playerOne\": \"%s\", \"playerTwo\": \"%s\", \"turn\": \"%s\", \"turnNumber\": %d , \"board\": %s, \"winner\": \"%s\", \"startTime\": \"%s\", \"endTime\": \"%s\"}", game.gameID, game.playerOne, game.playerTwo, game.turn, game.turnNumber, boardJSON, game.winner, game.startTime, game.endTime);
+		String JSONResponse = String.format("{\"gameID\": \"%s\", \"playerOne\": \"%s\", \"playerTwo\": \"%s\", " +
+                "\"turn\": \"%s\", \"turnNumber\": %d , \"board\": %s, \"winner\": \"%s\", \"startTime\": \"%s\", " +
+                "\"endTime\": \"%s\"}", game.gameID, game.playerOne, game.playerTwo, game.turn, game.turnNumber,
+                boardJSON, game.winner, game.startTime, game.endTime);
         return JSONResponse;
     }
     
@@ -284,7 +298,8 @@ public class Server {
                     gamePieceID = "\"" + boardSquare.gamePiece.ID + "\"";
                 }
 
-				boardRow += String.format("{\"environment\": \"%s\", \"piece\": %s, \"available\": %b}", boardSquare.environment, gamePieceID, boardSquare.isValid);
+				boardRow += String.format("{\"environment\": \"%s\", \"piece\": %s, \"available\": %b}",
+                        boardSquare.environment, gamePieceID, boardSquare.isValid);
                 if (j < 6) {
                     boardRow += ",";
                 }
@@ -316,7 +331,7 @@ public class Server {
 
     public static void main(String[] args){
         if(args.length > 0 && args[0].equals("--debug")){
-            debugMode = Boolean.parseBoolean(args[0]);
+            debugMode = true;
         }
         Server server = new Server();
         server.serve();

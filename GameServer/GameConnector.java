@@ -203,7 +203,8 @@ class GameConnector extends Thread {
 
     private void handleUserRegistration() throws IOException{
         // handle a client requesting to register a new account.
-        Terminal.printInfo(String.format("User '%s' is attempting to register a new account.", request.body.get("username")));
+        Terminal.printInfo(String.format("User '%s' is attempting to register a new account.",
+                request.body.get("username")));
         String username = request.body.get("username");
         String password = request.body.get("password");
         String userHash = Server.calculateUserHash(username, password);
@@ -213,7 +214,8 @@ class GameConnector extends Thread {
 
     private void handleUserUnregistration() throws IOException{
         // handle a client requesting to register a new account.
-        Terminal.printInfo(String.format("User '%s' is attempting to unregister their account.", request.body.get("username")));
+        Terminal.printInfo(String.format("User '%s' is attempting to unregister their account.",
+                request.body.get("username")));
         String username = request.body.get("username");
         String password = request.body.get("password");
         String userHash = Server.calculateUserHash(username, password);
@@ -226,7 +228,8 @@ class GameConnector extends Thread {
         // handle a client requesting to move a game piece.
         Terminal.printInfo(String.format("User '%s' is attempting to move a piece.", request.body.get("username")));
 		String JSONResponse = "";
-		JSONResponse = Server.movePiece(request.body.get("gameID"), request.body.get("username"), request.body.get("row"), request.body.get("column"));
+		JSONResponse = Server.movePiece(request.body.get("gameID"), request.body.get("username"),
+                request.body.get("row"), request.body.get("column"));
 		if (JSONResponse.length() != 0) {
 		    sendJSONReponse(JSONResponse);
         }

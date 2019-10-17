@@ -48,7 +48,8 @@ public class Request {
             Terminal.printDebug(String.format("The request path has been changed to: %s.", header.get("path")));
         }
         if (header.get("path").equals("/css/common.css")) {
-            throw new FileNotFoundException(); // browsers automatically send a request for this file, which does not exist and wastes server resources.
+            // browsers automatically send a request for this file, which does not exist and wastes server resources.
+            throw new FileNotFoundException();
         }
     }
 
@@ -57,7 +58,8 @@ public class Request {
         while ((headerLine = bufferedReader.readLine()).length() != 0) {
             if (headerLine.contains("Content-Length")) {
                 header.put("contentLength", headerLine.split(" ")[1]);
-                Terminal.printDebug(String.format("The content length of the request is: %s.", header.get("contentLength")));
+                Terminal.printDebug(String.format("The content length of the request is: %s.",
+                        header.get("contentLength")));
             }
             if(headerLine.contains("Cookie")){
                 header.put("cookie", headerLine.split("=")[1]);
