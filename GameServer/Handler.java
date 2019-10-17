@@ -1,8 +1,9 @@
 package GameServer;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.Socket;
-import java.sql.SQLNonTransientConnectionException;
 
 class Handler extends Thread {
 
@@ -10,8 +11,7 @@ class Handler extends Thread {
     private PrintWriter outputStream;
     private BufferedReader bufferedReader;
     private Request request;
-    private String HEADER = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: " +
-            "*\r\nAccess-Control-Allow-Methods: POST, GET\r\nAccess-Control-Allow-Headers: *\r\n";
+    private Response response;
 
     Handler(Socket clientSocket){
         this.clientSocket = clientSocket;
@@ -44,29 +44,20 @@ class Handler extends Thread {
                 return;
         }
         // check client authentication.
-        try {
-            if (clientIsAuthenticated()) {
-                // client is authenticated, handle the client's request.
-                try {
-                    handleRequest();
-                } catch (IOException e) {
-                        e.printStackTrace();
-                        Terminal.printError("Encountered an error while attempting to handle the request; tearing " +
-                                "down connection.");
-                        tearDownConnection();
-                        return;
-                }
-            } else {
-                // client is not authenticated, deny access and redirect to the login page.
-                Terminal.printDebug("Client is not authenticated.");
-                tearDownConnection();
-                return;
+        if (clientIsAuthenticated()) {
+            // client is authenticated, handle the client's request.
+            try {
+                handleRequest();
+            } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
+                    e.printStackTrace();
+                    Terminal.printError("Encountered an error while attempting to handle the request; tearing " +
+                            "down connection.");
+                    tearDownConnection();
+                    return;
             }
-        } catch(SQLNonTransientConnectionException sql){
-            Terminal.printError("Encountered an error while attempting verify authenticity due to a problem " +
-                    "connecting to the database. (HINT: the proxy server is likely different than what is set.); " +
-                    "tearing down connection.");
-            sql.printStackTrace();
+        } else {
+            // client is not authenticated, deny access and redirect to the login page.
+            Terminal.printDebug("Client is not authenticated.");
             tearDownConnection();
             return;
         }
@@ -88,178 +79,37 @@ class Handler extends Thread {
             throw new IOException();
         }
         else if(flag == -2){
-            outputStream.println(HEADER + "\r\n\r\n");
             throw new FileNotFoundException();
         }
     }
 
-    private void handleRequest() throws IOException{
-        // handle the client requests, GET aor POST.
-        Terminal.printDebug("Handling request.");
-        String method = request.header.get("method");
-        switch(method){
-            case "GET":
-                handleGETRequest();
-                break;
-            case "POST":
-                handlePOSTRequest();
-                break;
-			case "OPTIONS":
-				handleOPTIONSRequest();
-				break;
-        }
-    }
-
-    private boolean clientIsAuthenticated() throws SQLNonTransientConnectionException{
+    private boolean clientIsAuthenticated() {
 		// check if client is logged in, or is trying to either register, login or logout.
         Terminal.printDebug("Checking is client is authenticated for this action.");
         String action = request.body.get("action");
         String cookie = request.header.get("cookie");
-        return action.equals("user_registration") || action.equals("login") || action.equals("logout") ||
+        return action.equals("Register") || action.equals("Login") || action.equals("Logout") ||
                 Server.isLoggedIn(cookie);
     }
-    
-    private void handleOPTIONSRequest() throws IOException{
-        Terminal.printDebug("Handling OPTIONS request.");
-		sendJSONReponse("");
-    }
 
-    private void handleGETRequest() throws IOException {
-        // handle a client GET request.
-        Terminal.printDebug("Handling GET request.");
+    private void handleRequest() throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException{
+
         String action = request.body.get("action");
-        switch(action){
-            case "view_game":
-                handleViewGame();
-                break;
-            case "view_stats":
-                // viewPlayerStats();
-                break;
-        }
+        Class<?> classSupportingAction = Class.forName(String.format("GameServer.%s", action));
+        Object actionInstance = classSupportingAction.newInstance();
+        Method executeAction = classSupportingAction.getDeclaredMethod("executeAction", Request.class);
+        response = ((Response)executeAction.invoke(actionInstance, request));
+        sendJSONResponse(response.response);
 
     }
 
-    private void handlePOSTRequest() throws IOException{
-        // handle a client POST request.
-        Terminal.printDebug("Handling POST request.");
-        String action = request.body.get("action");
-        switch(action){
-            case "user_registration":
-                handleUserRegistration();
-                break;
-            case "user_unregistration":
-                handleUserUnregistration();
-                break;
-            case "login":
-                handleLogin();
-                break;
-            case "logout":
-                handleLogout();
-                break;
-            case "send_invite":
-                handleSendInvite();
-                break;
-			case "accept_invite":
-                handleAcceptInvite();
-				break;
-			case "decline_invite":
-			    handleDeclineInvite();
-				break;
-            case "forfeit_game":
-                // forfeitGame();
-                break;
-            case "move_piece":
-                handleMovePiece();
-                break;
-        }
-    }
-
-    private void handleLogin() throws IOException{
-        // handle a client requesting to log in.
-        Terminal.printInfo(String.format("User '%s' is attempting to log in.", request.body.get("username")));
-        String username = request.body.get("username");
-        String password = request.body.get("password");
-        String userHash = Server.calculateUserHash(username, password);
-		String JSONResponse = Server.login(request.body.get("username"), userHash);
-		HEADER += String.format("Set-Cookie: user_hash=%s\r\n\r\n", userHash);
-		sendJSONReponse(JSONResponse);
-    }
-
-    private void handleLogout() throws IOException{
-        // handle a client requesting to log out.
-        Terminal.printInfo(String.format("User '%s' is attempting to log out.", request.body.get("username")));
-		String JSONResponse = Server.logout(request.header.get("cookie"));
-		sendJSONReponse(JSONResponse);
-    }
-
-    private void handleUserRegistration() throws IOException{
-        // handle a client requesting to register a new account.
-        Terminal.printInfo(String.format("User '%s' is attempting to register a new account.",
-                request.body.get("username")));
-        String username = request.body.get("username");
-        String password = request.body.get("password");
-        String JSONResponse = Server.registerUser(request.body.get("username"), request.body.get("password"));
-        sendJSONReponse(JSONResponse);
-    }
-
-    private void handleUserUnregistration() throws IOException{
-        // handle a client requesting to register a new account.
-        Terminal.printInfo(String.format("User '%s' is attempting to unregister their account.",
-                request.body.get("username")));
-        String username = request.body.get("username");
-        String userHash = request.header.get("cookie");
-        String JSONResponse = Server.unregisterUser(username, userHash);
-        sendJSONReponse(JSONResponse);
-    }
     
-    
-    private void handleMovePiece() throws IOException{
-        // handle a client requesting to move a game piece.
-        Terminal.printInfo(String.format("User '%s' is attempting to move a piece.", request.body.get("username")));
-		String JSONResponse = "";
-		JSONResponse = Server.movePiece(request.body.get("gameID"), request.body.get("username"),
-                request.body.get("row"), request.body.get("column"));
-		if (JSONResponse.length() != 0) {
-		    sendJSONReponse(JSONResponse);
-        }
-    }
-
-    private void handleSendInvite() throws IOException{
-        
-        String JSONResponse = Server.sendInvite(request.body.get("playerOne"), request.body.get("playerTwo"));
-        sendJSONReponse(JSONResponse);
-
-    }
-
-    private void handleAcceptInvite() throws IOException{
-
-
-        String JSONResponse = Server.acceptInvite(request.body.get("playerOne"), request.body.get("playerTwo"));
-        sendJSONReponse(JSONResponse);
-
-    }
-
-    private void handleDeclineInvite() throws IOException{
-
-        String JSONResponse = Server.declineInvite(request.body.get("playerOne"), request.body.get("playerTwo"));
-        sendJSONReponse(JSONResponse);
-
-    }
-
-    private void handleViewGame() throws IOException{
-
-        String JSONresponse = Server.viewGame(request.body.get("gameID"));
-        sendJSONReponse(JSONresponse);
-
-    }
-    
-    private void sendJSONReponse(String JSONResponse) throws IOException{
+   private void sendJSONResponse(String response) {
 		// send a JSON response to the client.
-		String response = HEADER + "\r\n" + JSONResponse;
         Terminal.printInfo(String.format("Sending JSON response: \n %s", response));
 		outputStream.println(response); // send the response to the client.
- 
     }
+
 
     private void tearDownConnection(){
         // tear down the connection with the client.
