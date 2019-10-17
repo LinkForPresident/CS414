@@ -20,6 +20,7 @@ public class Terminal {
     }
 
     static void printInfo(String message){
+
         System.out.println(INFO_TAG + message);
     }
 
