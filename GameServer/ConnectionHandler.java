@@ -4,17 +4,16 @@ import java.io.*;
 import java.net.Socket;
 import java.sql.SQLNonTransientConnectionException;
 
-class GameConnector extends Thread {
+class ConnectionHandler extends Thread {
 
-    Socket clientSocket;
-    private InputStream inputStream;
+    private Socket clientSocket;
     private PrintWriter outputStream;
-    BufferedReader bufferedReader;
+    private BufferedReader bufferedReader;
     private Request request;
     private String HEADER = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: " +
             "*\r\nAccess-Control-Allow-Methods: POST, GET\r\nAccess-Control-Allow-Headers: *\r\n";
 
-    GameConnector(Socket clientSocket){
+    ConnectionHandler(Socket clientSocket){
         this.clientSocket = clientSocket;
 
     }
@@ -87,7 +86,7 @@ class GameConnector extends Thread {
     private void setUpConnection() throws IOException, NullPointerException{
         // set up the necessary data structures to handle a client socket connection.
         Terminal.printDebug("Setting up connection.");
-        inputStream = this.clientSocket.getInputStream(); // gets data from client.
+        InputStream inputStream = this.clientSocket.getInputStream(); // gets data from client.
         bufferedReader = new BufferedReader(new InputStreamReader(inputStream)); // stores data from client.
         outputStream = new PrintWriter(clientSocket.getOutputStream(), true); // sends data to client.
         request = new Request(bufferedReader, clientSocket); // create request object
@@ -207,8 +206,7 @@ class GameConnector extends Thread {
                 request.body.get("username")));
         String username = request.body.get("username");
         String password = request.body.get("password");
-        String userHash = Server.calculateUserHash(username, password);
-        String JSONResponse = Server.registerUser(request.body.get("username"), request.body.get("password"), userHash);
+        String JSONResponse = Server.registerUser(request.body.get("username"), request.body.get("password"));
         sendJSONReponse(JSONResponse);
     }
 
@@ -217,8 +215,7 @@ class GameConnector extends Thread {
         Terminal.printInfo(String.format("User '%s' is attempting to unregister their account.",
                 request.body.get("username")));
         String username = request.body.get("username");
-        String password = request.body.get("password");
-        String userHash = Server.calculateUserHash(username, password);
+        String userHash = request.header.get("cookie");
         String JSONResponse = Server.unregisterUser(username, userHash);
         sendJSONReponse(JSONResponse);
     }

@@ -14,7 +14,7 @@ public class Server {
     private static final String RELATIVE_PATH = "client/html";
     static final String DEFAULT_METHOD = "GET";
     static final String DEFAULT_PAGE = "/index.html";
-    static final double HASH_KEY = 47324824;    // used in the encryption process of user authentication.
+    private static final double HASH_KEY = 47324824;    // used in the encryption process of user authentication.
 
     private ServerSocket serverListener;
 
@@ -34,7 +34,7 @@ public class Server {
 			Game game = new Game("dummy_user", "the_devil_himself");
 			game.gameID = "1234";
 			activeGames.add(game);
-		}catch(PlayerNameException e){
+		}catch(PlayerNameException ignored){
 
 		}
 
@@ -49,11 +49,11 @@ public class Server {
 
         try {
             while (true) {
-                Thread thread = new GameConnector(serverListener.accept()); // start a thread to handle the connection.
+                Thread thread = new ConnectionHandler(serverListener.accept()); // start a thread to handle the connection.
                 Terminal.printSuccess("Connection accepted from client.");
                 thread.start();
             }
-        }catch(IOException e){}
+        }catch(IOException ignored){}
     }
 
 
@@ -85,7 +85,7 @@ public class Server {
 
     }
 
-    static boolean isLoggedIn(String user_hash) throws SQLNonTransientConnectionException{
+    static boolean isLoggedIn(String user_hash) {
         // check whether a client is logged in, i.e. the client IP address is an entry in the Logged_In table.
         Terminal.printInfo(String.format("Checking if user with user_hash: '%s' is logged in.", user_hash));
         boolean loggedIn = false;
@@ -98,7 +98,7 @@ public class Server {
         return loggedIn;
     }
 
-    static String login(String username, String user_hash){
+    static String login(String username, String user_hash) {
         // Login a client by checking if the client is registered and if so, adding client to list of logged in users.
         Terminal.printInfo(String.format("Attempting to log in user with username: '%s' and user_hash: '%s'.",
                 username, user_hash));
@@ -120,29 +120,30 @@ public class Server {
             } else {   // User does not exist. Stop the request handling.
                 Terminal.printDebug(String.format("User '%s' does not exist.", username));
             }
-        }catch(SQLException sql) {
-        }finally {
-            return JSONResponse;
+        }catch(SQLException ignored) {
         }
+        return JSONResponse;
     }
 
     static String logout(String user_hash){
 	    // Remove user_hash from loggedInUsers list.
+        String JSONResponse = "";
         Terminal.printInfo(String.format("Attempting to log out user with user_hash: '%s'.", user_hash));
 		loggedInUsers.remove(user_hash);
         Terminal.printInfo(String.format("User with user_hash: '%s' has been logged out.", user_hash));
-		String JSONResponse = String.format("{\"loggedIn\": %b}", false);
+		JSONResponse = String.format("{\"loggedIn\": %b}", false);
 		return JSONResponse;
     }
 
-    static String registerUser(String username, String password, String user_hash){
+    static String registerUser(String username, String password){
         // handle a POST request to register a new user in the system.
+        String userHash = calculateUserHash(username, password);
         Terminal.printInfo(String.format("Attempting to register new user with username: %s , password: %s , " +
-                "user_hash: %s.", username, password, user_hash));
+                "user_hash: %s.", username, password, userHash));
         String registerUser = String.format("INSERT INTO User VALUES('%s', '%s', '%s');", username, password,
-                user_hash);
+                userHash);
         ResultSet resultSet = Database.executeDatabaseQuery(registerUser);
-        String checkIfRegistered = String.format("SELECT 1 FROM User WHERE hash_code='%s';", user_hash);
+        String checkIfRegistered = String.format("SELECT 1 FROM User WHERE hash_code='%s';", userHash);
         resultSet = Database.executeDatabaseQuery(checkIfRegistered);
         String JSONResponse = String.format("{\"loggedIn\": %b}", false);
         try {
@@ -156,9 +157,7 @@ public class Server {
             Terminal.printError(String.format("Encountered an error while attempting to register a new user with " +
                     "username '%s'.", username));
         }
-        finally {
-            return JSONResponse;
-        }
+        return JSONResponse;
     }
 
     static String unregisterUser(String username, String user_hash){
@@ -181,14 +180,13 @@ public class Server {
             Terminal.printError(String.format("Encountered an error while attempting to unregister user with username" +
                     " '%s'.", username));
         }
-        finally{
-            return JSONResponse;
-        }
+        return JSONResponse;
 
     }
     
     static String sendInvite(String playerOne, String playerTwo){
         Terminal.printInfo(String.format("Attempting to service the invite of %s to %s.", playerOne, playerTwo));
+        String JSONResponse = "";
 		// TODO: Check if user exists in DB.
 		String[] newInvite = {playerOne, playerTwo};
 		boolean alreadyExists = false;
@@ -203,7 +201,7 @@ public class Server {
             Terminal.printDebug(String.format("Creating invite between %s and %s.", playerOne, playerTwo));
             invites.add(newInvite);
         }
-        String JSONResponse = String.format("{\"invitedPlayer\": \"%s\", \"wasSuccessful\": %b}", playerTwo,
+        JSONResponse = String.format("{\"invitedPlayer\": \"%s\", \"wasSuccessful\": %b}", playerTwo,
                 !alreadyExists);
 		return JSONResponse;
     }
@@ -218,7 +216,7 @@ public class Server {
                 invitesIterator.remove();
                 try {
                     Game game = new Game(playerOne, playerTwo);
-                } catch (PlayerNameException e) {
+                } catch (PlayerNameException ignored) {
                 }
                 String playerInvites = "";
                 for (String[] inv : invites) {
@@ -279,8 +277,9 @@ public class Server {
     }
     
     private static String formatGameResponse(Game game){
+        String JSONResponse = "";
 		String boardJSON = formatBoardArrayResponse(game.board);
-		String JSONResponse = String.format("{\"gameID\": \"%s\", \"playerOne\": \"%s\", \"playerTwo\": \"%s\", " +
+		JSONResponse = String.format("{\"gameID\": \"%s\", \"playerOne\": \"%s\", \"playerTwo\": \"%s\", " +
                 "\"turn\": \"%s\", \"turnNumber\": %d , \"board\": %s, \"winner\": \"%s\", \"startTime\": \"%s\", " +
                 "\"endTime\": \"%s\"}", game.gameID, game.playerOne, game.playerTwo, game.turn, game.turnNumber,
                 boardJSON, game.winner, game.startTime, game.endTime);
