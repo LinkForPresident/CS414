@@ -5,8 +5,8 @@ import java.util.*;
 
 public class Request {
 
-    protected Map<String, String> header = new HashMap<String, String>();
-    protected Map<String, String> body = new HashMap<String, String>();
+    protected Map<String, String> header = new HashMap<>();
+    protected Map<String, String> body = new HashMap<>();
 
     private BufferedReader bufferedReader;
 

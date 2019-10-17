@@ -2,18 +2,18 @@ package GameServer;
 
 public class Terminal {
 
-    static final String RESET_TEXT_COLOR = "\u001B[0m";
-    static final String RED_TEXT = "\u001B[38;5;196m";
-    static final String BLUE_TEXT = "\u001B[38;5;14m";
-    static final String GRAY_TEXT = "\u001B[38;5;7m";
-    static final String GREEN_TEXT = "\u001B[38;5;82m";
-    static final String YELLOW_TEXT = "\u001B[38;5;11m";
+    private static final String RESET_TEXT_COLOR = "\u001B[0m";
+    private static final String RED_TEXT = "\u001B[38;5;196m";
+    private static final String BLUE_TEXT = "\u001B[38;5;14m";
+    private static final String GRAY_TEXT = "\u001B[38;5;7m";
+    private static final String GREEN_TEXT = "\u001B[38;5;82m";
+    private static final String YELLOW_TEXT = "\u001B[38;5;11m";
 
-    static final String INFO_TAG = BLUE_TEXT + "==INFO==:: " + RESET_TEXT_COLOR;
-    static final String DEBUG_TAG = GRAY_TEXT + "==DEBUG==:: " + RESET_TEXT_COLOR;
-    static final String WARNING_TAG = YELLOW_TEXT + "==WARNING==:: " + RESET_TEXT_COLOR;
-    static final String ERROR_TAG = RED_TEXT + "==ERROR==:: " + RESET_TEXT_COLOR;
-    static final String SUCCESS_TAG = GREEN_TEXT + "==SUCCESS==:: " + RESET_TEXT_COLOR;
+    private static final String INFO_TAG = BLUE_TEXT + "==INFO==:: " + RESET_TEXT_COLOR;
+    private static final String DEBUG_TAG = GRAY_TEXT + "==DEBUG==:: " + RESET_TEXT_COLOR;
+    private static final String WARNING_TAG = YELLOW_TEXT + "==WARNING==:: " + RESET_TEXT_COLOR;
+    private static final String ERROR_TAG = RED_TEXT + "==ERROR==:: " + RESET_TEXT_COLOR;
+    private static final String SUCCESS_TAG = GREEN_TEXT + "==SUCCESS==:: " + RESET_TEXT_COLOR;
 
     protected Terminal(){
 
