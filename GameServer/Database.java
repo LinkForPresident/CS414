@@ -8,45 +8,31 @@ import java.lang.*;
 import java.sql.*;
 import java.util.*;
 
-public class Database{
+public class Database {
 
 	private static final String JDBC_DRIVER = "org.mariadb.jdbc.Driver";
     private static String PROXY_ADDRESS = "jdbc:mariadb://proxy19.rt3.io:39136/cs414";
     private static final String DB_USERNAME = "user";
     private static final String DB_PASSWORD = "the_password_123";
-    
     private static String devAPIKey = "MTA2M0FGNDUtM0M1QS00ODMyLUFDNDgtOEVBQ0E1Q0JBRUU1";
     private static String deviceAddress = "80:00:00:00:01:01:38:E9";
-    
-	static final String RESET_TEXT_COLOR = "\u001B[0m";
-    static final String RED_TEXT = "\u001B[38;5;196m";
-    static final String BLUE_TEXT = "\u001B[38;5;14m";
-    static final String GRAY_TEXT = "\u001B[38;5;7m";
-    static final String GREEN_TEXT = "\u001B[38;5;82m";
-    static final String YELLOW_TEXT = "\u001B[38;5;11m";
-
-    static final String INFO_TAG = BLUE_TEXT + "==INFO==:: " + RESET_TEXT_COLOR;
-    static final String DEBUG_TAG = GRAY_TEXT + "==DEBUG==:: " + RESET_TEXT_COLOR;
-    static final String ERROR_TAG = RED_TEXT + "==ERROR==:: " + RESET_TEXT_COLOR;
-    static final String WARNING_TAG = YELLOW_TEXT + "==WARNING==:: " + RESET_TEXT_COLOR;
-    static final String SUCCESS_TAG = GREEN_TEXT + "==SUCCESS==:: " + RESET_TEXT_COLOR;
     
     protected Database(){
     
     }
     
-    public static void establishDatabaseProxyAddress() throws IOException, InterruptedException, ClassNotFoundException, SQLException {
+    static void establishDatabaseProxyAddress() throws IOException, InterruptedException, ClassNotFoundException, SQLException {
 
         try {
-            System.out.println(DEBUG_TAG + "Attempting to connect to remote database with existing proxy server address.");
+            Terminal.printDebug("Attempting to connect to remote database with existing proxy server address.");
             Class.forName(JDBC_DRIVER); // register the JDBC driver.
             DriverManager.getConnection(
                     PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
-            System.out.println(SUCCESS_TAG + "Using the existing proxy server address was successful.");
+            Terminal.printSuccess("Using the existing proxy server address was successful.");
             return;
         }catch(SQLNonTransientConnectionException sql){
-            System.out.println(WARNING_TAG + "Using the existing proxy server address failed;" +
-                    " executing curl commands to retrieve new proxy server address.");
+            Terminal.printWarning("Using the existing proxy server address failed; executing curl commands to " +
+                    "retrieve new proxy server address.");
         }
         Process process = Runtime.getRuntime().exec("GameServer/getSessionToken.sh");
         process.waitFor();
@@ -59,10 +45,11 @@ public class Database{
         }
         // System.out.println("==DEBUG==:: getSessionToken.sh response: " + response);
         String sessionToken = response.split(":")[2].replace("\"", "").split(",")[0];
-        System.out.println(DEBUG_TAG + "Parsed remote proxy session token: " + sessionToken);
+        Terminal.printDebug(String.format("Parsed remote proxy session token: %s", sessionToken));
 
-        String getProxyAddress = String.format("curl -X POST -H \"token:%s\" -H \"developerkey\":\"%s\" -d \'{\"wait\":\"true\", " +
-                "\"deviceaddress\":\"\'%s\'\"}' https://api.remot3.it/apv/v27/device/connect", sessionToken, devAPIKey, deviceAddress);
+        String getProxyAddress = String.format("curl -X POST -H \"token:%s\" -H \"developerkey\":\"%s\" " +
+                "-d \'{\"wait\":\"true\", \"deviceaddress\":\"\'%s\'\"}' https://api.remot3.it/apv/v27/device/connect",
+                sessionToken, devAPIKey, deviceAddress);
         // System.out.println(getProxyAddress);
 
         FileWriter fileWriter = new FileWriter("GameServer/getProxyAddress.sh");
@@ -90,13 +77,14 @@ public class Database{
             }
         }
         PROXY_ADDRESS = "jdbc:mariadb://" + PROXY_ADDRESS + "/cs414";
-        System.out.println(DEBUG_TAG + "Parsed remote proxy database address: " + PROXY_ADDRESS);
+        Terminal.printDebug(String.format("Parsed remote proxy database address: ", PROXY_ADDRESS));
     }
     
-    public static ResultSet executeDatabaseQuery(String query){
+    static ResultSet executeDatabaseQuery(String query){
         Connection connection;
         Statement statement;
         ResultSet resultSet = null;
+        Terminal.printInfo(String.format("Attempting to execute database query: %s", query));
         try{
             establishDatabaseProxyAddress();
             Class.forName(JDBC_DRIVER); // register the JDBC driver.
@@ -105,20 +93,21 @@ public class Database{
             statement = connection.createStatement();
             resultSet = statement.executeQuery(query);
         } catch(SQLNonTransientConnectionException e){
-            System.out.println(ERROR_TAG + "Encountered an error while connecting to the database. (HINT: the proxy server is likely different than what is set.)");
+            Terminal.printError("Encountered an error while connecting to the database. (HINT: the proxy server is" +
+                    " likely different than what is set.)");
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         } catch(InterruptedException | IOException e) {
-            System.out.println(ERROR_TAG + "Encountered an error while attempting to curl proxy server credentials for the database.");
+            Terminal.printError("Encountered an error while attempting to curl proxy server credentials for the database.");
             e.printStackTrace();
         }finally {
             return resultSet;
         }
     }
     
-    public static void main(String[] args) throws InterruptedException, IOException, ClassNotFoundException, SQLException, SQLNonTransientConnectionException{
+    public static void main(String[] args) throws SQLException{
 		String query = args[0];
-		System.out.println(String.format("Executing the following SQL query: \"%s\".", query));
+		Terminal.printInfo(String.format("The following SQL query will be executed: \"%s\".", query));
 		ResultSet resultSet = executeDatabaseQuery(query);
 		ResultSetMetaData rsmd = resultSet.getMetaData();
 		int numberOfColumns = rsmd.getColumnCount();
