@@ -99,8 +99,7 @@ class Handler extends Thread {
         String method = request.header.get("method");
         switch(method){
             case "GET":
-                String path = request.header.get("path");
-                handleGETRequest(path);
+                handleGETRequest();
                 break;
             case "POST":
                 handlePOSTRequest();
@@ -125,7 +124,7 @@ class Handler extends Thread {
 		sendJSONReponse("");
     }
 
-    private void handleGETRequest(String path) throws IOException {
+    private void handleGETRequest() throws IOException {
         // handle a client GET request.
         Terminal.printDebug("Handling GET request.");
         String action = request.body.get("action");
