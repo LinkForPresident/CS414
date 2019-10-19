@@ -1,122 +1,95 @@
 package GameServer;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
-public class Request extends GameConnector{
+public class Request {
 
-    protected String method = "";
-    protected String path = "";
-    protected String action = "";
-    protected Map<String, String> args = new HashMap<String, String>();
-    protected String username;
-    protected String password;
-    protected double user_hash;
-    protected String clientIP;
-    protected double cookie = -1;
-    protected BufferedReader bufferedReader;
-    protected Socket clientSocket;
+    protected Map<String, String> header = new HashMap<>();
+    protected Map<String, String> body = new HashMap<>();
 
-    protected String playerOne;
-    protected String playerTwo;
+    private BufferedReader bufferedReader;
 
-    protected String gameID;
-    protected String row;
-    protected String column;
-
-    public Request(BufferedReader bufferedReader, Socket clientSocket) throws ArrayIndexOutOfBoundsException, NullPointerException{
+    public Request(BufferedReader bufferedReader) throws ArrayIndexOutOfBoundsException, NullPointerException {
         // constructor
         this.bufferedReader = bufferedReader;
-        this.clientSocket = clientSocket;
     }
 
-    protected int parseRequest() throws IOException, ArrayIndexOutOfBoundsException, NullPointerException{
+    int parseRequest() throws IOException, ArrayIndexOutOfBoundsException, NullPointerException {
         // parse the request for various arguments and parameters.
-        System.out.println(INFO_TAG + "Attempting to parse the request for parameters.");
-        // clientIP = clientSocket.getRemoteSocketAddress().toString().split(":")[0];
-        method = DEFAULT_METHOD; // GET, POST, etc.
-        path = DEFAULT_PAGE; // used for GET requests.
+        Terminal.printDebug("Attempting to parse the request for parameters.");
 
         try {
-            String[] parts = bufferedReader.readLine().split(" ");
-            method = parts[0];
-            path = parts[1];
+            extractRequestLine();
+            extractRequestHeader();
+            extractRequestBody();
+            printRequest();
 
-            System.out.println(String.format(DEBUG_TAG + "The request method is: %s.", method));
-            System.out.println(String.format(DEBUG_TAG + "The request path is: %s.", path));
-
-
-            if (path.equals("/")) {
-                path = DEFAULT_PAGE;
-                System.out.println(String.format(DEBUG_TAG + "The request path has been changed to: %s.", path));
-            }
-            if (path.equals("/css/common.css")) {
-                return -2; // browsers automatically send a request for this file, which does not exist and wastes server resources.
-            }
-
-            int length = 0;
-            String line = "";
-            while ((line = bufferedReader.readLine()).length() != 0) {
-                if (line.contains("Content-Length")) {
-                    length = Integer.parseInt(line.split(" ")[1]);
-                    System.out.println(String.format(DEBUG_TAG + "The content length of the request is: %d.", length));
-                }
-                if(line.contains("Cookie")){
-                    cookie = Double.parseDouble(line.split("=")[1]);
-                    System.out.println(String.format(DEBUG_TAG + "The cookies of the request are: %s.", cookie));
-                }
-            }
-
-            if (method.equals("POST")) {
-                // TODO: Refactor, there has got to be an easier way of doing this!
-                char[] temp = new char[length];
-                bufferedReader.read(temp);
-                String[] kv_arr = new String(temp).split("&"); // split by key-value pair, which are separated by &;
-                for (String arg : kv_arr){
-					System.out.println(arg);
-                }
-                // extract the POST request arguments.
-                for (String arg : kv_arr) {
-                    String[] kv = arg.split("=");   // split by key and and value, which are separated by =
-                    String key = kv[0];
-                    String value = kv[1];
-                    args.put(key, value);
-                }
-                action = args.get("action"); // whatever the client is trying to do: "login", "move_piece", etc.
-                System.out.println(String.format(DEBUG_TAG + "The action of the POST request is: %s.", action));
-                if(action.equals("login") || action.equals("user_registration")) {
-                    username = args.get("username");
-                    double username_hash = username.hashCode() % HASH_KEY;
-                    password = args.get("password");
-                    double password_hash = password.hashCode() % HASH_KEY;
-                    user_hash = (username_hash % password_hash) % HASH_KEY;   // calculate the hash that acts as the primary key in the User table.
-                    System.out.println(String.format(DEBUG_TAG + "The username, password and user_hash from the POST request are: %s, %s, %f", username, password, user_hash));
-                }
-                if(action.equals("move_piece")){
-					gameID = args.get("gameID");
-					username = args.get("username");
-					row = args.get("row");
-					column = args.get("column");
-                }
-                if(action.equals("view_game")){
-					gameID = args.get("gameID");
-                }
-                if(action.equals("send_invite")){
-                    playerOne = args.get("playerOne");
-                    playerTwo = args.get("playerTwo");
-                }
-                if(action.equals("accept_invite") || action.equals("decline_invite")){
-                    playerOne = args.get("playerOne");
-                    playerTwo = args.get("playerTwo");
-                }
-
-            }
-        }catch(NullPointerException | ArrayIndexOutOfBoundsException e){
+        }catch(NullPointerException | ArrayIndexOutOfBoundsException e) {
             return -1;
+
+        }catch(FileNotFoundException f) {
+            return -2;
         }
+
         return 0;
+    }
+
+    private void extractRequestLine() throws IOException {
+        String[] requestLine = bufferedReader.readLine().split(" ");
+        header.put("method", requestLine[0]);
+        header.put("path", requestLine[1]);
+
+        if (header.get("path").equals("/css/common.css")) {
+            // browsers automatically send a request for this file, which does not exist and wastes server resources.
+            throw new FileNotFoundException();
+        }
+    }
+
+    private void extractRequestHeader() throws IOException {
+        String headerLine = "";
+        while ((headerLine = bufferedReader.readLine()).length() != 0) {
+            if (headerLine.contains("Content-Length")) {
+                header.put("contentLength", headerLine.split(" ")[1]);
+                Terminal.printDebug(String.format("The content length of the request is: %s.",
+                        header.get("contentLength")));
+            }
+            if(headerLine.contains("Cookie")){
+                header.put("cookie", headerLine.split("=")[1]);
+                Terminal.printDebug(String.format("The cookies of the request are: %s.", header.get("cookie")));
+            }
+        }
+    }
+
+    private void extractRequestBody() throws IOException {
+        if (header.get("method").equals("POST")) {
+            // TODO: Refactor, there has got to be an easier way of doing this!
+            char[] temp = new char[Integer.parseInt(header.get("contentLength"))];
+            bufferedReader.read(temp);
+            String[] kv_arr = new String(temp).split("&"); // split by key-value pair, which are separated by &;
+            // extract the POST request arguments.
+            for (String arg : kv_arr) {
+                String[] kv = arg.split("=");   // split by key and and value, which are separated by =
+                String key = kv[0];
+                String value = kv[1];
+                body.put(key, value);
+            }
+            Terminal.printDebug(String.format("The action of the POST request is: %s.", body.get("action")));
+        }
+    }
+
+    private void printRequest(){
+        Terminal.printDebug("~~ Request header: ~~");
+        for (Map.Entry<String, String> kv: header.entrySet()) {
+            String key = kv.getKey();
+            String value = kv.getValue();
+            Terminal.printDebug(String.format("~~ %s: %s ~~", key, value));
+        }
+        Terminal.printDebug("~~ Request body: ~~");
+        for (Map.Entry<String, String> kv: body.entrySet()) {
+            String key = kv.getKey();
+            String value = kv.getValue();
+            Terminal.printDebug(String.format("~~ %s: %s ~~", key, value));
+        }
     }
 }

@@ -33,7 +33,7 @@ class Login extends React.Component {
     render() {
         return (
             <form onSubmit={(e) => this.handleSubmit(e, this.state.apiConfig.url,
-                "action=login&username=" + this.state.username + "&password=" + this.state.password,
+                "action=Login&username=" + this.state.username + "&password=" + this.state.password,
                 this.props.apiConfig.headers)}>
                 <label>
                     Username:
