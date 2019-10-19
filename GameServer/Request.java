@@ -8,12 +8,6 @@ public class Request {
     protected Map<String, String> header = new HashMap<>();
     protected Map<String, String> body = new HashMap<>();
 
-    protected String playerOne;
-    protected String playerTwo;
-
-    protected String gameID;
-    protected String row;
-    protected String column;
     private BufferedReader bufferedReader;
 
     public Request(BufferedReader bufferedReader) throws ArrayIndexOutOfBoundsException, NullPointerException {
