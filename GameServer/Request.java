@@ -22,7 +22,7 @@ public class Request extends GameConnector{
 
     protected String playerOne;
     protected String playerTwo;
-    
+
     protected String gameID;
     protected String row;
     protected String column;
@@ -102,7 +102,7 @@ public class Request extends GameConnector{
 					column = args.get("column");
                 }
                 if(action.equals("view_game")){
-                    gameID = args.get("gameID");
+					gameID = args.get("gameID");
                 }
                 if(action.equals("send_invite")){
                     playerOne = args.get("playerOne");
@@ -112,6 +112,7 @@ public class Request extends GameConnector{
                     playerOne = args.get("playerOne");
                     playerTwo = args.get("playerTwo");
                 }
+
             }
         }catch(NullPointerException | ArrayIndexOutOfBoundsException e){
             return -1;
