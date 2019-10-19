@@ -24,12 +24,41 @@ public class ServerTest {
 
     @Test
     public void test1LoginWithHardcodedValue() throws Exception {
-        System.out.println("Testing Server POST method!");
-
-        String username = "dummy_user", password = "iforgot123";
+        String username = "the_devil_himself", password = "666";
         HashMap<String, String> map = serverUtils.sendHttpRequest("POST","action=login&username=" + username + "&password=" + password);
 
         Assert.assertEquals(map.get("responseCode"), "200"); //Assert that we get a Http Response code 200
+
+        String response = map.get("response");
+        System.out.println("Received Response from Server for view game: " + response);
+
+        HashMap<String, String> jsonMap = serverUtils.convertJsonStringToMap(response);
+        Assert.assertEquals(jsonMap.get("loggedIn"), "true");
+        Assert.assertEquals(jsonMap.get("username"), username);
+    }
+
+    @Test
+    public void test1RegisterUserAndLogin() throws Exception {
+        String username = "new_test_user"+(Math.random()+"").substring(2,8), password = "123";
+        HashMap<String, String> map = serverUtils.sendHttpRequest("POST","action=user_registration&username=" + username + "&password=" + password);
+
+        Assert.assertEquals(map.get("responseCode"), "200"); //Assert that we get a Http Response code 200
+
+        String response = map.get("response");
+        System.out.println("Received Response from Server for view game: " + response);
+
+        HashMap<String, String> jsonMap = serverUtils.convertJsonStringToMap(response);
+        Assert.assertEquals(jsonMap.get("loggedIn"), "false");
+
+        map = serverUtils.sendHttpRequest("POST","action=login&username=" + username + "&password=" + password);
+        Assert.assertEquals(map.get("responseCode"), "200"); //Assert that we get a Http Response code 200
+
+        response = map.get("response");
+        System.out.println("Received Response from Server for view game: " + response);
+
+        jsonMap = serverUtils.convertJsonStringToMap(response);
+        Assert.assertEquals(jsonMap.get("loggedIn"), "true");
+        Assert.assertEquals(jsonMap.get("username"), username);
     }
 
     @Test
@@ -57,8 +86,6 @@ public class ServerTest {
 
     @Test
     public void test3BasicMovePieceAndCheckJSONResponse() throws Exception {
-        System.out.println("Testing Server POST method!");
-
         HashMap<String, String> map = serverUtils.sendHttpRequest("POST","action=move_piece&gameID=1234&username=dummy_user&row=8&column=0"); //Select Blue Lion
         String response = map.get("response");
         System.out.println("Received Response from Server for view game: " + response);
