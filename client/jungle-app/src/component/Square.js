@@ -21,8 +21,8 @@ class Square extends React.Component {
                 }}
                 // onClick={this.props.postExample()}
             >
-                <img src={require("./images/"+this.props.environment+".png")} alt="r1" height="100%" style={{position: "absolute", z-index: "20";}}/>
-                <img src={require("./images/"+this.props.piece+".png")} alt="r1" height="100%" style={{position: "absolute", z-index: "10";}}/>
+                <img src={require("./images/"+this.props.environment+".png")} alt="r1" height="95%" style={{position: "absolute", zIndex: "10"}}/>
+                <img src={require("./images/"+this.props.piece+".png")} alt="r1" height="100%" style={{zIndex: "20"}}/>
             </button>
         );
     }
