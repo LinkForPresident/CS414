@@ -25,7 +25,7 @@ class Invite extends React.Component {
         return (
             <div className={'InvitePage'}>
                 <form onSubmit={(e) => this.handleGeneralRequest(e, this.state.apiConfig.url,
-                    "action=send_invite&playerOne=" + this.props.username + "&playerTwo=" + this.state.invitedPlayer,
+                    "action=SendInvite&playerOne=" + this.props.username + "&playerTwo=" + this.state.invitedPlayer,
                     this.props.apiConfig.headers)}>
                     <label>
                         Username of player to invite:
@@ -53,14 +53,14 @@ class Invite extends React.Component {
     }
     async handleAcceptInvite(playerOne){
         console.log("playerOne is: " + playerOne);
-        this.props.handleAcceptInvite(this.state.apiConfig.url, "action=accept_invite&playerOne=" + playerOne + "&playerTwo=" + this.props.username, this.props.apiConfig.headers)
+        this.props.handleAcceptInvite(this.state.apiConfig.url, "action=AcceptInvite&playerOne=" + playerOne + "&playerTwo=" + this.props.username, this.props.apiConfig.headers)
             .then(response => this.props.updateInvites(response.invites));
 
 
     }
     async handleDeclineInvite(playerOne){
 
-        this.props.handleAcceptInvite(this.state.apiConfig.url, "action=decline_invite&playerOne=" + playerOne + "&playerTwo=" + this.props.username, this.props.apiConfig.headers)
+        this.props.handleAcceptInvite(this.state.apiConfig.url, "action=DeclineInvite&playerOne=" + playerOne + "&playerTwo=" + this.props.username, this.props.apiConfig.headers)
             .then(response => this.props.updateInvites(response.invites));
 
     }

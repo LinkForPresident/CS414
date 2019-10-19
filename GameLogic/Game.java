@@ -90,9 +90,14 @@ public class Game {
         // returns true if the game state has changed, else returns false
         if(isTurn(player) && winner.isEmpty()){
             if(move.selectedSquare == null){ // selecting an empty square
-                move.selectedSquare = board[row][col];
-                move.updateValidTiles();
-                return true;
+                if(board[row][col].gamePiece != null){
+                    if(board[row][col].gamePiece.color.equals(turn)){
+                        move.selectedSquare = board[row][col];
+                        move.updateValidTiles();
+                        return true;
+                    }
+                }
+                return false;
             }
             else if(move.selectedSquare == board[row][col]){ // re-selecting the same square
                 move.selectedSquare = null;
@@ -105,7 +110,9 @@ public class Game {
                 return true;
             }
             else {
-                System.out.println("Invalid Move!");
+                move.selectedSquare = board[row][col];
+                move.updateValidTiles();
+                return true;
             }
         }
         return false;
@@ -177,9 +184,11 @@ public class Game {
         for(int row = 0; row < 9; row++){
             for(int col = 0; col < 7; col++){
                 testMove.selectedSquare = board[row][col];
-                if (testMove.isFriendlyUnit(row, col)) {
-                    testMove.updateValidTiles();
-                    if (testMove.numberOfValidTiles > 0) return true;
+                if(testMove.selectedSquare.gamePiece != null){
+                    if(testMove.selectedSquare.gamePiece.color.equals(turn)){
+                        testMove.updateValidTiles();
+                        if (testMove.numberOfValidTiles > 0) return true;
+                    }
                 }
             }
         }
