@@ -25,7 +25,7 @@ public class ServerTest {
     @Test
     public void test1LoginWithHardcodedValue() throws Exception {
         String username = "the_devil_himself", password = "666";
-        HashMap<String, String> map = serverUtils.sendHttpRequest("POST","action=login&username=" + username + "&password=" + password);
+        HashMap<String, String> map = serverUtils.sendHttpRequest("POST","action=Login&username=" + username + "&password=" + password);
 
         Assert.assertEquals(map.get("responseCode"), "200"); //Assert that we get a Http Response code 200
 
@@ -40,7 +40,7 @@ public class ServerTest {
     @Test
     public void test1RegisterUserAndLogin() throws Exception {
         String username = "new_test_user"+(Math.random()+"").substring(2,8), password = "123";
-        HashMap<String, String> map = serverUtils.sendHttpRequest("POST","action=user_registration&username=" + username + "&password=" + password);
+        HashMap<String, String> map = serverUtils.sendHttpRequest("POST","action=Register&username=" + username + "&password=" + password);
 
         Assert.assertEquals(map.get("responseCode"), "200"); //Assert that we get a Http Response code 200
 
@@ -50,7 +50,7 @@ public class ServerTest {
         HashMap<String, String> jsonMap = serverUtils.convertJsonStringToMap(response);
         Assert.assertEquals(jsonMap.get("loggedIn"), "false");
 
-        map = serverUtils.sendHttpRequest("POST","action=login&username=" + username + "&password=" + password);
+        map = serverUtils.sendHttpRequest("POST","action=Login&username=" + username + "&password=" + password);
         Assert.assertEquals(map.get("responseCode"), "200"); //Assert that we get a Http Response code 200
 
         response = map.get("response");
@@ -65,7 +65,7 @@ public class ServerTest {
     public void test2BasicViewGame() throws Exception {
         System.out.println("Testing GET on view_game API of Server! Should return a json showing the requested game!");
 
-        HashMap<String, String> map = serverUtils.sendHttpRequest("GET","action=view_game&gameID=1234");
+        HashMap<String, String> map = serverUtils.sendHttpRequest("POST","action=ViewGame&gameID=1234");
 
         Assert.assertEquals(map.get("responseCode"), "200"); //Assert that we get a Http Response code 200
         String response = map.get("response");
@@ -86,7 +86,7 @@ public class ServerTest {
 
     @Test
     public void test3BasicMovePieceAndCheckJSONResponse() throws Exception {
-        HashMap<String, String> map = serverUtils.sendHttpRequest("POST","action=move_piece&gameID=1234&username=dummy_user&row=8&column=0"); //Select Blue Lion
+        HashMap<String, String> map = serverUtils.sendHttpRequest("POST","action=MovePiece&gameID=1234&username=dummy_user&row=8&column=0"); //Select Blue Lion
         String response = map.get("response");
         System.out.println("Received Response from Server for view game: " + response);
 
@@ -100,7 +100,7 @@ public class ServerTest {
         Assert.assertTrue(serverUtils.isCoordinateAvailable(board,7,0));
         Assert.assertTrue(serverUtils.isCoordinateAvailable(board,8,1));
 
-        map = serverUtils.sendHttpRequest("POST","action=move_piece&gameID=1234&username=dummy_user&row=8&column=1"); //Select Blue Lion Destination Square
+        map = serverUtils.sendHttpRequest("POST","action=MovePiece&gameID=1234&username=dummy_user&row=8&column=1"); //Select Blue Lion Destination Square
         response = map.get("response");
         System.out.println("Received Response from Server for view game: " + response);
         Assert.assertEquals(map.get("responseCode"), "200"); //Assert that we get a Http Response code 200
