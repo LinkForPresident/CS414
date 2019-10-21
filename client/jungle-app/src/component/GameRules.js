@@ -1,5 +1,6 @@
 import React from "react";
 class GameRules extends React.Component {
+    // Static page with description
     render() {
         return (
             <div className={'GaneRules'}>
