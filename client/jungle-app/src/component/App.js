@@ -131,7 +131,7 @@ export default class App extends React.Component {
             },
         apiConfig:{
             url:'http://localhost:8080',
-            payload: "action=login&username=dummy_user&password=iforgot123",
+            payload: "action=Login&username=dummy_user&password=iforgot123",
             headers: {
                 'Content-Type': 'application/text',
                 'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
@@ -229,7 +229,7 @@ export default class App extends React.Component {
         console.log("calling api for game state...");
         axios.post(
             this.state.apiConfig.url,
-            "action=view_game&gameID=1234",
+            "action=ViewGame&gameID=1234",
             {headers: this.state.apiConfig.headers}
         ).then((response) => console.log(response));
         console.log("Game State set.")
@@ -251,7 +251,7 @@ export default class App extends React.Component {
 
             'http://localhost:8080',
 
-            "action=login&username=" + username + "&password=" + password,
+            "action=Login&username=" + username + "&password=" + password,
             {
                 headers: {
                     'Content-Type': 'application/json',
