@@ -12,6 +12,7 @@ class Games extends React.Component {
     }
 
     render() {
+        // This is where active and inactive games can be chosen for either viewing or playing.
         if (this.props.loggedIn) {
 
             const activeGamesList = this.state.activeGames.map((game) =>
