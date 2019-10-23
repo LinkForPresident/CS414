@@ -10,6 +10,7 @@ class Board extends React.Component {
         };
     }
 
+    // Constructing the board involves mapping the 2 dimensional array into "Squares" where piece, and environment logic and display specifics exist.
     render() {
 
         if (this.props.loggedIn) {
@@ -21,6 +22,7 @@ class Board extends React.Component {
             );
 
             return (
+                // bootstrapped grid container with rows
                 <div className={'Board container'}>
 
                     <ul className={"board-ul row"}>

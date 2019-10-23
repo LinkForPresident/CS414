@@ -4,13 +4,14 @@ class Square extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            background_src: "./images/dou_shou_qi_jungle_game-board.jpg",
+            // background_src: "./images/dou_shou_qi_jungle_game-board.jpg",
             environment: null
         }
     }
 
     render() {
         return(
+            // While buttons seem to be working well here, any event driven component would work here. All the logic needed should have been passed via a prop.
             <button
                 id={this.props.row + "," + this.props.column}
                 value={this.props.row + "," + this.props.column}
@@ -19,7 +20,7 @@ class Square extends React.Component {
                     this.props.postExample("action=MovePiece&gameID=1234&username=" + this.props.username + "&password=iforgot123&row=" + this.props.row + "&column=" + this.props.column)
                 }}
                 // onClick={this.props.postExample()}
-            >{this.props.piece}.{(this.props.environment != "empty" ? this.props.environment : "")}.{this.props.available}</button>
+            >{this.props.piece}.{(this.props.environment !== "empty" ? this.props.environment : "")}.{this.props.available}</button>
         );
     }
 }
