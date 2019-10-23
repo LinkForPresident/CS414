@@ -65,7 +65,8 @@ public class ServerTest {
     public void test2BasicViewGame() throws Exception {
         System.out.println("Testing GET on view_game API of Server! Should return a json showing the requested game!");
 
-        HashMap<String, String> map = serverUtils.sendHttpRequest("POST","action=ViewGame&gameID=1234");
+        String username = "the_devil_himself", password = "666";
+        HashMap<String, String> map = serverUtils.sendHttpRequest("POST","action=ViewGame&gameID=1234&username=" + username + "&password=" + password);
 
         Assert.assertEquals(map.get("responseCode"), "200"); //Assert that we get a Http Response code 200
         String response = map.get("response");

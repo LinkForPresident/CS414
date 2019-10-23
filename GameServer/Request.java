@@ -55,7 +55,7 @@ public class Request {
                         header.get("contentLength")));
             }
             if(headerLine.contains("Cookie")){
-                header.put("cookie", headerLine.split("=")[1]);
+                header.put("cookie", headerLine.split(": ")[1]);
                 Terminal.printDebug(String.format("The cookies of the request are: %s.", header.get("cookie")));
             }
         }

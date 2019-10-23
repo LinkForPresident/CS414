@@ -80,6 +80,7 @@ public class ServerUtils {
         //add reuqest header
         con.setRequestMethod(requestMethod);
         con.setRequestProperty("Content-Type", "application/json");
+        con.setRequestProperty("Set-Cookie", "-26687.0");
 
         // Send post request
         if(requestMethod.equals("POST")) {
