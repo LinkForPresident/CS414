@@ -2,7 +2,6 @@ import React from "react";
 import {Tabs, TabList, Tab, TabPanel} from 'react-tabs';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
-
 // Custom Components
 import Games from './Games';
 import Home from './Home';
@@ -18,7 +17,6 @@ export default class App extends React.Component {
 
 
     constructor(props) {
-
         super(props);
         this.updateLoginValue = this.updateLoginValue.bind(this);
         this.updateInvites = this.updateInvites.bind(this);
@@ -26,8 +24,9 @@ export default class App extends React.Component {
         this.postExample = this.postExample.bind(this);
     }
 
+    // state of components shared between components must live here, that way when one is updated the other will "react"
+    // to the changes.
     state = {
-
         loggedIn: false,
         username: null,
         password: null,
@@ -129,9 +128,10 @@ export default class App extends React.Component {
                 "startTime": "",
                 "endTime": ""
             },
+
+        // common rest request configuration
         apiConfig:{
             url:'http://localhost:8080',
-            payload: "action=login&username=dummy_user&password=iforgot123",
             headers: {
                 'Content-Type': 'application/text',
                 'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
@@ -139,12 +139,11 @@ export default class App extends React.Component {
         }
     };
 
+    // This method is responsible for making game state requests, and updating the gameState fields when users click the game board
     postExample(data) {
         var self = this;
         console.log("Making request");
-        axios.post('http://localhost:8080',
-
-            // "action=move_piece&gameID=1234&username=dummy_user&password=iforgot123&row=8&column=0",
+        axios.post(this.state.apiConfig.url,
             data,
             {
                 headers: {
@@ -162,9 +161,8 @@ export default class App extends React.Component {
             .catch()
     }
 
-    //
-
-
+    // This is a general request that will take arguments in a payload, and return the data contained in the server response.
+    // Ideally this should be called from a seperate method that updates the state with the response from this.
     async handleGeneralRequest(event, url, payload, headers) {
         let resp = await axios.post(url,
             payload,
@@ -179,6 +177,7 @@ export default class App extends React.Component {
         return resp.data;
     }
 
+    // This is repeated code that needs to be refactored to use the "HandleGeneralRequest", which is functionally identical.
     async handleAcceptInvite(url, payload, headers) {
         var resp = await axios.post(url,
             payload,
@@ -193,6 +192,7 @@ export default class App extends React.Component {
         return resp.data;
     }
 
+    // This is repeated code that needs to be refactored to use the "HandleGeneralRequest", which is functionally identical.
     async handleDeclineInvite(url, payload, headers) {
         var resp = await axios.post(url,
             payload,
@@ -223,13 +223,13 @@ export default class App extends React.Component {
         });
     }
 
-
+    // It appears this method never sets the game state. What was expected here? There is already another method to set the game state...
     setGameState(gameId) {
         console.log(gameId);
         console.log("calling api for game state...");
         axios.post(
             this.state.apiConfig.url,
-            "action=view_game&gameID=1234",
+            "action=ViewGame&gameID=1234",
             {headers: this.state.apiConfig.headers}
         ).then((response) => console.log(response));
         console.log("Game State set.")
@@ -267,7 +267,7 @@ export default class App extends React.Component {
     }
 
     render() {
-
+        // This section should be reserved for rendering pagewide components, complex code should be factored into child components, or new components.
         if (this.state.loggedIn) {
             return (
                 <div className='menu navigation-menu'>
@@ -314,6 +314,7 @@ export default class App extends React.Component {
                 </div>
             )
         } else {
+            // Tabs that show up if user is not logged in.
 
             return (
                 <div className='menu navigation-menu'>
@@ -335,61 +336,3 @@ export default class App extends React.Component {
         }
     }
 }
-
-// postExampleOld(data) {
-//     console.log("Making request");
-//     var self = this;
-//
-//     axios.post('http://localhost:8080',
-//
-//         // "action=move_piece&gameID=1234&username=dummy_user&password=iforgot123&row=8&column=0",
-//         data,
-//         {
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH',
-//             }
-//         })
-//         .then(function (response) {
-//             let availableMovesProto = response.data.availableMoves;
-//             console.log(response);
-//             if (typeof availableMovesProto == 'undefined') {
-//                 return
-//             }
-//
-//             availableMovesProto = availableMovesProto.substring(0, availableMovesProto.length - 2);
-//
-//             availableMovesProto = availableMovesProto.split(",|");
-//             let availableMoves = [];
-//             availableMovesProto.forEach(function (element) {
-//
-//                 let elems = element.split(",");
-//                 let row = [];
-//                 elems.forEach(function (elem) {
-//                     row.push(elem);
-//                 });
-//                 availableMoves.push(row);
-//             });
-//             let boardStateProto = response.data.board;
-//
-//             boardStateProto = boardStateProto.substring(0, boardStateProto.length - 2);
-//
-//             boardStateProto = boardStateProto.split(",|");
-//             let boardState = [];
-//             boardStateProto.forEach(function (element) {
-//                 let elems = element.split(",");
-//                 let row = [];
-//                 elems.forEach(function (elem) {
-//                     row.push(elem);
-//                 });
-//                 boardState.push(row);
-//             });
-//             response.data.availableMoves = availableMoves;
-//             response.data.board = boardState;
-//             self.setState({
-//                 gameState: response.data
-//             })
-//         })
-//         .catch();
-//     // let board = this.state.gameState.board;
-// }
