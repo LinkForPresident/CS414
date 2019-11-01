@@ -179,6 +179,9 @@ export default class App extends React.Component {
 
     // This is repeated code that needs to be refactored to use the "HandleGeneralRequest", which is functionally identical.
     async handleAcceptInvite(url, payload, headers) {
+        console.log("URL: " +url);
+        console.log("Payload: " +payload);
+        console.log("header: " +headers);
         var resp = await axios.post(url,
             payload,
             headers,
@@ -304,7 +307,9 @@ export default class App extends React.Component {
                         <TabPanel><History /></TabPanel>
                         <TabPanel><Invite apiConfig={this.state.apiConfig} handleGeneralRequest={this.handleGeneralRequest}
                                           handleAcceptInvite={this.handleAcceptInvite}
-                                          invites={this.state.invites} username={this.state.username}
+                                          invites={this.state.invites}
+                                          username={this.state.username}
+                                          password={this.state.password}
                                           handleDeclineInvite={this.handleDeclineInvite}
                                           updateInvites={this.updateInvites}/></TabPanel>
                         <TabPanel><Register users={this.state.users} passwords={this.state.passwords}/></TabPanel>
