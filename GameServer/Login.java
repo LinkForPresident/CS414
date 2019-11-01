@@ -12,11 +12,11 @@ public class Login extends Action{
         String password = request.body.get("password");
         String userHash = Server.calculateUserHash(username, password);
         String header = Response.defaultHeader + String.format("Set-Cookie: user_hash=%s\r\n\r\n", userHash);
-        String body = login(request.body.get("username"), userHash);
+        String body = login(username, password, userHash);
         return new Response(header, body);
     }
 
-    private static String login(String username, String user_hash) {
+    private static String login(String username, String password, String user_hash) {
         // Login a client by checking if the client is registered and if so, adding client to list of logged in users.
         Terminal.printInfo(String.format("Attempting to log in user with username: '%s' and user_hash: '%s'.",
                 username, user_hash));
@@ -32,8 +32,8 @@ public class Login extends Action{
                         playerInvites += inv[0] + ",";
                     }
                 }
-                JSONResponse = String.format("{\"loggedIn\": %b, \"username\": \"%s\", \"invites\": \"%s\"}", true,
-                        username, playerInvites);
+                JSONResponse = String.format("{\"loggedIn\": %b, \"username\": \"%s\", \"password\": \"%s\", \"invites\": \"%s\"}", true,
+                        username, password, playerInvites);
                 Terminal.printSuccess(String.format("User '%s' has been logged in.", username));
             } else {   // User does not exist. Stop the request handling.
                 Terminal.printDebug(String.format("User '%s' does not exist.", username));

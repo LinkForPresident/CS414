@@ -10,7 +10,7 @@ import java.util.*;
 
 public class Server {
 
-    private static final int PORT_NUMBER = 8080;
+    private static final int PORT_NUMBER = 8081;
     private static final double HASH_KEY = 47324824;    // used in the encryption process of user authentication.
 
     private ServerSocket serverListener;
