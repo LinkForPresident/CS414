@@ -17,7 +17,7 @@ class Board extends React.Component {
             const gameBoard = this.props.gameState.board.map((game, row_index) =>
                 <li className={'game-row col-12 col-lg-8'}>
                     {game.map((space, column_index) =>
-                        <Square row={row_index} column={column_index} username={this.props.username} postExample={this.props.postExample} environment={space.environment} piece={space.piece} available={space.available} />
+                        <Square row={row_index} column={column_index} username={this.props.username} gameID={this.props.gameState.gameID} password={this.props.password} postExample={this.props.postExample} environment={space.environment} piece={space.piece} available={space.available} />
                         )}</li>
             );
 

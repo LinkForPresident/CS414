@@ -36,7 +36,7 @@ export default class App extends React.Component {
         invites: " ",
         gameState:
             {
-                "gameID": "00000",
+                "gameID": "1234",
                 "playerOne": "Bob",
                 "playerTwo": "Sally",
                 "turn": "Bob",
@@ -131,7 +131,7 @@ export default class App extends React.Component {
 
         // common rest request configuration
         apiConfig:{
-            url:'http://localhost:8080',
+            url:'http://129.82.44.122:8081',
             headers: {
                 'Content-Type': 'application/text',
                 'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
@@ -207,12 +207,13 @@ export default class App extends React.Component {
         return resp.data;
     }
 
-    updateLoginValue(loginVal, username, invites) {
+    updateLoginValue(loginVal, username, password, invites) {
         console.log(username);
         console.log(invites);
         this.setState({
             loggedIn: loginVal,
             username: username,
+            password: password,
             invites: invites,
         });
     }
@@ -244,27 +245,27 @@ export default class App extends React.Component {
         this.setGameState(e.target.value);
     }
 
-    handleLogin(username, password) {
-        var self = this;
-        console.log("calling api for game state...");
-        axios.post(
-
-            'http://localhost:8080',
-
-            "action=Login&username=" + username + "&password=" + password,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH',
-                }
-            }
-        ).then(function (response) {
-            // const loggedIn = response.data.loggedIn;
-            self.setState({
-                loggedIn: response.data
-            })
-        })
-    }
+    // handleLogin(username, password) {
+    //     var self = this;
+    //     console.log("calling api for game state...");
+    //     axios.post(
+    //
+    //         'http://localhost:8080',
+    //
+    //         "action=Login&username=" + username + "&password=" + password,
+    //         {
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //                 'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH',
+    //             }
+    //         }
+    //     ).then(function (response) {
+    //         // const loggedIn = response.data.loggedIn;
+    //         self.setState({
+    //             loggedIn: response.data
+    //         })
+    //     })
+    // }
 
     render() {
         // This section should be reserved for rendering pagewide components, complex code should be factored into child components, or new components.
@@ -296,6 +297,7 @@ export default class App extends React.Component {
                                    postExample={this.postExample}
                                    loggedIn={this.state.loggedIn}
                                    username={this.state.username}
+                                   password={this.state.password}
                             />
                         </TabPanel>
                         <TabPanel><GameRules/></TabPanel>
