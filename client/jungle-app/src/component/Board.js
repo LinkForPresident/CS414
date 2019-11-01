@@ -9,6 +9,10 @@ class Board extends React.Component {
             selected_piece: null,
         };
     }
+    componentDidMount() {
+        // console.log
+        this.props.ViewGameState();
+    }
 
     // Constructing the board involves mapping the 2 dimensional array into "Squares" where piece, and environment logic and display specifics exist.
     render() {

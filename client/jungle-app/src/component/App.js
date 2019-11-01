@@ -21,6 +21,7 @@ export default class App extends React.Component {
         this.updateLoginValue = this.updateLoginValue.bind(this);
         this.updateInvites = this.updateInvites.bind(this);
         this.setSelectedGame = this.setSelectedGame.bind(this);
+        this.ViewGameState = this.ViewGameState.bind(this);
         this.postExample = this.postExample.bind(this);
     }
 
@@ -131,7 +132,7 @@ export default class App extends React.Component {
 
         // common rest request configuration
         apiConfig:{
-            url:'http://129.82.44.122:8081',
+            url:'http://localhost:8080',
             headers: {
                 'Content-Type': 'application/text',
                 'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
@@ -227,15 +228,20 @@ export default class App extends React.Component {
         });
     }
 
-    // It appears this method never sets the game state. What was expected here? There is already another method to set the game state...
-    setGameState(gameId) {
-        console.log(gameId);
+    ViewGameState() {
+        var self = this;
         console.log("calling api for game state...");
         axios.post(
             this.state.apiConfig.url,
-            "action=ViewGame&gameID=1234",
+            "action=ViewGame&gameID=" + this.state.gameState.gameID + "&username=" + this.state.username + "&password=" + this.state.password,
             {headers: this.state.apiConfig.headers}
-        ).then((response) => console.log(response));
+        ).then(function (response) {
+            console.log(response.data);
+            console.log("Setting game state");
+            self.setState({
+                gameState: response.data
+            })
+        }).catch();
         console.log("Game State set.")
     }
 
@@ -245,7 +251,7 @@ export default class App extends React.Component {
         this.setState({
             selectedGame: e.target.value
         });
-        this.setGameState(e.target.value);
+        this.ViewGameState(e.target.value);
     }
 
     // handleLogin(username, password) {
@@ -300,6 +306,7 @@ export default class App extends React.Component {
                                    postExample={this.postExample}
                                    loggedIn={this.state.loggedIn}
                                    username={this.state.username}
+                                   ViewGameState={this.ViewGameState}
                                    password={this.state.password}
                             />
                         </TabPanel>
