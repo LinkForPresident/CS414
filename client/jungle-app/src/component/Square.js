@@ -10,7 +10,6 @@ class Square extends React.Component {
     }
 
     render() {
-        // {this.props.piece}.{(this.props.environment != "empty" ? this.props.environment : "")}.{this.props.available}
         let environmentImg;
         let pieceImg;
         if (this.props.environment !== null && this.props.environment !== "empty") {
@@ -26,7 +25,7 @@ class Square extends React.Component {
                 value={this.props.row + "," + this.props.column}
                 className={"game-buttons " + (this.props.available ? "availableSpace" : "notAvailableSpace")}
                 onClick={() => {
-                    this.props.postExample("action=move_piece&gameID=1234&username=" + this.props.username + "&password=iforgot123&row=" + this.props.row + "&column=" + this.props.column)
+                    this.props.postExample("action=MovePiece&gameID=1234&username=" + this.props.username + "&password=iforgot123&row=" + this.props.row + "&column=" + this.props.column)
                 }}
                 // onClick={this.props.postExample()}
             >

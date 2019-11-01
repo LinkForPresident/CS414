@@ -272,16 +272,10 @@ public class GameTest extends TestCase {
         // Tests that invalid moves cannot be made
         System.out.println("Invalid move test: Tests that invalid moves cannot be made");
 
-        String newBoard[][] = {
-                {"__","__","__","__","__","__","__"},
-                {"__","__","__","__","__","__","__"},
-                {"__","__","__","__","__","__","__"},
-                {"r7","__","__","__","__","__","__"},
-                {"b3","__","__","__","__","__","__"},
-                {"b1","__","__","__","__","__","__"},
-                {"__","__","__","__","__","__","__"},
-                {"__","__","__","__","__","__","__"},
-                {"__","__","__","__","__","__","__"}};
+        game.board[2][0].gamePiece = null;
+        game.board[3][0].setPiece("lion", "red");
+        game.board[4][0].setPiece("wolf", "blue");
+        game.board[5][0].setPiece("rat", "blue");
 
         //game.board = newBoard;
         game.printBoard();
@@ -290,19 +284,20 @@ public class GameTest extends TestCase {
         game.sendInput("Sally", 3,0);
         game.sendInput("Sally", 2,0);
         assertEquals("r7", game.board[3][0].gamePiece.ID);
-        assertEquals("__", game.board[2][0].gamePiece.ID);
+        //assertEquals("__", game.board[2][0].gamePiece.ID);
+        assertNull(game.board[2][0].gamePiece);
 
         // moving in to an enemy unit that is stronger than you
         game.sendInput("Bob",4,0);
         game.sendInput("Bob",3,0);
-        assertEquals("b3", game.board[4][0]);
-        assertEquals("r7", game.board[3][0]);
+        assertEquals("b3", game.board[4][0].gamePiece.ID);
+        assertEquals("r7", game.board[3][0].gamePiece.ID);
 
         // moving in to a friendly unit
         game.sendInput("Bob",5,0);
         game.sendInput("Bob",4,0);
-        assertEquals("b1", game.board[5][0]);
-        assertEquals("b3", game.board[4][0]);
+        assertEquals("b1", game.board[5][0].gamePiece.ID);
+        assertEquals("b3", game.board[4][0].gamePiece.ID);
     }
 
     @Test
@@ -310,29 +305,25 @@ public class GameTest extends TestCase {
         // Tests that traps work
         System.out.println("Trap Test: Tests that traps work");
 
-        String newBoard[][] = {
-                {"__","__","r7","__","__","__","__"},
-                {"__","__","r1","b3","__","__","__"},
-                {"__","__","__","__","__","__","__"},
-                {"__","__","__","__","__","__","__"},
-                {"__","__","__","__","__","__","__"},
-                {"__","__","__","__","__","__","__"},
-                {"__","__","__","__","__","__","__"},
-                {"__","__","__","__","__","__","__"},
-                {"__","__","__","__","__","__","__"}};
+        game.board[0][2].setPiece("lion", "red");
+        game.board[1][2].setPiece("rat", "red");
+        game.board[1][3].setPiece("wolf", "blue");
 
-        //game.board = newBoard;
         game.printBoard();
         game.sendInput("Bob",1,3);
         game.sendInput("Bob",1,2);
 
-        assertEquals("b3", game.board[1][3]);
-        assertEquals("r1", game.board[1][2]);
+        assertEquals("b3", game.board[1][3].gamePiece.ID);
+        assertEquals("r1", game.board[1][2].gamePiece.ID);
 
-        game.turn = "red";
+        game.sendInput("Bob",6, 0);
+        game.sendInput("Bob",5, 0);
 
         game.sendInput("Sally",1,2);
         game.sendInput("Sally",1,3);
+
+        assertEquals("r1", game.board[1][3].gamePiece.ID);
+        game.printBoard();
 
     }
 
@@ -340,16 +331,14 @@ public class GameTest extends TestCase {
     public void testWin_1(){
         System.out.println("Win test 1: Tests that you can win by capturing all enemy units");
 
-        String newBoard[][] = {
-                {"__","__","__","__","__","__","__"},
-                {"__","r3","b6","__","__","__","__"},
-                {"__","__","__","__","__","__","__"},
-                {"__","__","__","__","__","__","__"},
-                {"__","__","__","__","__","__","__"},
-                {"__","__","__","__","__","__","__"},
-                {"__","__","__","__","__","__","__"},
-                {"__","__","__","__","__","__","__"},
-                {"__","__","__","__","__","__","__"}};
+        for(int row=0; row<9; row++) {
+            for (int col = 0; col < 7; col++) {
+                game.board[row][col].gamePiece = null;
+            }
+        }
+
+        game.board[1][1].setPiece("wolf", "red");
+        game.board[1][2].setPiece("tiger", "blue");
 
         //game.board = newBoard;
 
@@ -367,18 +356,15 @@ public class GameTest extends TestCase {
     @Test
     public void testWin_2(){
         System.out.println("Win test 1: Tests that you can win by entering the enemy den");
-        String newBoard[][] = {
-                {"__","__","__","__","__","__","__"},
-                {"__","r3","__","b6","__","__","__"},
-                {"__","__","__","__","__","__","__"},
-                {"__","__","__","__","__","__","__"},
-                {"__","__","__","__","__","__","__"},
-                {"__","__","__","__","__","__","__"},
-                {"__","__","__","__","__","__","__"},
-                {"__","__","__","__","__","__","__"},
-                {"__","__","__","__","__","__","__"}};
 
-        //game.board = newBoard;
+        for(int row=0; row<9; row++) {
+            for (int col = 0; col < 7; col++) {
+                game.board[row][col].gamePiece = null;
+            }
+        }
+
+        game.board[1][1].setPiece("wolf", "red");
+        game.board[1][3].setPiece("tiger", "blue");
 
         game.sendInput("Bob", 1, 3);
         game.sendInput("Bob", 0, 3);
@@ -398,9 +384,18 @@ public class GameTest extends TestCase {
                 {"__","__","__","__","__","__","__"},
                 {"__","__","__","__","__","__","__"}};
 
-        //game.board = newBoard;
+        for(int row=0; row<9; row++) {
+            for (int col = 0; col < 7; col++) {
+                game.board[row][col].gamePiece = null;
+            }
+        }
+        game.board[0][0].setPiece("wolf", "red");
+        game.board[2][0].setPiece("tiger", "blue");
+        game.board[0][1].setPiece("elephant", "blue");
 
         game.sendInput("Bob", 2, 0);
+        System.out.println(game.move.selectedSquare.gamePiece.ID);
+        game.move.printValidTiles();
         game.sendInput("Bob", 1, 0);
         game.printBoard();
         assertEquals("Bob", game.winner);

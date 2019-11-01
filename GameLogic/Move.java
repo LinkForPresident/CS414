@@ -40,6 +40,15 @@ public class Move {
                 if (selectedSquare.row <= 7) handleUpdate(selectedSquare.row + 1, selectedSquare.col);
                 if (selectedSquare.row >= 1) handleUpdate(selectedSquare.row - 1, selectedSquare.col);
             }
+        } else {
+            for (int i = 0; i < 9; i++) {
+                for (int j = 0; j < 7; j++) {
+                    game.board[i][j].isValid = false;
+                    if(game.board[i][j].gamePiece != null){
+                        game.board[i][j].isValid = game.board[i][j].gamePiece.color.equals(this.game.turn);
+                    }
+                }
+            }
         }
     }
 

@@ -251,7 +251,7 @@ export default class App extends React.Component {
 
             'http://localhost:8080',
 
-            "action=login&username=" + username + "&password=" + password,
+            "action=Login&username=" + username + "&password=" + password,
             {
                 headers: {
                     'Content-Type': 'application/json',
