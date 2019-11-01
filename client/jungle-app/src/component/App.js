@@ -296,6 +296,7 @@ export default class App extends React.Component {
                                    postExample={this.postExample}
                                    loggedIn={this.state.loggedIn}
                                    username={this.state.username}
+                                   password={this.state.password}
                             />
                         </TabPanel>
                         <TabPanel><GameRules/></TabPanel>
