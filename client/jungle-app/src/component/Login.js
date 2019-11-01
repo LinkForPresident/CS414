@@ -25,7 +25,7 @@ class Login extends React.Component {
     async handleLoginSubmit(event, url, payload, headers){
         event.preventDefault();
         this.props.handleGeneralRequest(event, url, payload, headers)
-            .then(response => this.props.updateLoginValue(response.loggedIn, response.username, response.invites));
+            .then(response => this.props.updateLoginValue(response.loggedIn, response.username, response.password, response.invites));
 
     }
 
