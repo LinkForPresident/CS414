@@ -86,14 +86,22 @@ class Handler extends Thread {
     private boolean clientIsAuthenticated() {
 		// check if client is logged in, or is trying to either register, login or logout.
         Terminal.printDebug("Checking is client is authenticated for this action.");
+	if(request.header.get("method").equals("OPTIONS")){
+		return true;
+	}
         String action = request.body.get("action");
-        String cookie = request.header.get("cookie");
+        // String cookie = request.header.get("cookie");
+	String cookie = Server.calculateUserHash(request.body.get("username"), request.body.get("password"));
         return action.equals("Register") || action.equals("Login") || action.equals("Logout") ||
                 Server.isLoggedIn(cookie);
     }
 
     private void handleRequest() throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException{
 
+	if(request.header.get("method").equals("OPTIONS")){
+		sendJSONResponse("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: POST, GET\r\nAccess-Control-Allow-Headers: *\r\n");
+		return;
+	}
         String action = request.body.get("action");
         Class<?> classSupportingAction = Class.forName(String.format("GameServer.%s", action));
         Object actionInstance = classSupportingAction.newInstance();

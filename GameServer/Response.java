@@ -3,6 +3,8 @@ package GameServer;
 import GameLogic.BoardSquare;
 import GameLogic.Game;
 
+import java.util.ArrayList;
+
 public class Response {
 
     static String defaultHeader = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n" +
@@ -22,6 +24,17 @@ public class Response {
         this.header = header;
         this.body = body;
         this.response = header + "\r\n" + this.body;
+    }
+
+    static String formatViewUserGamesResponse(String username, ArrayList<String> gameIds) {
+        String JSONResponse = "{\"username\": \"" + username + "\", \"activeGames\": {";
+        for(int i = 0; i<gameIds.size(); i++) {
+            JSONResponse += "\"" + gameIds.get(i) +"\"";
+            if(i < gameIds.size()-1) {
+                JSONResponse += ",";
+            }
+        }
+        return JSONResponse + "}}";
     }
 
     static String formatGameResponse(Game game){
