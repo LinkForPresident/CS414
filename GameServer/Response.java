@@ -26,10 +26,10 @@ public class Response {
         this.response = header + "\r\n" + this.body;
     }
 
-    static String formatViewUserGames(String username, ArrayList<String> gameIds) {
+    static String formatViewUserGamesResponse(String username, ArrayList<String> gameIds) {
         String JSONResponse = "{\"username\": \"" + username + "\", \"activeGames\": {";
         for(int i = 0; i<gameIds.size(); i++) {
-            JSONResponse += "\"gameID\": \"" + gameIds.get(i) +"\"";
+            JSONResponse += "\"" + gameIds.get(i) +"\"";
             if(i < gameIds.size()-1) {
                 JSONResponse += ",";
             }

@@ -21,6 +21,6 @@ public class ViewUserGames extends Action {
                 gameIdList.add(game.gameID);
             }
         }
-        return Response.formatViewUserGames(username, gameIdList);
+        return Response.formatViewUserGamesResponse(username, gameIdList);
     }
 }

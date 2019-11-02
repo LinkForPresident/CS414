@@ -15,7 +15,7 @@ public class AcceptInvite extends Action {
 
     private static String acceptInvite(String playerOne, String playerTwo) {
         Terminal.printInfo(String.format("Attempting to accept the invite of %s to %s", playerOne, playerTwo));
-        String JSONResponse = "";
+        String JSONResponse = "{";
         Iterator<String[]> invitesIterator = Server.invites.iterator();
         while(invitesIterator.hasNext()) {
             String[] invite = invitesIterator.next();
@@ -23,6 +23,8 @@ public class AcceptInvite extends Action {
                 invitesIterator.remove();
                 try {
                     Game game = new Game(playerOne, playerTwo);
+                    Server.activeGames.add(game);
+                    JSONResponse += "\"gameID\":\"" + game.gameID +"\", ";
                 } catch (PlayerNameException ignored) {
                 }
                 String playerInvites = "";
@@ -31,10 +33,10 @@ public class AcceptInvite extends Action {
                         playerInvites += inv[0] + ",";
                     }
                 }
-                JSONResponse = String.format("{\"invites\": \"%s\"}", playerInvites);
+                JSONResponse += String.format("\"wasSuccessful\":\"true\", \"invites\": \"%s\"", playerInvites);
             }
         }
-        return JSONResponse;
+        return JSONResponse +"}";
     }
 
 }

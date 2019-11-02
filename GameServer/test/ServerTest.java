@@ -21,6 +21,7 @@ public class ServerTest {
     //Work in progress!
     ServerUtils serverUtils = new ServerUtils();
     String newlyCreatedUser = "";
+    boolean loggedIn = false;
 
     public void sendInvite(String playerTwo) throws IOException {
         HashMap<String, String> map = serverUtils.sendHttpRequest("POST","action=SendInvite&playerOne=the_devil_himself&playerTwo=" + playerTwo + "&username=dummy_user&password=iforgot123");
@@ -44,6 +45,8 @@ public class ServerTest {
         HashMap<String, String> jsonMap = serverUtils.convertJsonStringToMap(response);
         Assert.assertEquals(jsonMap.get("loggedIn"), "true");
         Assert.assertEquals(jsonMap.get("username"), username);
+
+        loggedIn = true;
     }
 
     @Test
@@ -108,7 +111,7 @@ public class ServerTest {
         HashMap<String, String> jsonMap = serverUtils.convertJsonStringToMap(response);
         Assert.assertTrue(map.get("response").contains("1234"));
         Assert.assertTrue(map.get("response").contains("2345"));
-        Assert.assertEquals(jsonMap.get("activeGames"), "gameID");
+        Assert.assertEquals(jsonMap.get("activeGames"), "1234,2345");
         Assert.assertEquals(jsonMap.get("username"), "the_devil_himself");
     }
 
@@ -140,7 +143,9 @@ public class ServerTest {
 
     @Test
     public void test3AcceptUserInvitation() throws Exception {
-
+        if(!loggedIn) {
+            test1LoginWithHardcodedValue();
+        }
         sendInvite("dummy_user");
         System.out.println("Testing GET on view_game API of Server! Should return a json showing the requested game!");
 
@@ -152,6 +157,14 @@ public class ServerTest {
 
         HashMap<String, String> jsonMap = serverUtils.convertJsonStringToMap(response);
         Assert.assertEquals(jsonMap.get("invites"), ""); //After accepting an invite there should be an empty invites array
+        Assert.assertEquals(jsonMap.get("wasSuccessful"), "true");
+        Assert.assertTrue(jsonMap.containsKey("gameID"));
+        String newGameId = jsonMap.get("gameID");
+        //Now check gamesList and make sure new game is added
+        map = serverUtils.sendHttpRequest("POST","action=ViewUserGames&username=the_devil_himself&password=666");
+        response = map.get("response");
+        jsonMap = serverUtils.convertJsonStringToMap(response);
+        Assert.assertTrue(jsonMap.get("activeGames").contains(newGameId));
     }
 
     @Test
