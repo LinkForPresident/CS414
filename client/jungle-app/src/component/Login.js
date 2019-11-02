@@ -3,7 +3,7 @@ import React from 'react';
 class Login extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {username: '', password: '', apiConfig: this.props.apiConfig, loggedIn: this.props.loggedIn, loginFail: false};
+        this.state = {username: '', password: '', apiConfig: this.props.apiConfig, loggedIn: this.props.loggedIn, loginFail: null};
         console.log(this.state);
         console.log(this.props);
 
@@ -26,24 +26,34 @@ class Login extends React.Component {
         event.preventDefault();
         this.props.handleGeneralRequest(event, url, payload, headers)
             .then(response => this.props.updateLoginValue(response.loggedIn, response.username, response.invites));
-
-        console.log("test1");
-        const response = await fetch("http://localhost:8080"); //Await test, appears to never work
-        console.log("test2");
+        //console.log("test1");
+        //const response = await fetch("http://localhost:8080"); //Await test, appears to never work
+        //console.log("test2");
         //TODO: This is checked before server response. Should check after server response.
-        if(response.ok && this.props.loggedIn === false){
-            console.log("test3");
-            this.setState({loginFail: true});
+        // if(response.ok && this.props.loggedIn === false){
+        //     console.log("test3");
+        //     this.setState({loginFail: true});
+        // }
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps !== this.props) {
+            this.failedLogin();
         }
     }
 
+    failedLogin(){
+        this.setState({loginFail: true});
+    }
+
+    loginError(){
+        if (this.state.loginFail === true) {
+            return "Error: Incorrect username or password";
+        }
+        return "";
+    }
 
     render() {
-        let loginF = "";
-        if(this.state.loginFail === true){
-            loginF = "Error: Incorrect username or password";
-        }
-
         return (
             <div>
                 <form onSubmit={(e) => this.handleSubmit(e, this.state.apiConfig.url,
@@ -51,14 +61,14 @@ class Login extends React.Component {
                     this.props.apiConfig.headers)}>
                     <label>
                         Username:
-                        <input type="text" value={this.state.username} onChange={this.handleNameChange} on />
+                        <input type="text" value={this.state.username} onChange={this.handleNameChange}/>
                         Password:
-                        <input type="password" value={this.state.password} onChange={this.handlePasswordChange} />
-                        <input type="text" value="login" hidden />
+                        <input type="password" value={this.state.password} onChange={this.handlePasswordChange}/>
+                        <input type="text" value="login" hidden/>
                     </label>
                     <input type="submit" value="Submit"/>
                 </form>
-                <p style={{color: "red"}}>{loginF}</p>
+                <p style={{color: "red"}}>{this.loginError()}</p>
             </div>
         );
     }
