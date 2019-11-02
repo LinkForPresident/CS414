@@ -12,10 +12,10 @@ class Square extends React.Component {
     render() {
         let environmentImg;
         let pieceImg;
-        if (this.props.environment !== null && this.props.environment !== "empty") {
-            environmentImg = <img src={require("./images/"+this.props.environment+".png")} alt="r1" height="95%" style={{position: "relative", zIndex: "10"}}/>
+        if (this.props.environment !== "empty") {
+            environmentImg = <img src={require("./images/"+this.props.environment+".png")} alt="r1" height="95%" style={{position: "absolute", zIndex: "10"}}/>
         }
-        if (this.props.piece !== null && this.props.piece !== undefined) {
+        if (this.props.piece !== undefined) {
             pieceImg = <img src={require("./images/"+this.props.piece+".png")} alt="r1" height="100%" style={{position: "relative", zIndex: "20"}}/>
         }
         return(

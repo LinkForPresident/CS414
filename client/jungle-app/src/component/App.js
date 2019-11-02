@@ -23,6 +23,7 @@ export default class App extends React.Component {
         this.setSelectedGame = this.setSelectedGame.bind(this);
         this.ViewGameState = this.ViewGameState.bind(this);
         this.postExample = this.postExample.bind(this);
+        this.Logout = this.Logout.bind(this);
     }
 
     // state of components shared between components must live here, that way when one is updated the other will "react"
@@ -132,13 +133,34 @@ export default class App extends React.Component {
 
         // common rest request configuration
         apiConfig:{
-            url:'http://localhost:8080',
+            url:'http://129.82.44.118:8080',
             headers: {
                 'Content-Type': 'application/text',
                 'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
             }
         }
     };
+
+    Logout() {
+        var self = this;
+        axios.post(this.state.apiConfig.url,
+            "action=Logout&username=" + this.state.username + "&password=" + this.state.password, {
+            headers: {
+                'Content-Type': 'application/text',
+                'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+            }
+        }
+    ).then(
+            function (response) {
+                console.log(response.data);
+                self.setState({
+                    loggedIn: false,
+                    username: null,
+                    password: null,
+                })
+            }
+        )
+    }
 
     // This method is responsible for making game state requests, and updating the gameState fields when users click the game board
     postExample(data) {
@@ -288,8 +310,6 @@ export default class App extends React.Component {
                             <Tab>Game Rules</Tab>
                             <Tab>History</Tab>
                             <Tab>Invite</Tab>
-                            <Tab>Register</Tab>
-                            <Tab>Login</Tab>
                             <Tab>User</Tab>
                         </TabList>
                         <TabPanel><Home/></TabPanel>
@@ -319,11 +339,7 @@ export default class App extends React.Component {
                                           password={this.state.password}
                                           handleDeclineInvite={this.handleDeclineInvite}
                                           updateInvites={this.updateInvites}/></TabPanel>
-                        <TabPanel><Register users={this.state.users} passwords={this.state.passwords}/></TabPanel>
-                        <TabPanel><Login apiConfig={this.state.apiConfig} handleGeneralRequest={this.handleGeneralRequest}
-                                         loggedIn={this.state.loggedIn}
-                                         updateLoginValue={this.updateLoginValue}/></TabPanel>
-                        <TabPanel><User/></TabPanel>
+                        <TabPanel><User Logout={this.Logout}/></TabPanel>
                     </Tabs>
                 </div>
             )

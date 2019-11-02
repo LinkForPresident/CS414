@@ -1,5 +1,12 @@
 package GameServer;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Date;
+
 public class SendInvite extends Action {
 
     @Override
@@ -23,6 +30,10 @@ public class SendInvite extends Action {
         }
         if(!alreadyExists) {
             Terminal.printDebug(String.format("Creating invite between %s and %s.", playerOne, playerTwo));
+            DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+			Date date = new Date();
+            String createInvite = String.format("INSERT INTO Invite VALUES('%s', '%s', '%s');", playerOne, playerTwo, dateFormat.format(date));
+			Database.executeDatabaseQuery(createInvite);
             Server.invites.add(newInvite);
         }
         JSONResponse = String.format("{\"invitedPlayer\": \"%s\", \"wasSuccessful\": %b}", playerTwo,
