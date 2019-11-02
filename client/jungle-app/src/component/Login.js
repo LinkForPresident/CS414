@@ -12,40 +12,39 @@ class Login extends React.Component {
         this.handleSubmit = this.handleLoginSubmit.bind(this);
     }
 
+    //handles appropriately changing the state of the page whenever the username is changed
     handleNameChange(event) {
         event.preventDefault();
         this.setState({username: event.target.value});
     }
 
+    //handles appropriately changing the state of the page whenever the password is changed
     handlePasswordChange(event) {
         event.preventDefault();
         this.setState({password: event.target.value});
     }
 
+    //Handles the submission of a login request to the server
     async handleLoginSubmit(event, url, payload, headers){
         event.preventDefault();
         this.props.handleGeneralRequest(event, url, payload, headers)
             .then(response => this.props.updateLoginValue(response.loggedIn, response.username, response.invites));
-        //console.log("test1");
-        //const response = await fetch("http://localhost:8080"); //Await test, appears to never work
-        //console.log("test2");
-        //TODO: This is checked before server response. Should check after server response.
-        // if(response.ok && this.props.loggedIn === false){
-        //     console.log("test3");
-        //     this.setState({loginFail: true});
-        // }
     }
 
+    //Input: Previous props state
+    //Automatically compares against the previous props state and runs a function if props changes
     componentDidUpdate(prevProps) {
         if (prevProps !== this.props) {
             this.failedLogin();
         }
     }
 
+    //sets the local state if a login fails
     failedLogin(){
         this.setState({loginFail: true});
     }
 
+    //Returns the appropriate error message based on the state. Default has no error.
     loginError(){
         if (this.state.loginFail === true) {
             return "Error: Incorrect username or password";
