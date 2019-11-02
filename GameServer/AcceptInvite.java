@@ -20,6 +20,8 @@ public class AcceptInvite extends Action {
         while(invitesIterator.hasNext()) {
             String[] invite = invitesIterator.next();
             if (invite[0].equals(playerOne) && invite[1].equals(playerTwo)) {
+				String acceptInvite = String.format("DELETE FROM Invite WHERE playerOne='%s' AND playerTwo='%s';", playerOne, playerTwo);
+				Database.executeDatabaseQuery(acceptInvite);
                 invitesIterator.remove();
                 try {
                     Game game = new Game(playerOne, playerTwo);

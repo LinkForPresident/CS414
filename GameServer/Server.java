@@ -32,9 +32,19 @@ public class Server {
 			game.gameID = "1234";
 			activeGames.add(game);
             game = new Game("the_devil_himself", "dummy_user");
-            game.gameID = "2345";;
+            game.gameID = "2345";
             activeGames.add(game);
-        }catch(PlayerNameException ignored){
+            
+            String getInvites = "SELECT * FROM Invite";
+            ResultSet resultSet = Database.executeDatabaseQuery(getInvites);
+			ResultSetMetaData rsmd = resultSet.getMetaData();
+            int numberOfColumns = rsmd.getColumnCount();
+            while(resultSet.next()){
+				String[] invite = {resultSet.getString(1), resultSet.getString(2)};
+				invites.add(invite);
+			}
+            
+        }catch(PlayerNameException | SQLException ignored){
 
 		}
 
