@@ -4,7 +4,10 @@ class User extends React.Component {
     render() {
         return (
             <div className={'UserPage'}>
-                <p>User Goes here</p>
+                <button
+                    onClick={() => {
+                    this.props.Logout()
+                }}>Logout</button>
             </div>
         )
     }
