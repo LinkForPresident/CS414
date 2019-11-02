@@ -43,14 +43,14 @@ public class Database {
         while((part = bufferedReader.readLine()) != null){
             response += part;
         }
-        // System.out.println("==DEBUG==:: getSessionToken.sh response: " + response);
+		Terminal.printDebug("getSessionToken.sh response: " + response);
         String sessionToken = response.split(":")[2].replace("\"", "").split(",")[0];
         Terminal.printDebug(String.format("Parsed remote proxy session token: %s", sessionToken));
 
         String getProxyAddress = String.format("curl -X POST -H \"token:%s\" -H \"developerkey\":\"%s\" " +
-                "-d \'{\"wait\":\"true\", \"deviceaddress\":\"\'%s\'\"}' https://api.remot3.it/apv/v27/device/connect",
+                "-d \'{\"wait\":\"true\", \"deviceaddress\":\"\'%s\'\"}' http://api.remot3.it/apv/v27/device/connect",
                 sessionToken, devAPIKey, deviceAddress);
-        // System.out.println(getProxyAddress);
+        Terminal.printDebug(getProxyAddress);
 
         FileWriter fileWriter = new FileWriter("GameServer/getProxyAddress.sh");
         fileWriter.write(getProxyAddress);
@@ -67,7 +67,7 @@ public class Database {
             response += part;
         }
         process.destroy();
-        // System.out.println("==DEBUG==:: getProxyAddress.sh response: " + response);
+        Terminal.printDebug("getProxyAddress.sh response: " + response);
         String[] components = response.split(",");
         for(String component: components){
             if(component.contains("\"proxy\"")){
@@ -106,7 +106,10 @@ public class Database {
     }
     
     public static void main(String[] args) throws SQLException{
-		String query = args[0];
+		if(args.length > 0 && args[0].equals("--debug")){
+				Server.debugMode = true;
+			}
+		String query = args[1];
 		Terminal.printInfo(String.format("The following SQL query will be executed: \"%s\".", query));
 		ResultSet resultSet = executeDatabaseQuery(query);
 		ResultSetMetaData rsmd = resultSet.getMetaData();

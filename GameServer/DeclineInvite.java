@@ -17,6 +17,8 @@ public class DeclineInvite extends Action {
         while(invitesIterator.hasNext()) {
             String[] invite = invitesIterator.next();
             if (invite[0].equals(playerOne) && invite[1].equals(playerTwo)) {
+				String declineInvite = String.format("DELETE FROM Invite WHERE playerOne='%s' AND playerTwo='%s';", playerOne, playerTwo);
+				Database.executeDatabaseQuery(declineInvite);
                 invitesIterator.remove();
                 String playerInvites = "";
                 for (String[] inv : Server.invites) {

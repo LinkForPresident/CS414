@@ -22,9 +22,10 @@ public class MovePiece extends Action {
         String JSONResponse = "";
         for(Game game : Server.activeGames){
             if(game.gameID.equals(gameID)){
-                if(game.sendInput(playerID, Integer.parseInt(row), Integer.parseInt(column))){
+            game.sendInput(playerID, Integer.parseInt(row), Integer.parseInt(column));
+               // if(game.sendInput(playerID, Integer.parseInt(row), Integer.parseInt(column))){
                     JSONResponse = Response.formatGameResponse(game);
-                }
+               // }
             }
         }
         return JSONResponse;

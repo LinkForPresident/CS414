@@ -31,7 +31,20 @@ public class Server {
 			Game game = new Game("dummy_user", "the_devil_himself");
 			game.gameID = "1234";
 			activeGames.add(game);
-		}catch(PlayerNameException ignored){
+            game = new Game("the_devil_himself", "dummy_user");
+            game.gameID = "2345";
+            activeGames.add(game);
+            
+            String getInvites = "SELECT * FROM Invite";
+            ResultSet resultSet = Database.executeDatabaseQuery(getInvites);
+			ResultSetMetaData rsmd = resultSet.getMetaData();
+            int numberOfColumns = rsmd.getColumnCount();
+            while(resultSet.next()){
+				String[] invite = {resultSet.getString(1), resultSet.getString(2)};
+				invites.add(invite);
+			}
+            
+        }catch(PlayerNameException | SQLException ignored){
 
 		}
 

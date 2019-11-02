@@ -48,7 +48,9 @@ public class Request {
 
     private void extractRequestHeader() throws IOException {
         String headerLine = "";
+        Terminal.printDebug("Request header: ");
         while ((headerLine = bufferedReader.readLine()).length() != 0) {
+			Terminal.printDebug(headerLine);
             if (headerLine.contains("Content-Length")) {
                 header.put("contentLength", headerLine.split(" ")[1]);
                 Terminal.printDebug(String.format("The content length of the request is: %s.",

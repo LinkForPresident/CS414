@@ -64,16 +64,13 @@ public class ServerUtils {
     }
 
     public boolean isCoordinateAvailable(String[][] board, int y, int x) {
-        if(board[y][x].contains("true")) {
-            return true;
-        }
-        return false;
+        return board[y][x].contains("true");
     }
 
     public HashMap<String, String> sendHttpRequest(String requestMethod, String urlParameters) throws IOException {
         HashMap<String, String> map = new HashMap<String,String>();
 
-        String url = "http://localhost:8080/" + urlParameters;
+        String url = "http://localhost:12001/" + urlParameters;
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
