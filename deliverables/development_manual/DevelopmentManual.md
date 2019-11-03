@@ -27,3 +27,13 @@ How to set up workspace:
 
 # Running tests
 To run game logic test: execute GameLogic/GameTest.java by right clicking the class and selecting "run".
+
+GameLogic backend
+
+#Compiling GameLogic java packages
+
+javac *.java exception/*.java application/*.java -classpath ../lib/junit-4.12.jar 
+
+#Running java tests for GameLogic backend
+
+Run the GameTest.java in your IDE
