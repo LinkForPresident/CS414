@@ -30,8 +30,8 @@ public class Server {
     
 		try{
             initializeObjectLists();
-            String[] dummyInvite = {"dummy_user", "the_devil_himself"};
-            invites.add(dummyInvite);
+        //    String[] dummyInvite = {"dummy_user", "the_devil_himself"};
+        //    invites.add(dummyInvite);
             
         }catch(SQLException ignored){
 
