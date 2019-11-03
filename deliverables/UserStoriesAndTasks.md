@@ -72,3 +72,16 @@ Create a game board with buttons that can make requests and update app state bas
 Refactor back-end game logic into distinct classes for easier front-end data digestion **(Not estimated)**
 * #89
 Display Piece, Environment, and available move data **(8)**
+
+
+## As a user, I would like to know when no moves are possible (1)
+### Acceptance Criteria:
+#### Logic:
+* Count the number of available legal moves a player has
+* End the game if no moves are available for a player on their turn
+
+### Associated Tasks
+* #133
+End the game if no moves are available **(1)**
+* #75
+Implement method of detecting when no legal moves are available for the current turn's player **(5)**
