@@ -8,7 +8,6 @@
 * Board should show valid moves
 * Games should be able to be started from a list
 * Games should be able to be created
-* Games should be able to be forfeited
 #### Server:
 * Should be able to handle new games
 * Should be able to handle viewing games
@@ -23,9 +22,6 @@
 * Should be able to handle winning/losing
 
 ### Associated Tasks 
-* #125 GameServer handle forfeit game **(2)**
-* #126 GameServer handle view game list **(2)**
-* #172 Client handle forfeit game **(2)**
 * #110 GameServer create game API support **(2)**
 * #111 GameServer move API support **(1)**
 * #112 GameServer view game API support **(2)**
