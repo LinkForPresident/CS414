@@ -27,7 +27,7 @@ public class GameApp {
 
         System.out.println("Starting a game between " + BLUE + bluePlayer + WHITE + " and " + RED + redPlayer + WHITE + ".");
 
-        Game game = new Game(bluePlayer, redPlayer);
+        Game game = new Game(bluePlayer, redPlayer, "2323");
         gameUtils.printBoardVeryVerboseWithColor(game.board);
 
         while(game.winner.isEmpty()) {
