@@ -315,12 +315,13 @@ export default class App extends React.Component {
                         <TabPanel><Home/></TabPanel>
 
                         <TabPanel>
-                            <Games
-                                activeGames={this.state.activeGames}
-                                completedGames={this.state.completedGames}
-                                setSelectedGame={this.setSelectedGame}
-                                loggedIn={this.state.loggedIn}
-                            />
+                            {/*<Games*/}
+                            {/*    activeGames={this.state.activeGames}*/}
+                            {/*    completedGames={this.state.completedGames}*/}
+                            {/*    setSelectedGame={this.setSelectedGame}*/}
+                            {/*    loggedIn={this.state.loggedIn}*/}
+                            {/*/>*/}
+                            <h1>Jungle Game #{this.state.gameState.gameID}</h1>
                             <Board selectedGame={this.state.selectedGame}
                                    gameState={this.state.gameState}
                                    postExample={this.postExample}
