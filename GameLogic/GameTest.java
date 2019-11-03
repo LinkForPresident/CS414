@@ -16,7 +16,7 @@ public class GameTest extends TestCase {
     public void setUp() throws PlayerNameException {
         // This will run before every method
         System.out.println("\nSTART OF TEST\n===================");
-        game = new Game("Bob", "Sally");
+        game = new Game("Bob", "Sally", "1234");
         System.out.println("Start Time: "+ game.startTime);
     }
 
@@ -227,19 +227,19 @@ public class GameTest extends TestCase {
         System.out.println("Testing that Player Name Exceptions are being thrown as expected");
 
         try {
-            game = new Game("", "Sally");
+            game = new Game("", "Sally", "12334");
         } catch (PlayerNameException e) {
             assertTrue(e.getMessage().contains("Player One Name must not be empty"));
         }
 
         try {
-            game = new Game("Bob", "");
+            game = new Game("Bob", "", "23455");
         } catch (PlayerNameException e) {
             assertTrue(e.getMessage().contains("Player Two Name must not be empty"));
         }
 
         try {
-            game = new Game("Sally", "Sally");
+            game = new Game("Sally", "Sally", "232322");
         } catch (PlayerNameException e) {
             assertTrue(e.getMessage().contains("Player One Name cannot be same as Player Two Name"));
         }
