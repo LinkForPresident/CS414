@@ -1,0 +1,9 @@
+.vrt-header th {
+  writing-mode: vertical-lr;
+  min-width: 20px; /* for firefox */
+
+}
+
+table, th, td{
+  border: 1px solid black;
+}
