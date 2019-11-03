@@ -21,6 +21,7 @@
 * Should be able to handle giving valid moves
 * Should be able to handle making a move
 * Should be able to handle winning/losing
+
 ### Associated Tasks 
 * #125 GameServer handle forfeit game **(2)**
 * #126 GameServer handle view game list **(2)**
@@ -69,6 +70,7 @@ Implement method of detecting when no legal moves are available for the current 
 * Handle user deletion
 * Handle login requests
 * Handle logout requests
+
 ### Associated Tasks
 * #132 Client handle registering a user **(2)**
 * #134 Client handle user unregistration **(1)**
@@ -83,3 +85,26 @@ Implement method of detecting when no legal moves are available for the current 
 * #166 Give user feedback on failed login **(2)**
 * #24 Login/Logout **(3)**
 * #39 Refactored Server, added classes, handle user auth **(8)**
+
+## As a user, I would like to be able to send and accept invites (3)
+
+### Acceptance Criteria:
+#### Client:
+* Should be able to send an invitation to another user.
+* Should be able to accept or decline an invitation.
+* Should be able to view incoming and outgoing invites.
+* Should be able to cancel and invitation sent.
+#### Server:
+* Should be able to handle requests for invitations sent.
+* Should be able to handle requests for invitations accepted/declined.
+* Should be able to handle requests for viewing incoming and outgoing invitations.
+* Should be able to handle requests for invitations cancelled.
+
+### Associated Tasks
+* #104 GameServer handle create invite **(1)**
+* #105 GameServer cancel invite API support **(1)**
+* #106 GameServer accept invite API support **(1)**
+* #107 GameServer view invites API support **(1)**
+* #108 Database invite support **(2)**
+* #109 Client support of Invite functionality **(Not estimated)**
+* #110 GameServer create game API support **(2)**
