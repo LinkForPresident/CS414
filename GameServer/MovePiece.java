@@ -26,15 +26,9 @@ public class MovePiece extends Action {
                int oldTurn = game.turnNumber;
                if(game.sendInput(playerID, Integer.parseInt(row), Integer.parseInt(column))){
                    if(game.turnNumber != oldTurn) {
-                       Gson gson = new GsonBuilder().create();
-                       String json = gson.toJson(game);
-                       json = json.replace("}", "#");
-                       json = json.replace("{", "%");
-                       json = json.replace("]", "&");
-                       json = json.replace("[", "^");
-                       Terminal.printDebug(String.format("The JSON game object is: %s", json));
-
-                       String saveGame = String.format("UPDATE Game SET gameJSON = '%s' WHERE gameID = %d;", json, Integer.parseInt(gameID));
+                       String gameJSON = Database.formatGameGSON(game);
+                       Terminal.printDebug(String.format("The JSON game object is: %s", gameJSON));
+                       String saveGame = String.format("UPDATE Game SET gameJSON = '%s' WHERE gameID = %d;", gameJSON, Integer.parseInt(gameID));
                        Database.executeDatabaseQuery(saveGame);
                    }
                 }

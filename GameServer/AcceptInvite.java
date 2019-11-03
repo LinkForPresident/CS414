@@ -38,15 +38,10 @@ public class AcceptInvite extends Action {
                     }
                     Terminal.printDebug(String.format("Game ID is: %s", gameID));
                     Game game = new Game(playerOne, playerTwo, gameID);
-                    Gson gson = new GsonBuilder().create();
-                    String json = gson.toJson(game);
-                    json = json.replace("}", "#");
-                    json = json.replace("{", "%");
-                    json = json.replace("]", "&");
-                    json = json.replace("[", "^");
-                    Terminal.printDebug(String.format("The JSON game object is: %s", json));
+                    String gameJSON = Database.formatGameGSON(game);
+                    Terminal.printDebug(String.format("The JSON game object is: %s", gameJSON));
 
-                    String saveGame = String.format("INSERT INTO Game VALUES(%d, '%s');", Integer.parseInt(gameID), json);
+                    String saveGame = String.format("INSERT INTO Game VALUES(%d, '%s');", Integer.parseInt(gameID), gameJSON);
                     Database.executeDatabaseQuery(saveGame);
 
                     Server.activeGames.add(game);

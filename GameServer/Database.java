@@ -7,6 +7,7 @@ import java.io.*;
 import java.lang.*;
 import java.sql.*;
 import java.util.*;
+import com.google.gson.*;
 
 public class Database {
 
@@ -103,6 +104,16 @@ public class Database {
         }finally {
             return resultSet;
         }
+    }
+
+    public static String formatGameGSON(Game game){
+        Gson gson = new GsonBuilder().create();
+        String json = gson.toJson(game);
+        json = json.replace("}", "#");
+        json = json.replace("{", "%");
+        json = json.replace("]", "&");
+        json = json.replace("[", "^");
+        return json;
     }
     
     public static void main(String[] args) throws SQLException{
