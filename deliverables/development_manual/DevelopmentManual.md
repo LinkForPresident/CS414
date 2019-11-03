@@ -32,7 +32,7 @@ GameLogic backend
 
 #Compiling GameLogic java packages
 
-javac *.java exception/*.java application/*.java -classpath ../lib/junit-4.12.jar 
+javac GameLogic/*.java GameLogic/exception/*.java GameLogic/application/*.java -classpath lib/junit-4.12.jar 
 
 #Running java tests for GameLogic backend
 
