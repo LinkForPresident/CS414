@@ -8,7 +8,7 @@ public class Move {
     public int numberOfValidTiles = 0;
     public BoardSquare selectedSquare;
 
-    Move(Game current_game){
+    public Move(Game current_game){
         game = current_game;
     }
 

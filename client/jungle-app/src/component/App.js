@@ -38,7 +38,7 @@ export default class App extends React.Component {
         invites: " ",
         gameState:
             {
-                "gameID": "1234",
+                "gameID": "0",
                 "playerOne": "Bob",
                 "playerTwo": "Sally",
                 "turn": "Bob",
@@ -133,7 +133,7 @@ export default class App extends React.Component {
 
         // common rest request configuration
         apiConfig:{
-            url:'http://129.82.44.118:8080',
+            url:'http://localhost:8080',
             headers: {
                 'Content-Type': 'application/text',
                 'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',

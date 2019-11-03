@@ -7,6 +7,7 @@ import java.io.*;
 import java.lang.*;
 import java.sql.*;
 import java.util.*;
+import com.google.gson.*;
 
 public class Server {
 
@@ -28,23 +29,11 @@ public class Server {
     protected void serve(){
     
 		try{
-			Game game = new Game("dummy_user", "the_devil_himself");
-			game.gameID = "1234";
-			activeGames.add(game);
-            game = new Game("the_devil_himself", "dummy_user");
-            game.gameID = "2345";
-            activeGames.add(game);
+            initializeObjectLists();
+            String[] dummyInvite = {"dummy_user", "the_devil_himself"};
+            invites.add(dummyInvite);
             
-            String getInvites = "SELECT * FROM Invite";
-            ResultSet resultSet = Database.executeDatabaseQuery(getInvites);
-			ResultSetMetaData rsmd = resultSet.getMetaData();
-            int numberOfColumns = rsmd.getColumnCount();
-            while(resultSet.next()){
-				String[] invite = {resultSet.getString(1), resultSet.getString(2)};
-				invites.add(invite);
-			}
-            
-        }catch(PlayerNameException | SQLException ignored){
+        }catch(SQLException ignored){
 
 		}
 
@@ -64,6 +53,37 @@ public class Server {
                 thread.start();
             }
         }catch(IOException ignored){}
+    }
+
+    private static void initializeObjectLists() throws SQLException{
+        String getGames = "SELECT * FROM Game;";
+        ResultSet resultSet = Database.executeDatabaseQuery(getGames);
+        while(resultSet.next()){
+            initializeGameObject(resultSet.getString(2));
+        }
+
+        String getInvites = "SELECT * FROM Invite";
+        resultSet = Database.executeDatabaseQuery(getInvites);
+        while(resultSet.next()){
+            initializeInviteObject(resultSet.getString(1), resultSet.getString(2));
+        }
+    }
+
+    private static void initializeGameObject(String json) throws SQLException{
+        // {, }, [, and ] stored as different characters b/c SQL treats them differently.
+        json = json.replace("#", "}");
+        json = json.replace("%", "{");
+        json = json.replace("&", "]");
+        json = json.replace("^", "[");
+        Gson gson = new GsonBuilder().create();
+        Game game = gson.fromJson(json, Game.class);
+        game.move = new Move(game);
+        activeGames.add(game);
+    }
+
+    private static void initializeInviteObject(String playerOne, String playerTwo) throws SQLException{
+        String[] invite = {playerOne, playerTwo};
+        invites.add(invite);
     }
 
     static String calculateUserHash(String username, String password) {

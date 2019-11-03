@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+
+    table{
+                display:flex-inline;
+                font-size: 12px;
+                height:155px;
+                width: 350px;
+                background-color:gray;
+
+
+    }
+
+        table, td, th {
+            border: 1px solid black;
+
+        }
+
+
+
+tr{
+flex-grow: 1;
+}
+
+        th{
+        background-color: skyblue;
+        width: 100%;
+        height:25px;
+        }
+
+        td{
+            min-width: 50px;
+            max-width: 300px;
+            background-color:white;
+            width: 100%;
+
+        }
+
+        li{
+        margin-left: -20px;
+        }
+
+        div{
+        display:inline-block;
+        }
+
+
+    </style>
+</head>
+<body>
+
+<div>
+<table>
+    <tr><th colspan="2">AcceptInvite</th></tr>
+    <tr>
+        <td>
+            <ul>
+                <li>Support the acceptance of a game invite</li>
+            </ul>
+        </td>
+        <td>
+            <ul>
+                <li>Database</li>
+                <li>Terminal</li>
+                <li>Server</li>
+                <li>Request</li>
+                <li>Response</li>
+            </ul>
+        </td>
+    </tr>
+</table>
+</div>
+<div>
+<table>
+    <tr><th colspan="2">Action</th></tr>
+    <tr>
+        <td>
+            <ul>
+                <li>Abstract class for all concrete executors of client requests</li>
+            </ul>
+        </td>
+        <td>
+            <ul>
+                <li>Request</li>
+                <li>Response</li>
+            </ul>
+        </td>
+    </tr>
+</table>
+</div>
+<div>
+<table>
+    <tr><th colspan="2">Database</th></tr>
+    <tr>
+        <td>
+            <ul>
+                <li>Handle all queries to the database</li>
+                <li>Handle connections to the database</li>
+                <li>Format data for storing in the database</li>
+                <li>Allow users to execute custom queries from the terminal</li>
+            </ul>
+        </td>
+        <td>
+            <ul>
+                <li>Terminal</li>
+                <li>Game</li>
+            </ul>
+        </td>
+    </tr>
+</table>
+</div>
+<div>
+<table>
+    <tr><th colspan="2">DeclineInvite</th></tr>
+    <tr>
+        <td>
+            <ul>
+                <li>Support the decline of a game invite</li>
+            </ul>
+        </td>
+        <td>
+            <ul>
+                <li>Database</li>
+                <li>Server</li>
+                <li>Terminal</li>
+                <li>Request</li>
+                <li>Response</li>
+            </ul>
+        </td>
+    </tr>
+</table>
+</div>
+<div>
+<table>
+    <tr><th colspan="2">Handler</th></tr>
+    <tr>
+        <td>
+            <ul>
+                <li>Handles set up and tear down of connections with clients</li>
+                <li>Invokes Action classes</li>
+                <li>Sends responses to clients</li>
+            </ul>
+        </td>
+        <td>
+            <ul>
+                <li>Request</li>
+                <li>Response</li>
+                <li>Terminal</li>
+                <li>Action classes</li>
+            </ul>
+        </td>
+    </tr>
+</table>
+</div>
+<div>
+<table>
+    <tr><th colspan="2">Login</th></tr>
+    <tr>
+        <td>
+            <ul>
+                <li>Support the login of a client</li>
+            </ul>
+        </td>
+        <td>
+            <ul>
+                <li>Terminal</li>
+                <li>Server</li>
+                <li>Request</li>
+                <li>Response</li>
+                <li>Database</li>
+            </ul>
+        </td>
+    </tr>
+</table>
+</div>
+<div>
+<table>
+    <tr><th colspan="2">Logout</th></tr>
+    <tr>
+        <td>
+            <ul>
+                <li>Support the logout of a client</li>
+            </ul>
+        </td>
+        <td>
+            <ul>
+                <li>Terminal</li>
+                <li>Server</li>
+                <li>Request</li>
+                <li>Response</li>
+            </ul>
+        </td>
+    </tr>
+</table>
+</div>
+<div>
+<table>
+    <tr><th colspan="2">MovePiece</th></tr>
+    <tr>
+        <td>
+            <ul>
+                <li>Support the moving of a piece</li>
+            </ul>
+        </td>
+        <td>
+            <ul>
+                <li>Terminal</li>
+                <li>Server</li>
+                <li>Request</li>
+                <li>Response</li>
+                <li>Database</li>
+            </ul>
+        </td>
+    </tr>
+</table>
+</div>
+<div>
+<table>
+    <tr><th colspan="2">Register</th></tr>
+    <tr>
+        <td>
+            <ul>
+                <li>Support the registration of a new user</li>
+            </ul>
+        </td>
+        <td>
+            <ul>
+                <li>Terminal</li>
+                <li>Server</li>
+                <li>Request</li>
+                <li>Response</li>
+                <li>Database</li>
+            </ul>
+        </td>
+    </tr>
+</table>
+</div>
+<div>
+<table>
+    <tr><th colspan="2">Request</th></tr>
+    <tr>
+        <td>
+            <ul>
+                <li>Extract and store user request data</li>
+            </ul>
+        </td>
+        <td>
+            <ul>
+                <li>Terminal</li>
+            </ul>
+        </td>
+    </tr>
+</table>
+</div>
+<div>
+<table>
+    <tr><th colspan="2">Response</th></tr>
+    <tr>
+        <td>
+            <ul>
+                <li>Format and store the server response to the client</li>
+            </ul>
+        </td>
+        <td>
+            <ul>
+                <li>Game</li>
+                <li>BoardSquare</li>
+                <li>Terminal</li>
+            </ul>
+        </td>
+    </tr>
+</table>
+</div>
+<div>
+<table>
+    <tr><th colspan="2">SendInvite</th></tr>
+    <tr>
+        <td>
+            <ul>
+                <li>Support the sending of a game invite</li>
+            </ul>
+        </td>
+        <td>
+            <ul>
+                <li>Terminal</li>
+                <li>Server</li>
+                <li>Request</li>
+                <li>Response</li>
+                <li>Database</li>
+            </ul>
+        </td>
+    </tr>
+</table>
+</div>
+<div>
+<table>
+    <tr><th colspan="2">Server</th></tr>
+    <tr>
+        <td>
+            <ul>
+                <li>Initiate the server process</li>
+                <li>Initialize the state lists</li>
+                <li>Accept connections from clients, spawn Handlers</li>
+            </ul>
+        </td>
+        <td>
+            <ul>
+                <li>Terminal</li>
+                <li>Game</li>
+                <li>Handler</li>
+                <li>Database</li>
+            </ul>
+        </td>
+    </tr>
+</table>
+</div>
+<div>
+<table>
+    <tr><th colspan="2">Terminal</th></tr>
+    <tr>
+        <td>
+            <ul>
+                <li>Provide an interface for classifying and formatting print statements that are useful to the programmer</li>
+            </ul>
+        </td>
+        <td>
+        </td>
+    </tr>
+</table>
+</div>
+<div>
+<table>
+    <tr><th colspan="2">Unregister</th></tr>
+    <tr>
+        <td>
+            <ul>
+                <li>Support the unregistration of a user</li>
+            </ul>
+        </td>
+        <td>
+            <ul>
+                <li>Terminal</li>
+                <li>Request</li>
+                <li>Response</li>
+                <li>Database</li>
+            </ul>
+        </td>
+    </tr>
+</table>
+</div>
+<div>
+<table>
+    <tr><th colspan="2">ViewGame</th></tr>
+    <tr>
+        <td>
+            <ul>
+                <li>Support the viewing of a single game</li>
+            </ul>
+        </td>
+        <td>
+            <ul>
+                <li>Terminal</li>
+                <li>Request</li>
+                <li>Response</li>
+            </ul>
+        </td>
+    </tr>
+</table>
+</div>
+<div>
+<table>
+    <tr><th colspan="2">ViewUserGames</th></tr>
+    <tr>
+        <td>
+            <ul>
+                <li>Support the  viewing of all games associated with a user</li>
+            </ul>
+        </td>
+        <td>
+            <ul>
+                <li>Terminal</li>
+                <li>Request</li>
+                <li>Response</li>
+            </ul>
+        </td>
+    </tr>
+</table>
+</div>
+
+</body>
+</html>
