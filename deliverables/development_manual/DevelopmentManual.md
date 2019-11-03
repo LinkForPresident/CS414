@@ -13,7 +13,7 @@ How to set up workspace:
 ##In order to compile and run the server:
 * From the cs414-f18-001-Team.name root folder, execute 2 commands:
 
-    * ```javac -cp .:GameServer/gson-2.8.5.jar GameServer/*.java``` 
+    * ```javac -cp .:GameServer/gson-2.8.5.jar GameServer/*.java ``` 
     
     * ```java -cp .:GameServer/mariadb-java-client-2.4.4.jar:GameServer/gson-2.8.5.jar GameServer.Server```
 

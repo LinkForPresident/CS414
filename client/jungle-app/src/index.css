@@ -7,7 +7,7 @@ html body {
 
 .game-buttons {
     list-style-type: none;
-    background-color: transparent;
+    background:rgba(51, 102, 0,0.5);
     /*font family must only contain monospaced fonts*/
     font-family: Courier, Courier New, Lucida Console, Monaco, monospace;
     width: 14%;
@@ -25,7 +25,7 @@ html body {
 }
 
 .availableSpace:hover {
-    background-color: #777777;
+    background:rgb(51, 102, 0);
 }
 
 .notAvailableSpace {
