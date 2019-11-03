@@ -9,7 +9,6 @@
 * Games should be able to be started from a list
 * Games should be able to be created
 * Games should be able to be forfeited
-
 #### Server:
 * Should be able to handle new games
 * Should be able to handle viewing games
@@ -17,13 +16,11 @@
 * Should be able to handle deleting games
 * Should properly interact withAs a user, I would like to be able to create and play games (1) database(s)
 * Should be able to return a list of viewable games
-
 #### Logic:
 * Should be able to handle game creation
 * Should be able to handle giving valid moves
 * Should be able to handle making a move
 * Should be able to handle winning/losing
-
 ### Associated Tasks 
 * #125 GameServer handle forfeit game **(2)**
 * #126 GameServer handle view game list **(2)**
@@ -55,13 +52,11 @@
 #### Logic:
 * Count the number of available legal moves a player has
 * End the game if no moves are available for a player on their turn
-
 ### Associated Tasks
 * #133
 End the game if no moves are available **(1)**
 * #75
 Implement method of detecting when no legal moves are available for the current turn's player **(5)**
-
 ## As a user, I would like to create/delete and login/logout of my user account (2)
 ### Acceptance Criteria:
 #### Client:
@@ -69,13 +64,11 @@ Implement method of detecting when no legal moves are available for the current 
 * Send in user credentials to log in to an existing account
 * Log out of an account
 * Delete an existing account
-
 #### Server:
 * Handle user creation
 * Handle user deletion
 * Handle login requests
 * Handle logout requests
-
 ### Associated Tasks
 * #132 Client handle registering a user **(2)**
 * #134 Client handle user unregistration **(1)**
