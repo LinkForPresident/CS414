@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+
+        table{
+            display:flex-inline;
+            font-size: 12px;
+            height:155px;
+            width: 350px;
+            background-color:gray;
+
+
+        }
+
+        table, td, th {
+            border: 1px solid black;
+
+        }
+
+
+
+        tr{
+            flex-grow: 1;
+        }
+
+        th{
+            background-color: skyblue;
+            width: 100%;
+            height:25px;
+        }
+
+        td{
+            min-width: 50px;
+            max-width: 300px;
+            background-color:white;
+            width: 100%;
+
+        }
+
+        li{
+            margin-left: -20px;
+        }
+
+        div{
+            display:inline-block;
+        }
+
+
+    </style>
+</head>
+<body>
+
+<div>
+    <table>
+        <tr><th colspan="2">Game</th></tr>
+        <tr>
+            <td>
+                <ul>
+                    <li>Maintains Game Board State and Piece Locations</li>
+                    <li>Maintains start and end times for Games</li>
+                    <li>Maintains current Player move info</li>
+                    <li>Calculates if a Player has won and stores this</li>
+                    <li>Sets up default Game State when a new game is created</li>
+                    <li>Handles incoming moves from Server and updates Board State accordingly</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>Move</li>
+                    <li>BoardSquare</li>
+                </ul>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div>
+    <table>
+        <tr><th colspan="2">BoardSquare</th></tr>
+        <tr>
+            <td>
+                <ul>
+                    <li>Maintains environment info</li>
+                    <li>Maintains Environment Info (trap, river, den)</li>
+                    <li>Maintains if tile can be moved as part of a valid move</li>
+                    <li>Calculates if a Player has won and stores this</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>GamePiece</li>
+                </ul>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div>
+    <table>
+        <tr><th colspan="2">Move</th></tr>
+        <tr>
+            <td>
+                <ul>
+                    <li>Updates board square validity based on Game State</li>
+                    <li>Handles movement conditions for each GamePiece</li>
+                    <li>Maintains currently selected piece</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li>Game</li>
+                    <li>BoardSquare</li>
+                </ul>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div>
+    <table>
+        <tr><th colspan="2">GamePiece</th></tr>
+        <tr>
+            <td>
+                <ul>
+                    <li>Updates type of piece</li>
+                    <li>Handles piece color</li>
+                    <li>Maintains pieceId</li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                </ul>
+            </td>
+        </tr>
+    </table>
+</div>
