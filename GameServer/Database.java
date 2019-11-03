@@ -117,8 +117,9 @@ public class Database {
 		for(int i = 1; i<=numberOfColumns; i++){
 			System.out.printf("| %-25s", rsmd.getColumnName(i));
 		}
+		System.out.println("|");
 		for(int i = 1; i<=numberOfColumns; i++){
-			for(int j = 0; j<25; j++){
+			for(int j = 0; j<30; j++){
 				System.out.print("=");
 			}
 		}System.out.println();

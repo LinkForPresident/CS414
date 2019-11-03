@@ -15,7 +15,7 @@ public class Game {
     public String playerTwo;
     public String turn;
     public BoardSquare[][] board = new BoardSquare[9][7];
-    public Move move = new Move(this);
+    public transient Move move = new Move(this);
     public String winner = "";
     public String startTime;
     public String endTime = "";
@@ -24,7 +24,7 @@ public class Game {
 
     GameUtils gameUtils = new GameUtils();
 
-    public Game(String playerOneName, String playerTwoName) throws PlayerNameException{
+    public Game(String playerOneName, String playerTwoName, String gameID) throws PlayerNameException{
 
         if(playerOneName.isEmpty()) {
             throw new PlayerNameException("Player One Name must not be empty!");
@@ -39,7 +39,7 @@ public class Game {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
         startTime = dtf.format(LocalDateTime.now()).toString();
 
-        gameID = new Random(System.currentTimeMillis()).toString();
+        this.gameID = gameID;
         
         playerOne = playerOneName;
         playerTwo = playerTwoName;

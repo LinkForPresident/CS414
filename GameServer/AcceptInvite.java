@@ -2,8 +2,9 @@ package GameServer;
 
 import GameLogic.Game;
 import GameLogic.exception.PlayerNameException;
-
+import java.sql.*;
 import java.util.Iterator;
+import com.google.gson.*;
 
 public class AcceptInvite extends Action {
 
@@ -24,10 +25,34 @@ public class AcceptInvite extends Action {
 				Database.executeDatabaseQuery(acceptInvite);
                 invitesIterator.remove();
                 try {
-                    Game game = new Game(playerOne, playerTwo);
+                    String findMaxGameID = "SELECT MAX(gameID) FROM Game;";
+                    ResultSet resultSet = Database.executeDatabaseQuery(findMaxGameID);
+                    String gameID = "";
+                    if(resultSet.next()){
+                        gameID = resultSet.getString(1);
+                    }
+                    if(gameID == null){
+                        gameID = "0";
+                    }else{
+                        gameID = Integer.toString(Integer.parseInt(gameID) + 1);
+                    }
+                    Terminal.printDebug(String.format("Game ID is: %s", gameID));
+                    Game game = new Game(playerOne, playerTwo, gameID);
+                    Gson gson = new GsonBuilder().create();
+                    String json = gson.toJson(game);
+                    json = json.replace("}", "#");
+                    json = json.replace("{", "%");
+                    json = json.replace("]", "&");
+                    json = json.replace("[", "^");
+                    Terminal.printDebug(String.format("The JSON game object is: %s", json));
+
+                    String saveGame = String.format("INSERT INTO Game VALUES(%d, '%s');", Integer.parseInt(gameID), json);
+                    Database.executeDatabaseQuery(saveGame);
+
                     Server.activeGames.add(game);
                     JSONResponse += "\"gameID\":\"" + game.gameID +"\", ";
-                } catch (PlayerNameException ignored) {
+                } catch (PlayerNameException | SQLException e) {
+                    System.out.println(e);
                 }
                 String playerInvites = "";
                 for (String[] inv : Server.invites) {
