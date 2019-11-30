@@ -359,7 +359,7 @@ export default class App extends React.Component {
                                          loggedIn={this.state.loggedIn}
                                          updateLoginValue={this.updateLoginValue}/>
                         </TabPanel>
-                        <TabPanel><Register users={this.state.users} passwords={this.state.passwords}/></TabPanel>
+                        <TabPanel><Register apiConfig={this.state.apiConfig} handleGeneralRequest={this.handleGeneralRequest}/></TabPanel>
 
                     </Tabs>
                 </div>
