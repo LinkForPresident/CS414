@@ -1,5 +1,11 @@
 package GameServer;
 
+import java.net.*;
+import java.io.*;
+import java.lang.*;
+import java.sql.*;
+import java.util.*;
+
 public class Terminal {
 
     private static final String RESET_TEXT_COLOR = "\u001B[0m";
@@ -40,6 +46,26 @@ public class Terminal {
 
     static void printSuccess(String message){
         System.out.println(SUCCESS_TAG + message);
+    }
+
+    static String executeShellScript(String scriptPath) throws IOException, InterruptedException{
+
+        Terminal.printDebug(String.format("Changing permissions for %s to 775.", scriptPath));
+        Process process = Runtime.getRuntime().exec(String.format("chmod 775 %s", scriptPath));
+        process.waitFor();
+        Terminal.printDebug(String.format("Executing %s.", scriptPath));
+        process = Runtime.getRuntime().exec(scriptPath);
+        process.waitFor();
+        InputStream inputStream = process.getInputStream();
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+        String part = "";
+        String response = "";
+        while((part = bufferedReader.readLine()) != null){
+            response += part;
+        }
+        process.destroy();
+        Terminal.printDebug(String.format("%s response: %s", scriptPath, response));
+        return response;
     }
 
 }

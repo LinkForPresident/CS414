@@ -1,1 +1,1 @@
-curl -X POST -H "token:76ba628673282b42dcfa03f73e537ce1" -H "developerkey":"MTA2M0FGNDUtM0M1QS00ODMyLUFDNDgtOEVBQ0E1Q0JBRUU1" -d '{"wait":"true", "deviceaddress":"'80:00:00:00:01:01:38:E9'"}' http://api.remot3.it/apv/v27/device/connect
+curl -X POST -H "token:755cd9d40cfa79abe4bb75771124a46f" -H "developerkey":"MTA2M0FGNDUtM0M1QS00ODMyLUFDNDgtOEVBQ0E1Q0JBRUU1" -d '{"wait":"true", "deviceaddress":"'80:00:00:00:01:01:38:E9'"}' http://api.remot3.it/apv/v27/device/connect
