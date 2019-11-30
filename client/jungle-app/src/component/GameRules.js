@@ -1,6 +1,6 @@
 import React from "react";
-import CardGroup from "react-bootstrap/CardGroup";
 import Card from "react-bootstrap/Card";
+import CardColumns from "react-bootstrap/CardColumns";
 import CardDeck from "react-bootstrap/CardDeck";
 class GameRules extends React.Component {
     // Static page with description
@@ -12,75 +12,94 @@ class GameRules extends React.Component {
                 <h3>Pieces</h3>
                 <p>Each player has eight pieces, which are different animals, with different degrees of power indicated by number.</p>
 
-
                 <Card className={"pieceDescriptionCard"} bg={"primary"} border={"light"}>
                     <Card.Img variant="top" style={{width: '9em'}} src={require("./images/b1.png")} />
                     <Card.Body>
-                        <Card.Title>Card title</Card.Title>
-                        <Card.Text>This is the card Text</Card.Text>
+                        <Card.Title>Rat</Card.Title>
                     </Card.Body>
                 </Card>
 
                 <Card className={"pieceDescriptionCard"} bg={"primary"} border={"light"}>
                     <Card.Img variant="top" style={{width: '9em'}} src={require("./images/b2.png")} />
                     <Card.Body>
-                        <Card.Title>Card title</Card.Title>
-                        <Card.Text>This is the card Text</Card.Text>
+                        <Card.Title>Cat</Card.Title>
                     </Card.Body>
                 </Card>
-
                 <Card className={"pieceDescriptionCard"} bg={"primary"} border={"light"}>
                     <Card.Img variant="top" style={{width: '9em'}} src={require("./images/b3.png")} />
                     <Card.Body>
-                        <Card.Title>Card title</Card.Title>
-                        <Card.Text>This is the card Text</Card.Text>
+                        <Card.Title>Wolf</Card.Title>
                     </Card.Body>
                 </Card>
 
                 <Card className={"pieceDescriptionCard"} bg={"primary"} border={"light"}>
                     <Card.Img variant="top" style={{width: '9em'}} src={require("./images/b4.png")} />
                     <Card.Body>
-                        <Card.Title>Card title</Card.Title>
-                        <Card.Text>
-                            This is the card Text</Card.Text>
+                        <Card.Title>Dog</Card.Title>
                     </Card.Body>
                 </Card>
-
                 <Card className={"pieceDescriptionCard"} bg={"primary"} border={"light"}>
                     <Card.Img variant="top" style={{width: '9em'}} src={require("./images/b5.png")} />
                     <Card.Body>
-                        <Card.Title>Card title</Card.Title>
-                        <Card.Text>This is the card Text</Card.Text>
+                        <Card.Title>Panther</Card.Title>
                     </Card.Body>
                 </Card>
 
                 <Card className={"pieceDescriptionCard"} bg={"primary"} border={"light"}>
                     <Card.Img variant="top" style={{width: '9em'}} src={require("./images/b6.png")} />
                     <Card.Body>
-                        <Card.Title>Card title</Card.Title>
-                        <Card.Text>This is the card Text</Card.Text>
+                        <Card.Title>Tiger</Card.Title>
                     </Card.Body>
                 </Card>
 
                 <Card className={"pieceDescriptionCard"} bg={"primary"} border={"light"}>
                     <Card.Img variant="top" style={{width: '9em'}} src={require("./images/b7.png")} />
                     <Card.Body>
-                        <Card.Title>Card title</Card.Title>
-                        <Card.Text>This is the card Text</Card.Text>
+                        <Card.Title>Lion</Card.Title>
                     </Card.Body>
                 </Card>
 
                 <Card className={"pieceDescriptionCard"} bg={"primary"} border={"light"}>
                     <Card.Img variant="top" style={{width: '9em'}} src={require("./images/b8.png")} />
                     <Card.Body>
-                        <Card.Title>Card title</Card.Title>
-                        <Card.Text>This is the card Text</Card.Text>
+                        <Card.Title>Elephant</Card.Title>
                     </Card.Body>
                 </Card>
                 <br style={{clear: "left"}}/>
+                <ul>
+                    <li>The rat is the only animal that may go onto a water square, and cannot be killed while in the water.</li>
+                    <li>The rat can capture and Elephant, but only from a land square (not a water tile)</li>
+                </ul>
+
+
+                <h3>Tile Environments</h3>
+                <Card className={"tileDescriptionCard"} bg={"dark"} border={"success"}>
+                    <Card.Img variant="top" style={{width: '9em'}} src={require("./images/trap.png")} />
+                    <Card.Body>
+                        <Card.Title>Trap</Card.Title>
+                        <Card.Text>This is the card Text</Card.Text>
+                    </Card.Body>
+                </Card>
+
+                <Card className={"tileDescriptionCard"} bg={"dark"} border={"success"}>
+                    <Card.Img variant="top" style={{width: '9em'}} src={require("./images/water.png")} />
+                    <Card.Body>
+                        <Card.Title>Trap</Card.Title>
+                        <Card.Text>This is the card Text</Card.Text>
+                    </Card.Body>
+                </Card>
+
+                <Card className={"tileDescriptionCard"} bg={"dark"} border={"success"}>
+                    <Card.Img variant="top" style={{width: '9em'}} src={require("./images/den.png")} />
+                    <Card.Body>
+                        <Card.Title>Trap</Card.Title>
+                        <Card.Text>This is the card Text</Card.Text>
+                    </Card.Body>
+                </Card>
+
 
                 {/*consider removing or modifying the following paragraph*/}
-                <p>The Animals depicted on the pieces shown here are very interesting abstractions. Your set
+                <p style={{clear: "left"}}>The Animals depicted on the pieces shown here are very interesting abstractions. Your set
                     may look like this, or may have the same animals depicted in a different style — and the
                     same animals may be depicted differently on the board as well. You may want to pencil the
                     pieces’ value numbers, 1 through 8, on the underside of each piece, or keep this chart on
