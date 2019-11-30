@@ -1,15 +1,105 @@
 import React from "react";
+import CardGroup from "react-bootstrap/CardGroup";
+import Card from "react-bootstrap/Card";
+import CardDeck from "react-bootstrap/CardDeck";
 class GameRules extends React.Component {
     // Static page with description
     render() {
         return (
             <div className={'GaneRules'}>
-                <p>Rules of the Game of Jungle</p>
+                <h2>Rules of the Game of Jungle</h2>
 
-                <p>Each player has eight pieces, different animals, with different degrees of power. Here are the pieces, their English names, and their relative powers, indicated by number:</p>
+                <h3>Pieces</h3>
+                <p>Each player has eight pieces, which are different animals, with different degrees of power indicated by number.</p>
+                <CardDeck>
+                    <Card bg={"primary"}>
+                        <Card.Img variant="top" src={require("./images/b1.png")} />
+                        <Card.Body>
+                            <Card.Title>Card title</Card.Title>
+                            <Card.Text>
+                                This is the card Text
+                            </Card.Text>
+                        </Card.Body>
+                    </Card>
 
-                <p>the pieces of dou shou qi and their powers (the jungle game or Chinese animal chess)</p>
-                <p>The Animals depicted on the pieces shown here are very interesting abstractions. Your set may look like this, or may have the same animals depicted in a different style — and the same animals may be depicted differently on the board as well. You may want to pencil the pieces’ value numbers, 1 through 8, on the underside of each piece, or keep this chart on hand, to help you become acquainted with the pieces as you play.</p>
+                    <Card>
+                        <Card.Img variant="top" src={require("./images/b2.png")} />
+                        <Card.Body>
+                            <Card.Title>Card title</Card.Title>
+                            <Card.Text>
+                                This is the card Text
+                            </Card.Text>
+                        </Card.Body>
+                    </Card>
+
+                    <Card>
+                        <Card.Img variant="top" src={require("./images/b3.png")} />
+                        <Card.Body>
+                            <Card.Title>Card title</Card.Title>
+                            <Card.Text>
+                                This is the card Text
+                            </Card.Text>
+                        </Card.Body>
+                    </Card>
+
+                    <Card>
+                        <Card.Img variant="top" src={require("./images/b4.png")} />
+                        <Card.Body>
+                            <Card.Title>Card title</Card.Title>
+                            <Card.Text>
+                                This is the card Text
+                            </Card.Text>
+                        </Card.Body>
+                    </Card>
+
+                    <Card>
+                        <Card.Img variant="top" src={require("./images/b5.png")} />
+                        <Card.Body>
+                            <Card.Title>Card title</Card.Title>
+                            <Card.Text>
+                                This is the card Text
+                            </Card.Text>
+                        </Card.Body>
+                    </Card>
+
+                    <Card>
+                        <Card.Img variant="top" src={require("./images/b6.png")} />
+                        <Card.Body>
+                            <Card.Title>Card title</Card.Title>
+                            <Card.Text>
+                                This is the card Text
+                            </Card.Text>
+                        </Card.Body>
+                    </Card>
+
+                    <Card>
+                        <Card.Img variant="top" src={require("./images/b7.png")} />
+                        <Card.Body>
+                            <Card.Title>Card title</Card.Title>
+                            <Card.Text>
+                                This is the card Text
+                            </Card.Text>
+                        </Card.Body>
+                    </Card>
+
+                    <Card>
+                        <Card.Img variant="top" src={require("./images/b8.png")} />
+                        <Card.Body>
+                            <Card.Title>Card title</Card.Title>
+                            <Card.Text>
+                                This is the card Text
+                            </Card.Text>
+                        </Card.Body>
+                    </Card>
+
+                </CardDeck>
+
+                {/*consider removing or modifying the following paragraph*/}
+                <p>The Animals depicted on the pieces shown here are very interesting abstractions. Your set
+                    may look like this, or may have the same animals depicted in a different style — and the
+                    same animals may be depicted differently on the board as well. You may want to pencil the
+                    pieces’ value numbers, 1 through 8, on the underside of each piece, or keep this chart on
+                    hand, to help you become acquainted with the pieces as you play.</p>
 
                 <p>Object of the Game</p>
 
