@@ -20,6 +20,7 @@ export default class App extends React.Component {
         super(props);
         this.updateLoginValue = this.updateLoginValue.bind(this);
         this.updateInvites = this.updateInvites.bind(this);
+        this.updateGames = this.updateGames.bind(this);
         this.setSelectedGame = this.setSelectedGame.bind(this);
         this.ViewGameState = this.ViewGameState.bind(this);
         this.postExample = this.postExample.bind(this);
@@ -38,7 +39,7 @@ export default class App extends React.Component {
         invites: " ",
         gameState:
             {
-                "gameID": "0",
+                "gameID": "2",
                 "playerOne": "Bob",
                 "playerTwo": "Sally",
                 "turn": "Bob",
@@ -133,7 +134,7 @@ export default class App extends React.Component {
 
         // common rest request configuration
         apiConfig:{
-            url:'http://localhost:8080',
+            url:'http://10.0.0.251:8080',
             headers: {
                 'Content-Type': 'application/text',
                 'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
@@ -250,12 +251,12 @@ export default class App extends React.Component {
         });
     }
 
-    ViewGameState() {
+    ViewGameState(gameId) {
         var self = this;
         console.log("calling api for game state...");
         axios.post(
             this.state.apiConfig.url,
-            "action=ViewGame&gameID=" + this.state.gameState.gameID + "&username=" + this.state.username + "&password=" + this.state.password,
+            "action=ViewGame&gameID=" + gameId + "&username=" + this.state.username + "&password=" + this.state.password,
             {headers: this.state.apiConfig.headers}
         ).then(function (response) {
             console.log(response.data);
@@ -267,36 +268,40 @@ export default class App extends React.Component {
         console.log("Game State set.")
     }
 
+    async getGames(url, payload, headers) {
+        console.log("making request to the server for player games");
+        let resp = await axios.post(url,
+            payload,
+            headers,
+        )
+            .then(function (response) {
+                    console.log(response);
+                    return response;
+                }
+            )
+            .catch();
+        return resp.data;
+    }
+
+    updateGames(games) {
+    this.setState({
+        activeGames: games
+    });
+
+}
 
     setSelectedGame(e) {
-        console.log("making request to the server for game");
+        console.log("setSelectedGame: " + e.target.value);
         this.setState({
             selectedGame: e.target.value
         });
+        this.setState({
+            gameID: e.target.value
+        });
+
+
         this.ViewGameState(e.target.value);
     }
-
-    // handleLogin(username, password) {
-    //     var self = this;
-    //     console.log("calling api for game state...");
-    //     axios.post(
-    //
-    //         'http://localhost:8080',
-    //
-    //         "action=Login&username=" + username + "&password=" + password,
-    //         {
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //                 'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH',
-    //             }
-    //         }
-    //     ).then(function (response) {
-    //         // const loggedIn = response.data.loggedIn;
-    //         self.setState({
-    //             loggedIn: response.data
-    //         })
-    //     })
-    // }
 
     render() {
         // This section should be reserved for rendering pagewide components, complex code should be factored into child components, or new components.
@@ -315,12 +320,17 @@ export default class App extends React.Component {
                         <TabPanel><Home/></TabPanel>
 
                         <TabPanel>
-                            {/*<Games*/}
-                            {/*    activeGames={this.state.activeGames}*/}
-                            {/*    completedGames={this.state.completedGames}*/}
-                            {/*    setSelectedGame={this.setSelectedGame}*/}
-                            {/*    loggedIn={this.state.loggedIn}*/}
-                            {/*/>*/}
+                            <Games
+                                activeGames={this.state.activeGames}
+                                setSelectedGame={this.setSelectedGame}
+                                loggedIn={this.state.loggedIn}
+                                apiConfig={this.state.apiConfig}
+                                handleGeneralRequest={this.handleGeneralRequest}
+                                username={this.state.username}
+                                password={this.state.password}
+                                getGames={this.getGames}
+                                updateGames={this.updateGames}
+                            />
                             <h1>Jungle Game #{this.state.gameState.gameID}</h1>
                             <Board selectedGame={this.state.selectedGame}
                                    gameState={this.state.gameState}

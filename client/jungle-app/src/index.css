@@ -10,7 +10,7 @@ h1, h2, h3, h4 {
 }
 
 .pieceDescriptionCard {
-    width: 20em;
+    width: 18em;
     align-items: center;
     float: left;
     margin: 1em;
@@ -19,7 +19,7 @@ h1, h2, h3, h4 {
 
 
 .tileDescriptionCard {
-    width: 20em;
+    width: 18em;
     align-items: center;
     float: left;
     margin: 1em;

@@ -11,7 +11,7 @@ class Board extends React.Component {
     }
     componentDidMount() {
         // console.log
-        this.props.ViewGameState();
+        this.props.ViewGameState(this.props.gameState.gameID);
     }
 
     // Constructing the board involves mapping the 2 dimensional array into "Squares" where piece, and environment logic and display specifics exist.
