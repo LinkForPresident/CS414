@@ -11,88 +11,73 @@ class GameRules extends React.Component {
 
                 <h3>Pieces</h3>
                 <p>Each player has eight pieces, which are different animals, with different degrees of power indicated by number.</p>
-                <CardDeck>
-                    <Card bg={"primary"}>
-                        <Card.Img variant="top" src={require("./images/b1.png")} />
-                        <Card.Body>
-                            <Card.Title>Card title</Card.Title>
-                            <Card.Text>
-                                This is the card Text
-                            </Card.Text>
-                        </Card.Body>
-                    </Card>
 
-                    <Card>
-                        <Card.Img variant="top" src={require("./images/b2.png")} />
-                        <Card.Body>
-                            <Card.Title>Card title</Card.Title>
-                            <Card.Text>
-                                This is the card Text
-                            </Card.Text>
-                        </Card.Body>
-                    </Card>
 
-                    <Card>
-                        <Card.Img variant="top" src={require("./images/b3.png")} />
-                        <Card.Body>
-                            <Card.Title>Card title</Card.Title>
-                            <Card.Text>
-                                This is the card Text
-                            </Card.Text>
-                        </Card.Body>
-                    </Card>
+                <Card className={"pieceDescriptionCard"} bg={"primary"} border={"light"}>
+                    <Card.Img variant="top" style={{width: '9em'}} src={require("./images/b1.png")} />
+                    <Card.Body>
+                        <Card.Title>Card title</Card.Title>
+                        <Card.Text>This is the card Text</Card.Text>
+                    </Card.Body>
+                </Card>
 
-                    <Card>
-                        <Card.Img variant="top" src={require("./images/b4.png")} />
-                        <Card.Body>
-                            <Card.Title>Card title</Card.Title>
-                            <Card.Text>
-                                This is the card Text
-                            </Card.Text>
-                        </Card.Body>
-                    </Card>
+                <Card className={"pieceDescriptionCard"} bg={"primary"} border={"light"}>
+                    <Card.Img variant="top" style={{width: '9em'}} src={require("./images/b2.png")} />
+                    <Card.Body>
+                        <Card.Title>Card title</Card.Title>
+                        <Card.Text>This is the card Text</Card.Text>
+                    </Card.Body>
+                </Card>
 
-                    <Card>
-                        <Card.Img variant="top" src={require("./images/b5.png")} />
-                        <Card.Body>
-                            <Card.Title>Card title</Card.Title>
-                            <Card.Text>
-                                This is the card Text
-                            </Card.Text>
-                        </Card.Body>
-                    </Card>
+                <Card className={"pieceDescriptionCard"} bg={"primary"} border={"light"}>
+                    <Card.Img variant="top" style={{width: '9em'}} src={require("./images/b3.png")} />
+                    <Card.Body>
+                        <Card.Title>Card title</Card.Title>
+                        <Card.Text>This is the card Text</Card.Text>
+                    </Card.Body>
+                </Card>
 
-                    <Card>
-                        <Card.Img variant="top" src={require("./images/b6.png")} />
-                        <Card.Body>
-                            <Card.Title>Card title</Card.Title>
-                            <Card.Text>
-                                This is the card Text
-                            </Card.Text>
-                        </Card.Body>
-                    </Card>
+                <Card className={"pieceDescriptionCard"} bg={"primary"} border={"light"}>
+                    <Card.Img variant="top" style={{width: '9em'}} src={require("./images/b4.png")} />
+                    <Card.Body>
+                        <Card.Title>Card title</Card.Title>
+                        <Card.Text>
+                            This is the card Text</Card.Text>
+                    </Card.Body>
+                </Card>
 
-                    <Card>
-                        <Card.Img variant="top" src={require("./images/b7.png")} />
-                        <Card.Body>
-                            <Card.Title>Card title</Card.Title>
-                            <Card.Text>
-                                This is the card Text
-                            </Card.Text>
-                        </Card.Body>
-                    </Card>
+                <Card className={"pieceDescriptionCard"} bg={"primary"} border={"light"}>
+                    <Card.Img variant="top" style={{width: '9em'}} src={require("./images/b5.png")} />
+                    <Card.Body>
+                        <Card.Title>Card title</Card.Title>
+                        <Card.Text>This is the card Text</Card.Text>
+                    </Card.Body>
+                </Card>
 
-                    <Card>
-                        <Card.Img variant="top" src={require("./images/b8.png")} />
-                        <Card.Body>
-                            <Card.Title>Card title</Card.Title>
-                            <Card.Text>
-                                This is the card Text
-                            </Card.Text>
-                        </Card.Body>
-                    </Card>
+                <Card className={"pieceDescriptionCard"} bg={"primary"} border={"light"}>
+                    <Card.Img variant="top" style={{width: '9em'}} src={require("./images/b6.png")} />
+                    <Card.Body>
+                        <Card.Title>Card title</Card.Title>
+                        <Card.Text>This is the card Text</Card.Text>
+                    </Card.Body>
+                </Card>
 
-                </CardDeck>
+                <Card className={"pieceDescriptionCard"} bg={"primary"} border={"light"}>
+                    <Card.Img variant="top" style={{width: '9em'}} src={require("./images/b7.png")} />
+                    <Card.Body>
+                        <Card.Title>Card title</Card.Title>
+                        <Card.Text>This is the card Text</Card.Text>
+                    </Card.Body>
+                </Card>
+
+                <Card className={"pieceDescriptionCard"} bg={"primary"} border={"light"}>
+                    <Card.Img variant="top" style={{width: '9em'}} src={require("./images/b8.png")} />
+                    <Card.Body>
+                        <Card.Title>Card title</Card.Title>
+                        <Card.Text>This is the card Text</Card.Text>
+                    </Card.Body>
+                </Card>
+                <br style={{clear: "left"}}/>
 
                 {/*consider removing or modifying the following paragraph*/}
                 <p>The Animals depicted on the pieces shown here are very interesting abstractions. Your set

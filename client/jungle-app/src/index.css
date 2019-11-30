@@ -9,6 +9,13 @@ h1, h2, h3, h4 {
     text-align: center;
 }
 
+.pieceDescriptionCard {
+    width: 15em;
+    align-items: center;
+    float: left;
+    margin: 1em;
+}
+
 .game-buttons {
     list-style-type: none;
     background:rgba(51, 102, 0,0.5);
