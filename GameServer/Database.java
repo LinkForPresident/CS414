@@ -15,8 +15,8 @@ public class Database {
     private static String PROXY_ADDRESS = "jdbc:mariadb://proxy19.rt3.io:39136/cs414";
     private static final String DB_USERNAME = "user";
     private static final String DB_PASSWORD = "the_password_123";
-    private static String devAPIKey = "MTA2M0FGNDUtM0M1QS00ODMyLUFDNDgtOEVBQ0E1Q0JBRUU1";
-    private static String deviceAddress = "80:00:00:00:01:01:38:E9";
+    private static String DEV_API_KEY = "MTA2M0FGNDUtM0M1QS00ODMyLUFDNDgtOEVBQ0E1Q0JBRUU1";
+    private static String DEVICE_ADDRESS = "80:00:00:00:01:01:38:E9";
     
     protected Database(){
     
@@ -24,61 +24,110 @@ public class Database {
     
     static void establishDatabaseProxyAddress() throws IOException, InterruptedException, ClassNotFoundException, SQLException {
 
+        if(!canConnect()){
+            Terminal.printWarning("Using the existing proxy server address failed.");
+            Terminal.printInfo("Executing curl commands to retrieve new proxy server address.");
+            updateProxyAddress();
+
+            if(!canConnect()){
+                Terminal.printError("Establishing the database proxy address failed.");
+                throw new SQLException();
+            }
+            else{
+                Terminal.printSuccess("The database proxy address has been successfully updated.");
+            }
+        }
+        else{
+            Terminal.printDebug("Using the existing proxy server address was successful.");
+        }
+    }
+
+    static boolean canConnect() throws ClassNotFoundException{
+
         try {
-            Terminal.printDebug("Attempting to connect to remote database with existing proxy server address.");
+            Terminal.printDebug("Attempting to connect to remote database with the current proxy server address.");
             Class.forName(JDBC_DRIVER); // register the JDBC driver.
             DriverManager.getConnection(
                     PROXY_ADDRESS, DB_USERNAME, DB_PASSWORD); // Open a connection to the database.
-            Terminal.printSuccess("Using the existing proxy server address was successful.");
-            return;
-        }catch(SQLNonTransientConnectionException sql){
-            Terminal.printWarning("Using the existing proxy server address failed; executing curl commands to " +
-                    "retrieve new proxy server address.");
+            return true;
+        }catch(SQLException sql){
+            return false;
         }
-        Process process = Runtime.getRuntime().exec("GameServer/getSessionToken.sh");
-        process.waitFor();
-        InputStream inputStream = process.getInputStream();
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-        String part = "";
-        String response = "";
-        while((part = bufferedReader.readLine()) != null){
-            response += part;
+
+    }
+
+    static String getSessionToken() throws IOException, InterruptedException{
+
+        String response = Terminal.executeShellScript("GameServer/getSessionToken.sh");
+        String sessionToken = parseGetSessionTokenResponse(response);
+        return sessionToken;
+
+    }
+
+
+    static String parseGetSessionTokenResponse(String response){
+
+        String sessionToken;
+        try {
+            sessionToken = response.split(":")[2].replace("\"", "").split(",")[0];
+        }catch(NullPointerException e){
+            Terminal.printError("Encountered an error while parsing the response for the session token.");
+            throw new NullPointerException();
         }
-		Terminal.printDebug("getSessionToken.sh response: " + response);
-        String sessionToken = response.split(":")[2].replace("\"", "").split(",")[0];
         Terminal.printDebug(String.format("Parsed remote proxy session token: %s", sessionToken));
+        return sessionToken;
+    }
+
+
+    static void updateProxyAddress() throws IOException, InterruptedException{
+
+        String sessionToken = getSessionToken();
+        String scriptPath = writeGetProxyAddressFile(sessionToken);
+        String response = Terminal.executeShellScript(scriptPath);
+        String proxyAddress = parseGetProxyAddressResponse(response);
+        PROXY_ADDRESS = String.format("jdbc:mariadb://%s/cs414", proxyAddress);
+        Terminal.printDebug(String.format("Parsed remote proxy database address: %s", PROXY_ADDRESS));
+
+    }
+
+    static String writeGetProxyAddressFile(String sessionToken) throws IOException{
 
         String getProxyAddress = String.format("curl -X POST -H \"token:%s\" -H \"developerkey\":\"%s\" " +
-                "-d \'{\"wait\":\"true\", \"deviceaddress\":\"\'%s\'\"}' http://api.remot3.it/apv/v27/device/connect",
-                sessionToken, devAPIKey, deviceAddress);
-        Terminal.printDebug(getProxyAddress);
+                        "-d \'{\"wait\":\"true\", \"deviceaddress\":\"\'%s\'\"}' http://api.remot3.it/apv/v27/device/connect",
+                sessionToken, DEV_API_KEY, DEVICE_ADDRESS);
 
+        Terminal.printDebug("Writing new getProxyAddress.sh.");
         FileWriter fileWriter = new FileWriter("GameServer/getProxyAddress.sh");
-        fileWriter.write(getProxyAddress);
+        try {
+            fileWriter.write(getProxyAddress);
+        }catch(IOException e){
+            Terminal.printError("Encountered an error while attempting to write the getProxyAddress.sh file.");
+            fileWriter.close();
+            throw new IOException();
+        }
         fileWriter.close();
-        process = Runtime.getRuntime().exec("chmod 775 GameServer/getProxyAddress.sh");
-        process.waitFor();
-        process = Runtime.getRuntime().exec("GameServer/getProxyAddress.sh");
-        process.waitFor();
+        return "GameServer/getProxyAddress.sh";
 
-        inputStream = process.getInputStream();
-        bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-        response = "";
-        while((part = bufferedReader.readLine()) != null){
-            response += part;
-        }
-        process.destroy();
-        Terminal.printDebug("getProxyAddress.sh response: " + response);
-        String[] components = response.split(",");
-        for(String component: components){
-            if(component.contains("\"proxy\"")){
-                PROXY_ADDRESS = component.replace("\\", "").replace("\"", "")
-                        .split("proxy:")[1].replace("http://", "");
-                break;
+    }
+
+
+    static String parseGetProxyAddressResponse(String response){
+
+        String proxyAddress = "";
+        try {
+            String[] components = response.split(",");
+            for (String component : components) {
+                if (component.contains("\"proxy\"")) {
+                    proxyAddress = component.replace("\\", "").replace("\"", "")
+                            .split("proxy:")[1].replace("http://", "");
+                    break;
+                }
             }
+        }catch(NullPointerException e){
+            Terminal.printError("Encountered an error while parsing the response for the proxy address.");
         }
-        PROXY_ADDRESS = "jdbc:mariadb://" + PROXY_ADDRESS + "/cs414";
-        Terminal.printDebug(String.format("Parsed remote proxy database address: ", PROXY_ADDRESS));
+        return proxyAddress;
+
     }
     
     static ResultSet executeDatabaseQuery(String query){
