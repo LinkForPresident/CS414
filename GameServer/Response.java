@@ -27,14 +27,14 @@ public class Response {
     }
 
     static String formatViewUserGamesResponse(String username, ArrayList<String> gameIds) {
-        String JSONResponse = "{\"username\": \"" + username + "\", \"activeGames\": {";
+        String JSONResponse = "{\"username\": \"" + username + "\", \"activeGames\": [";
         for(int i = 0; i<gameIds.size(); i++) {
             JSONResponse += "\"" + gameIds.get(i) +"\"";
             if(i < gameIds.size()-1) {
                 JSONResponse += ",";
             }
         }
-        return JSONResponse + "}}";
+        return JSONResponse + "]}";
     }
 
     static String formatGameResponse(Game game){

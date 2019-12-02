@@ -11,39 +11,41 @@ class Games extends React.Component {
 
     }
 
+    async getGames(url, payload, headers){
+        // event.preventDefault();
+        this.props.getGames(url, payload, headers)
+            .then(response =>
+                this.props.updateGames(response.activeGames)
+                // console.log("GET GAMES RESPONSE: " + response.activeGames)
+            );
+    }
+
+    componentDidMount() {
+        // console.log
+        this.getGames(this.props.apiConfig.url, "action=ViewUserGames&username=" + this.props.username + "&password=" + this.props.password, this.props.apiConfig.headers)
+    }
+
+
     render() {
         // This is where active and inactive games can be chosen for either viewing or playing.
-        if (this.props.loggedIn) {
 
-            const activeGamesList = this.state.activeGames.map((game) =>
-                <li className={'list-group-item list-group-item-dark'}>
-                    <Button onClick={this.props.setSelectedGame} value={game}
-                    >
+            const activeGamesList = this.props.activeGames.map((game) =>
+                    <Button onClick={this.props.setSelectedGame} value={game}>
                         Game Id: {game}
-                    </Button> request json</li>);
-            const completedGamesList = this.state.completedGames.map((game) =>
-                <li className={'list-group-item list-group-item-dark'}>
-                    <Button onClick={this.props.setSelectedGame} value={game}
-                    >
-                        Game Id: {game}
-                    </Button> request json</li>);
+                    </Button>);
             return (
                 <div className={'GamesPage'}>
                     <h2>Active Games</h2>
                     <ul className={'list-group list-group-horizontal'}>
                         {activeGamesList}
                     </ul>
-                    <h2>Completed Games</h2>
-                    <ul className={'list-group list-group-horizontal'}>
-                        {completedGamesList}
-                    </ul>
+                    {/*<h2>Completed Games</h2>*/}
+                    {/*<ul className={'list-group list-group-horizontal'}>*/}
+                    {/*    {completedGamesList}*/}
+                    {/*</ul>*/}
 
                 </div>
             )
-        }
-        else {
-            return("");
-        }
     }
 }
 

@@ -2,7 +2,7 @@ import React from 'react';
 class Register extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {username: '', password: '', users: this.props.users, passwords: this.props.passwords};
+        this.state = {username: '', password: ''};
 
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
@@ -17,23 +17,22 @@ class Register extends React.Component {
         this.setState({password: event.target.value});
     }
 
-    handleSubmit(event) {
+    async handleSubmit(event, url, payload, headers) {
         event.preventDefault();
-        // let users = this.state.users;
-        // let passwords = this.state.passwords;
-        this.state.users.add(this.state.username);
-        this.state.passwords.add(this.state.password);
-        event.preventDefault();
+        this.props.handleGeneralRequest(event, url, payload, headers)
     }
 
     render() {
         return (
-            <form onSubmit={this.handleSubmit}>
+            <form onSubmit={(e) => this.handleSubmit(e, this.props.apiConfig.url,
+                "action=Register&username=" + this.state.username + "&password=" + this.state.password,
+                this.props.apiConfig.headers)}>
                 <label>
                     Name:
                     <input type="text" value={this.state.username} onChange={this.handleNameChange} />
                     Password:
                     <input type="password" value={this.state.password} onChange={this.handlePasswordChange} />
+                    <input type="text" hidden />
                 </label>
                 <input type="submit" value="Submit" />
             </form>
