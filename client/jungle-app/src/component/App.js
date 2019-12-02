@@ -331,7 +331,7 @@ export default class App extends React.Component {
                                 getGames={this.getGames}
                                 updateGames={this.updateGames}
                             />
-                            <h1>Jungle Game #{this.state.gameState.gameID}</h1>
+                            {this.state.gameState.gameID != null ? <h1 style={{textAlign: 'left'}}>Jungle Game #{this.state.gameState.gameID} VS {this.state.username === this.state.gameState.playerOne ? this.state.gameState.playerTwo: this.state.gameState.playerOne } </h1>: <h1 style={{textAlign: 'left'}}>Select a Game</h1>}
                             <Board selectedGame={this.state.selectedGame}
                                    gameState={this.state.gameState}
                                    postExample={this.postExample}

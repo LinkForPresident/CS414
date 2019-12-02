@@ -23,6 +23,7 @@ class Square extends React.Component {
             <button
                 id={this.props.row + "," + this.props.column}
                 value={this.props.row + "," + this.props.column}
+                // disabled={!this.props.available}
                 className={"game-buttons " + (this.props.available ? "availableSpace" : "notAvailableSpace")}
                 onClick={() => {
                     this.props.postExample("action=MovePiece&gameID=" + this.props.gameID + "&username=" + this.props.username + "&password=" + this.props.password + "&row=" + this.props.row + "&column=" + this.props.column)
