@@ -166,10 +166,13 @@ public class Database {
     }
     
     public static void main(String[] args) throws SQLException{
+        String query;
 		if(args.length > 0 && args[0].equals("--debug")){
-				Server.debugMode = true;
-			}
-		String query = args[1];
+            Server.debugMode = true;
+            query = args[1];
+        }else {
+            query = args[0];
+        }
 		Terminal.printInfo(String.format("The following SQL query will be executed: \"%s\".", query));
 		ResultSet resultSet = executeDatabaseQuery(query);
 		ResultSetMetaData rsmd = resultSet.getMetaData();
