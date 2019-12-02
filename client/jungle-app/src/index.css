@@ -16,8 +16,6 @@ h1, h2, h3, h4 {
     margin: 1em;
 }
 
-
-
 .tileDescriptionCard {
     width: 18em;
     align-items: center;
@@ -116,4 +114,9 @@ h1, h2, h3, h4 {
     background: #C9D845;
     border-radius: 5px 5px 0 0;
     color: #1E4D2B;
+}
+
+.GameRules {
+    font-size: 1.2em;
+    margin: 10px;
 }
