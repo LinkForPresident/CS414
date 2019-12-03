@@ -44,89 +44,7 @@ export default class App extends React.Component {
                 "playerTwo": "Sally",
                 "turn": "Bob",
                 "turnNumber": 0,
-                "board": [
-                    [
-                        {"environment": null, "piece": "r7", "available": false},
-                        {"environment": null, "piece": null, "available": false},
-                        {"environment": "trap", "piece": null, "available": false},
-                        {"environment": "den", "piece": null, "available": false},
-                        {"environment": "trap", "piece": null, "available": false},
-                        {"environment": null," piece": null, "available": false},
-                        {"environment": null," piece": "r6", "available": false}
-                    ],
-                    [
-                        {"environment": null, "piece": null, "available": false},
-                        {"environment": null, "piece": "r4", "available": false},
-                        {"environment": null, "piece": null, "available": false},
-                        {"environment": "trap", "piece": null, "available": false},
-                        {"environment": null, "piece": null, "available": false},
-                        {"environment": null, "piece": "r2", "available": false},
-                        {"environment": null, "piece": null, "available": false}
-                    ],
-                    [
-                        {"environment": null, "piece": "r1", "available": false},
-                        {"environment": null, "piece": null, "available": false},
-                        {"environment": null, "piece": "r5", "available": false},
-                        {"environment": null, "piece": null, "available": false},
-                        {"environment": null, "piece": "r3", "available": false},
-                        {"environment": null, "piece": null, "available": false},
-                        {"environment": null, "piece": "r8", "available": false}
-                    ],
-                    [
-                        {"environment": null, "piece": null, "available": false},
-                        {"environment": "water", "piece": null, "available": false},
-                        {"environment": "water", "piece": null, "available": false},
-                        {"environment": null, "piece": null, "available": false},
-                        {"environment": "water", "piece": null, "available": false},
-                        {"environment": "water", "piece": null, "available": false},
-                        {"environment": null, "piece": null, "available": false}
-                    ],
-                    [
-                        {"environment": null, "piece": null, "available": false},
-                        {"environment": "water", "piece": null, "available": false},
-                        {"environment": "water", "piece": null, "available": false},
-                        {"environment": null, "piece": null, "available": false},
-                        {"environment": "water", "piece": null, "available": false},
-                        {"environment": "water", "piece": null, "available": false},
-                        {"environment": null, "piece": null, "available": false}
-                    ],
-                    [
-                        {"environment": null, "piece": null, "available": false},
-                        {"environment": "water", "piece": null, "available": false},
-                        {"environment": "water", "piece": null, "available": false},
-                        {"environment": null, "piece": null, "available": false},
-                        {"environment": "water", "piece": null, "available": false},
-                        {"environment": "water", "piece": null, "available": false},
-                        {"environment": null, "piece": null, "available": false}
-                    ],
-                    [
-                        {"environment": null, "piece": "b8", "available": false},
-                        {"environment": null, "piece": null, "available": true},
-                        {"environment": null, "piece": "b3", "available": false},
-                        {"environment": null, "piece": null, "available": false},
-                        {"environment": null, "piece": "b5", "available": false},
-                        {"environment": null, "piece": null, "available": false},
-                        {"environment": null, "piece": "b1", "available": false}
-                    ],
-                    [
-                        {"environment": null, "piece": null, "available": true},
-                        {"environment": null, "piece": "b2", "available": true},
-                        {"environment": null, "piece": null, "available": true},
-                        {"environment": "trap", "piece": null, "available": false},
-                        {"environment": null, "piece": null, "available": false},
-                        {"environment": null, "piece": "b4", "available": false},
-                        {"environment": null, "piece": null, "available": false}
-                    ],
-                    [
-                        {"environment": null, "piece": "b6", "available": false},
-                        {"environment": null, "piece": null, "available": true},
-                        {"environment": "trap", "piece": null, "available": false},
-                        {"environment": "den", "piece": null, "available": false},
-                        {"environment": "trap", "piece": null, "available": false},
-                        {"environment": null, "piece": null, "available": false},
-                        {"environment": null, "piece": "b7", "available": false}
-                    ]
-                ],
+                "board": null,
                 "winner": "",
                 "startTime": "",
                 "endTime": ""
@@ -320,6 +238,7 @@ export default class App extends React.Component {
                         <TabPanel><Home/></TabPanel>
 
                         <TabPanel>
+                            {this.state.gameState.gameID != null ? <h1 style={{textAlign: 'left'}}>Jungle Game #{this.state.gameState.gameID} VS {this.state.username === this.state.gameState.playerOne ? this.state.gameState.playerTwo: this.state.gameState.playerOne } </h1>: <h1 style={{textAlign: 'left'}}>Select a Game</h1>}
                             <Games
                                 activeGames={this.state.activeGames}
                                 setSelectedGame={this.setSelectedGame}
@@ -331,7 +250,6 @@ export default class App extends React.Component {
                                 getGames={this.getGames}
                                 updateGames={this.updateGames}
                             />
-                            {this.state.gameState.gameID != null ? <h1 style={{textAlign: 'left'}}>Jungle Game #{this.state.gameState.gameID} VS {this.state.username === this.state.gameState.playerOne ? this.state.gameState.playerTwo: this.state.gameState.playerOne } </h1>: <h1 style={{textAlign: 'left'}}>Select a Game</h1>}
                             <Board selectedGame={this.state.selectedGame}
                                    gameState={this.state.gameState}
                                    postExample={this.postExample}
@@ -350,7 +268,7 @@ export default class App extends React.Component {
                                           password={this.state.password}
                                           handleDeclineInvite={this.handleDeclineInvite}
                                           updateInvites={this.updateInvites}/></TabPanel>
-                        <TabPanel><User Logout={this.Logout}/></TabPanel>
+                        <TabPanel><User Logout={this.Logout} username={this.state.username}/></TabPanel>
                     </Tabs>
                 </div>
             )
