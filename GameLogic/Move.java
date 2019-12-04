@@ -112,10 +112,14 @@ public class Move {
     }
 
     private boolean canCaptureUnit(int row, int col) {
-        // returns true if the piece at row, col has a lesser or equal power (or row, col is a trap) to the piece at selectedRow, SelectedCol
+        // returns true if the piece at target row, col has a lesser or equal power (or row, col is a friendly trap) to the piece in the selectedSquare
+        // will not return true if the piece is in an enemy trap
+        // will not return true if the rat in the water would capture the elephant
+        // will not return true if a piece on land would capture a piece in the water
         return ((selectedSquare.gamePiece.power >= game.board[row][col].gamePiece.power) || isFriendlyTrap(row, col) || isRat(selectedSquare.row, selectedSquare.col) && isElephant(row, col))
-                && (!game.board[row][col].environment.equals("water") || isRat(selectedSquare.row, selectedSquare.col))
-                && !isEnemyTrap(selectedSquare.row, selectedSquare.col);
+                && !isEnemyTrap(selectedSquare.row, selectedSquare.col)
+                && (!game.board[selectedSquare.row][selectedSquare.col].environment.equals("water") || isRat(row, col))
+                && !(!game.board[selectedSquare.row][selectedSquare.col].environment.equals("water") && game.board[row][col].environment.equals("water"));
     }
 
     private boolean isLionOrTiger(int row, int col){

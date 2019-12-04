@@ -22,7 +22,7 @@ How to set up workspace:
 
 # Running The Client
 
-* From the cs414-f18-001-Team.name root folder, execute 1 command:
+* From the cs414-f18-001-Team.name root folder, execute 1 command (in a separate terminal from the server):
 
 ```npm install --prefix client/jungle-app/ && npm start --prefix client/jungle-app/```
 
