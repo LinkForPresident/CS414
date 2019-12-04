@@ -78,7 +78,7 @@ public class Server {
         Gson gson = new GsonBuilder().create();
         Game game = gson.fromJson(json, Game.class);
         game.move = new Move(game);
-        if (game.winner.equals(""))
+//        if (game.winner.equals(""))
             activeGames.add(game);
     }
 
