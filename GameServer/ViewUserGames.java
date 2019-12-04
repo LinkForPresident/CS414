@@ -17,7 +17,7 @@ public class ViewUserGames extends Action {
         String JSONResponse = "";
         ArrayList<String>  gameIdList = new ArrayList<String>();
         for(Game game : Server.activeGames){
-            if(game.playerOne.equals(username) || game.playerTwo.equals(username) && (game.winner == "")){
+            if((game.playerOne.equals(username) || game.playerTwo.equals(username)) && (game.winner.length() <= 0)){
                 gameIdList.add(game.gameID);
             }
         }
