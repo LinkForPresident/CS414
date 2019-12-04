@@ -15,7 +15,7 @@ class Games extends React.Component {
         // event.preventDefault();
         this.props.getGames(url, payload, headers)
             .then(response =>
-                this.props.updateGames(response.activeGames)
+                this.props.updateActiveGames(response.activeGames)
                 // console.log("GET GAMES RESPONSE: " + response.activeGames)
             );
     }

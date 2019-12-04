@@ -20,7 +20,8 @@ export default class App extends React.Component {
         super(props);
         this.updateLoginValue = this.updateLoginValue.bind(this);
         this.updateInvites = this.updateInvites.bind(this);
-        this.updateGames = this.updateGames.bind(this);
+        this.updateActiveGames = this.updateActiveGames.bind(this);
+        this.updateCompletedGames = this.updateCompletedGames.bind(this);
         this.setSelectedGame = this.setSelectedGame.bind(this);
         this.ViewGameState = this.ViewGameState.bind(this);
         this.postExample = this.postExample.bind(this);
@@ -283,9 +284,16 @@ export default class App extends React.Component {
         return resp.data;
     }
 
-    updateGames(games) {
+    updateActiveGames(games) {
     this.setState({
         activeGames: games
+    });
+
+}
+
+    updateCompletedGames(games) {
+    this.setState({
+        completedGames: games
     });
 
 }
@@ -329,7 +337,7 @@ export default class App extends React.Component {
                                 username={this.state.username}
                                 password={this.state.password}
                                 getGames={this.getGames}
-                                updateGames={this.updateGames}
+                                updateActiveGames={this.updateActiveGames}
                             />
                             <h1>Jungle Game #{this.state.gameState.gameID}</h1>
                             <Board selectedGame={this.state.selectedGame}
@@ -342,7 +350,16 @@ export default class App extends React.Component {
                             />
                         </TabPanel>
                         <TabPanel><GameRules/></TabPanel>
-                        <TabPanel><History /></TabPanel>
+                        <TabPanel><History
+                                completedGames={this.state.completedGames}
+                                loggedIn={this.state.loggedIn}
+                                apiConfig={this.state.apiConfig}
+                                handleGeneralRequest={this.handleGeneralRequest}
+                                username={this.state.username}
+                                password={this.state.password}
+                                getGames={this.getGames}
+                                updateCompletedGames={this.updateCompletedGames}
+                        /></TabPanel>
                         <TabPanel><Invite apiConfig={this.state.apiConfig} handleGeneralRequest={this.handleGeneralRequest}
                                           handleAcceptInvite={this.handleAcceptInvite}
                                           invites={this.state.invites}
