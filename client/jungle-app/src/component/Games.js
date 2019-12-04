@@ -30,12 +30,11 @@ class Games extends React.Component {
         // This is where active and inactive games can be chosen for either viewing or playing.
 
             const activeGamesList = this.props.activeGames.map((game) =>
-                    <Button onClick={this.props.setSelectedGame} value={game}>
+                    <button style={{margin:'.5em'}} onClick={this.props.setSelectedGame} value={game}>
                         Game Id: {game}
-                    </Button>);
+                    </button>);
             return (
                 <div className={'GamesPage'}>
-                    <h2>Active Games</h2>
                     <ul className={'list-group list-group-horizontal'}>
                         {activeGamesList}
                     </ul>
