@@ -37,6 +37,24 @@ public class Response {
         return JSONResponse + "]}";
     }
 
+
+    static String formatViewGameHistoryResponse(String username, ArrayList<String> gameIds) {
+        String JSONResponse = "{\"username\": \"" + username + "\", \"completedGames\": [";
+        for(int i = 0; i<gameIds.size(); i++) {
+
+            for(Game game : Server.activeGames) {
+                if (gameIds.get(i).equals(game.gameID)){
+                    JSONResponse += "\"" + game.gameID + "$" + game.startTime + "$" +  game.endTime + "$" + game.playerOne + "$" + game.playerTwo + "$" + game.winner +"\"";
+                }
+            }
+            if(i < gameIds.size()-1) {
+                JSONResponse += ",";
+            }
+        }
+        return JSONResponse + "]}";
+    }
+
+
     static String formatGameResponse(Game game){
         String JSONResponse = "";
         String boardJSON = formatBoardArrayResponse(game.board);
