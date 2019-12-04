@@ -109,11 +109,6 @@ public class Game {
                 move.updateValidTiles();
                 return true;
             }
-            else {
-                move.selectedSquare = board[row][col];
-                move.updateValidTiles();
-                return true;
-            }
         }
         return false;
     }

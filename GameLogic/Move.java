@@ -96,7 +96,7 @@ public class Move {
     boolean isFriendlyUnit(int row, int col){
         // returns true if the game piece at row, col belongs to the current player, else returns false.
         if(game.board[row][col].gamePiece != null && selectedSquare.gamePiece != null){ // if there is a unit in the square at row, col
-            if(game.board[row][col].gamePiece.color == selectedSquare.gamePiece.color){ // if the unit at square row, col is an enemy
+            if(game.board[row][col].gamePiece.color.equals(selectedSquare.gamePiece.color)){ // if the unit at square row, col is an enemy
                 return true;
             } else return false;
         } else return false;
@@ -105,7 +105,7 @@ public class Move {
     private boolean isEnemyUnit(int row, int col){
         // returns true if the game piece at row, col belongs to the opponent of the current player, else returns false.
         if(game.board[row][col].gamePiece != null && selectedSquare.gamePiece != null){ // if there is a unit in the square at row, col
-            if(game.board[row][col].gamePiece.color != selectedSquare.gamePiece.color){ // if the unit at square row, col is an enemy
+            if(!game.board[row][col].gamePiece.color.equals(selectedSquare.gamePiece.color)){ // if the unit at square row, col is an enemy
                 return true;
             } else return false;
         } else return false;
@@ -116,10 +116,12 @@ public class Move {
         // will not return true if the piece is in an enemy trap
         // will not return true if the rat in the water would capture the elephant
         // will not return true if a piece on land would capture a piece in the water
+        // will not return true if the piece to capture is friendly
         return ((selectedSquare.gamePiece.power >= game.board[row][col].gamePiece.power) || isFriendlyTrap(row, col) || isRat(selectedSquare.row, selectedSquare.col) && isElephant(row, col))
                 && !isEnemyTrap(selectedSquare.row, selectedSquare.col)
                 && (!game.board[selectedSquare.row][selectedSquare.col].environment.equals("water") || isRat(row, col))
-                && !(!game.board[selectedSquare.row][selectedSquare.col].environment.equals("water") && game.board[row][col].environment.equals("water"));
+                && !(!game.board[selectedSquare.row][selectedSquare.col].environment.equals("water") && game.board[row][col].environment.equals("water"))
+                && !isFriendlyUnit(row, col);
     }
 
     private boolean isLionOrTiger(int row, int col){
