@@ -3,7 +3,12 @@ class Invite extends React.Component {
 
     constructor(props){
         super(props);
-        this.state = {invitedPlayer: "", apiConfig: this.props.apiConfig};
+        this.state = {
+            invitedPlayer: "",
+            apiConfig:
+            this.props.apiConfig,
+            inviteSuccess: null
+        };
         this.handleInvitedPlayerChange = this.handleInvitedPlayerChange.bind(this);
         this.handleGeneralRequest = this.handleGeneralRequest.bind(this);
         this.handleAcceptInvite = this.handleAcceptInvite.bind(this);
@@ -22,6 +27,16 @@ class Invite extends React.Component {
             console.log(inviteButtons);
         }
 
+        let successMessage;
+        if (this.state.inviteSuccess === false)
+        {
+            successMessage = <p style={{color:"red"}}>Invite was unsuccessful!</p>
+        }
+        else if (this.state.inviteSuccess === true)
+        {
+            successMessage = <p style={{color:"green"}}>Invite was successful!</p>
+        }
+
         return (
             <div className={'InvitePage'}>
                 <form onSubmit={(e) => this.handleGeneralRequest(e, this.state.apiConfig.url,
@@ -34,7 +49,7 @@ class Invite extends React.Component {
                     <input type="submit" value="Submit" />
                 </form>
                 {inviteButtons}
-
+                {successMessage}
             </div>
 
 
@@ -45,10 +60,19 @@ class Invite extends React.Component {
         event.preventDefault();
         this.setState({invitedPlayer: event.target.value});
     }
+
+
     async handleGeneralRequest(event, url, payload, headers){
+        var self = this;
         event.preventDefault();
         this.props.handleGeneralRequest(event, url, payload, headers)
-            .then(response => this.props.updateInvites(response.invites));
+            .then(function(response) {
+                    self.setState({
+                        inviteSuccess: response.wasSuccessful
+                    });
+                self.props.updateInvites(response.invites)
+                }
+            )
 
     }
     async handleAcceptInvite(playerOne){

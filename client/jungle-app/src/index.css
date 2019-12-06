@@ -23,6 +23,14 @@ h1, h2, h3, h4 {
     margin: 1em;
 }
 
+.bluePlayer {
+    color: skyblue
+}
+
+.redPlayer {
+    color: red
+}
+
 .game-buttons {
     list-style-type: none;
     background:rgba(51, 102, 0,0.5);

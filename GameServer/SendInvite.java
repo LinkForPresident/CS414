@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
+import java.sql.*;
 
 public class SendInvite extends Action {
 
@@ -19,6 +20,19 @@ public class SendInvite extends Action {
         Terminal.printInfo(String.format("Attempting to service the invite of %s to %s.", playerOne, playerTwo));
         String JSONResponse = "";
         // TODO: Check if user exists in DB.
+
+        String checkUser = String.format("SELECT * FROM User WHERE username='%s';", playerTwo);
+        try {
+            ResultSet resultSet = Database.executeDatabaseQuery(checkUser);
+            if(!resultSet.next()){
+                JSONResponse = String.format("{\"invitedPlayer\": \"%s\", \"wasSuccessful\": %b}", playerTwo, false);
+                return JSONResponse;
+            };
+        }catch(SQLException e){
+            JSONResponse = String.format("{\"invitedPlayer\": \"%s\", \"wasSuccessful\": %b}", playerTwo, false);
+            return JSONResponse;
+        }
+
         String[] newInvite = {playerOne, playerTwo};
         boolean alreadyExists = false;
         for(String[] invite : Server.invites){

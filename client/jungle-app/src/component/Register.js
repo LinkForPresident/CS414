@@ -2,10 +2,16 @@ import React from 'react';
 class Register extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {username: '', password: ''};
+        this.state = {
+            username: '',
+            password: '',
+            email: '',
+            registerSuccess: null
+        };
 
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
+        this.handleEmailChange = this.handleEmailChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
@@ -17,25 +23,52 @@ class Register extends React.Component {
         this.setState({password: event.target.value});
     }
 
-    async handleSubmit(event, url, payload, headers) {
-        event.preventDefault();
-        this.props.handleGeneralRequest(event, url, payload, headers)
+    handleEmailChange(event) {
+        this.setState({email: event.target.value});
     }
 
+    async handleSubmit(event, url, payload, headers) {
+        var self = this;
+        event.preventDefault();
+        this.props.handleGeneralRequest(event, url, payload, headers)
+            .then(function(response) {
+                self.setState({
+                    registerSuccess: response.wasSuccessful
+                })
+                }
+            )
+    }
+
+
     render() {
+        let successMessage;
+        if (this.state.registerSuccess === false)
+        {
+            successMessage = <p style={{color:"red"}}>Registration was unsuccessful!</p>
+        }
+        else if (this.state.registerSuccess === true)
+        {
+            successMessage = <p style={{color:"green"}}>Registration was successful!</p>
+        }
+
         return (
-            <form onSubmit={(e) => this.handleSubmit(e, this.props.apiConfig.url,
-                "action=Register&username=" + this.state.username + "&password=" + this.state.password,
-                this.props.apiConfig.headers)}>
-                <label>
-                    Name:
-                    <input type="text" value={this.state.username} onChange={this.handleNameChange} />
-                    Password:
-                    <input type="password" value={this.state.password} onChange={this.handlePasswordChange} />
-                    <input type="text" hidden />
-                </label>
-                <input type="submit" value="Submit" />
-            </form>
+            <div>
+                <form onSubmit={(e) => this.handleSubmit(e, this.props.apiConfig.url,
+                    "action=Register&username=" + this.state.username + "&password=" + this.state.password + "&email=" + this.state.email,
+                    this.props.apiConfig.headers)}>
+                    <label>
+                        Name:
+                        <input type="text" value={this.state.username} onChange={this.handleNameChange} />
+                        Password:
+                        <input type="password" value={this.state.password} onChange={this.handlePasswordChange} />
+                        Email:
+                        <input type="text" value={this.state.email} onChange={this.handleEmailChange} />
+                        <input type="text" hidden />
+                    </label>
+                    <input type="submit" value="Submit" />
+                </form>
+                {successMessage}
+            </div>
         );
     }
 }
