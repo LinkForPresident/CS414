@@ -37,10 +37,15 @@ class Board extends React.Component {
                         )}</li>
             );
 
+            let winning = "";
+            if(this.props.gameState.winner !== "") {
+                winning = "Player " + this.props.gameState.winner + " Wins!";
+            }
+
             return (
                 // bootstrapped grid container with rows
                 <div className={'Board container'}>
-
+                    <h3 style={{color: "lightgreen"}}>{winning}</h3>
                     <ul className={"board-ul row"}>
                         {gameBoard}
                     </ul>
