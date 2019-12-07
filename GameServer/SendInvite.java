@@ -29,7 +29,7 @@ public class SendInvite extends Action {
         try {
             ResultSet resultSet = Database.executeDatabaseQuery(checkUser);
             if(!resultSet.next()){
-                JSONResponse = String.format("{\"invitedPlayer\": \"%s\", \"wasSuccessful\": %b, \"description\": \"%s\"}", playerTwo, false, "User does not exist.");
+                JSONResponse = String.format("{\"invitedPlayer\": \"%s\", \"wasSuccessful\": %b, \"description\": \"%s}", playerTwo, false, "User does not exist." );
                 return JSONResponse;
             };
         }catch(SQLException e){
@@ -54,8 +54,20 @@ public class SendInvite extends Action {
 			Database.executeDatabaseQuery(createInvite);
             Server.invites.add(newInvite);
         }
-        JSONResponse = String.format("{\"invitedPlayer\": \"%s\", \"wasSuccessful\": %b}", playerTwo,
-                !alreadyExists);
+        String incomingInvites = "";
+        for (String[] inv : Server.invites) {
+            if (inv[1].equals(playerOne)) {
+                incomingInvites += inv[0] + ",";
+            }
+        }
+        String outgoingInvites = "";
+        for (String[] inv : Server.invites) {
+            if (inv[0].equals(playerOne)) {
+                outgoingInvites += inv[1] + ",";
+            }
+        }
+        JSONResponse = String.format("{\"invitedPlayer\": \"%s\", \"wasSuccessful\": %b, \"incomingInvites\": \"%s\", \"outgoingInvites\": \"%s\"}", playerTwo,
+                !alreadyExists, incomingInvites, outgoingInvites);
         return JSONResponse;
     }
 

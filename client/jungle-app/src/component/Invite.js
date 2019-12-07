@@ -16,26 +16,25 @@ class Invite extends React.Component {
     }
 
     render() {
-        console.log(this.props.invites);
-        if(typeof this.props.invites !== "undefined"){    // gotta be a better way of doing this...
-            var playerInvites = this.props.invites.split(",");
-            playerInvites.pop();
-            console.log(playerInvites);
-            var inviteButtons = playerInvites.map((elem) => <div style={{display:'block'}}>{elem}<button onClick={
+        if(typeof this.props.incomingInvites !== "undefined"){    // gotta be a better way of doing this...
+            var incomingInvites = this.props.incomingInvites.split(",");
+            incomingInvites.pop();
+            var incomingInviteButtons = incomingInvites.map((elem) => <div style={{display:'block'}}>{elem}<button onClick={
                 this.handleAcceptInvite.bind(this, elem)}>Accept</button>
                 <button onClick={this.handleDeclineInvite.bind(this, elem)}>Decline</button></div>);
-            console.log(inviteButtons);
+        }
+        if(typeof this.props.outgoingInvites !== "undefined"){    // gotta be a better way of doing this...
+            var outgoingInvites = this.props.outgoingInvites.split(",");
+            outgoingInvites.pop();
+            var outgoingInviteButtons = outgoingInvites.map((elem) => <div style={{display:'block'}}>{elem}<button onClick={
+                this.handleCancelInvite.bind(this, elem)}>Cancel</button></div>);
         }
 
         let successMessage;
         if (this.state.inviteSuccess === false)
-        {
-            successMessage = <p style={{color:"red"}}>Invite was unsuccessful!</p>
-        }
+        {successMessage = <p style={{color:"red"}}>Invite was unsuccessful!</p>}
         else if (this.state.inviteSuccess === true)
-        {
-            successMessage = <p style={{color:"green"}}>Invite was successful!</p>
-        }
+        {successMessage = <p style={{color:"green"}}>Invite was successful!</p>}
 
         return (
             <div className={'InvitePage'}>
@@ -48,8 +47,11 @@ class Invite extends React.Component {
                     </label>
                     <input type="submit" value="Submit" />
                 </form>
-                {inviteButtons}
                 {successMessage}
+                <h2> Outgoing Invites </h2>
+                {outgoingInviteButtons}
+                <h2> Incoming Invites </h2>
+                {incomingInviteButtons}
             </div>
 
 
@@ -70,22 +72,30 @@ class Invite extends React.Component {
                     self.setState({
                         inviteSuccess: response.wasSuccessful
                     });
-                self.props.updateInvites(response.invites)
+                self.props.updateIncomingInvites(response.incomingInvites);
+                self.props.updateOutgoingInvites(response.outgoingInvites);
                 }
             )
-
     }
+
+
     async handleAcceptInvite(playerOne){
         console.log("playerOne is: " + playerOne);
         this.props.handleAcceptInvite(this.state.apiConfig.url, "action=AcceptInvite&playerOne=" + playerOne + "&username=" + this.props.username + "&password=" + this.props.password + "&playerTwo=" + this.props.username, this.props.apiConfig.headers)
-            .then(response => this.props.updateInvites(response.invites));
+            .then(response => this.props.updateIncomingInvites(response.incomingInvites));
 
 
     }
     async handleDeclineInvite(playerOne){
 
         this.props.handleAcceptInvite(this.state.apiConfig.url, "action=DeclineInvite&playerOne=" + playerOne + "&username=" + this.props.username + "&password=" + this.props.password + "&playerTwo=" + this.props.username, this.props.apiConfig.headers)
-            .then(response => this.props.updateInvites(response.invites));
+            .then(response => this.props.updateIncomingInvites(response.incomingInvites));
+
+    }
+    async handleCancelInvite(playerTwo){
+
+        this.props.handleAcceptInvite(this.state.apiConfig.url, "action=CancelInvite&playerOne=" + this.props.username + "&username=" + this.props.username + "&password=" + this.props.password + "&playerTwo=" + playerTwo, this.props.apiConfig.headers)
+            .then(response => this.props.updateIncomingInvites(response.incomingInvites));
 
     }
 }

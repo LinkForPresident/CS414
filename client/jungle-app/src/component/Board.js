@@ -29,7 +29,6 @@ class Board extends React.Component {
 
     // Constructing the board involves mapping the 2 dimensional array into "Squares" where piece, and environment logic and display specifics exist.
     render() {
-
         if (this.props.loggedIn &&  this.props.gameState.board != null) {
             const gameBoard = this.props.gameState.board.map((game, row_index) =>
                 <li className={'game-row col-12 col-lg-8'}>

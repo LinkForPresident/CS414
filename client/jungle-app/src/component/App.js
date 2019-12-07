@@ -19,7 +19,8 @@ export default class App extends React.Component {
     constructor(props) {
         super(props);
         this.updateLoginValue = this.updateLoginValue.bind(this);
-        this.updateInvites = this.updateInvites.bind(this);
+        this.updateIncomingInvites = this.updateIncomingInvites.bind(this);
+        this.updateOutgoingInvites = this.updateOutgoingInvites.bind(this);
         this.updateActiveGames = this.updateActiveGames.bind(this);
         this.updateCompletedGames = this.updateCompletedGames.bind(this);
         this.setSelectedGame = this.setSelectedGame.bind(this);
@@ -38,7 +39,8 @@ export default class App extends React.Component {
         activeGames: ["0001", "0002", "0005"],
         completedGames: ["0003", "0004"],
         selectedGame: null,
-        invites: " ",
+        incomingInvites: " ",
+        outgoingInvites: " ",
         gameState:
             {
 
@@ -105,6 +107,7 @@ export default class App extends React.Component {
             headers,
         )
             .then(function (response) {
+                    console.log("General Request response: ");
                     console.log(response);
                     return response;
                 }
@@ -164,20 +167,27 @@ export default class App extends React.Component {
             .catch();
     }
 
-    updateLoginValue(loginVal, username, password, invites) {
-        console.log(username);
-        console.log(invites);
+    updateLoginValue(loginVal, username, password, incomingInvites, outgoingInvites) {
         this.setState({
             loggedIn: loginVal,
             username: username,
             password: password,
-            invites: invites,
+            incomingInvites: incomingInvites,
+            outgoingInvites: outgoingInvites,
         });
     }
 
-    updateInvites(invites) {
+    updateIncomingInvites(incomingInvites) {
+        console.log("Updating incoming invites");
         this.setState({
-            invites: invites
+            incomingInvites: incomingInvites
+        });
+    }
+
+    updateOutgoingInvites(outgoingInvites) {
+        console.log("Updating outgoing invites");
+        this.setState({
+            outgoingInvites: outgoingInvites
         });
     }
 
@@ -294,11 +304,13 @@ export default class App extends React.Component {
                         /></TabPanel>
                         <TabPanel><Invite apiConfig={this.state.apiConfig} handleGeneralRequest={this.handleGeneralRequest}
                                           handleAcceptInvite={this.handleAcceptInvite}
-                                          invites={this.state.invites}
+                                          incomingInvites={this.incomingInvites}
+                                          outgoingInvites={this.outgoingInvites}
                                           username={this.state.username}
                                           password={this.state.password}
                                           handleDeclineInvite={this.handleDeclineInvite}
-                                          updateInvites={this.updateInvites}/></TabPanel>
+                                          updateIncomingInvites={this.updateIncomingInvites}
+                                          updateOutgoingInvites={this.updateOutgoingInvites}/></TabPanel>
                         <TabPanel>
                             <User
                                 Logout={this.Logout}

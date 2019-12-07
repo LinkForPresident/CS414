@@ -49,16 +49,23 @@ public class AcceptInvite extends Action {
                 } catch (PlayerNameException | SQLException e) {
                     System.out.println(e);
                 }
-                String playerInvites = "";
-                for (String[] inv : Server.invites) {
-                    if (inv[1].equals(playerTwo)) {
-                        playerInvites += inv[0] + ",";
-                    }
-                }
-                JSONResponse += String.format("\"wasSuccessful\":\"true\", \"invites\": \"%s\"", playerInvites);
+
             }
         }
-        return JSONResponse +"}";
+        String incomingInvites = "";
+        for (String[] inv : Server.invites) {
+            if (inv[1].equals(playerOne)) {
+                incomingInvites += inv[0] + ",";
+            }
+        }
+        String outgoingInvites = "";
+        for (String[] inv : Server.invites) {
+            if (inv[0].equals(playerOne)) {
+                outgoingInvites += inv[1] + ",";
+            }
+        }
+        JSONResponse += String.format("\"incomingInvites\": \"%s\", \"outgoingInvites\": \"%s\"}", incomingInvites, outgoingInvites);
+        return JSONResponse;
     }
 
 }
