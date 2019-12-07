@@ -40,15 +40,7 @@ export default class App extends React.Component {
         invites: " ",
         gameState:
             {
-                "gameID": "2",
-                "playerOne": "Bob",
-                "playerTwo": "Sally",
-                "turn": "Bob",
-                "turnNumber": 0,
-                "board": null,
-                "winner": "",
-                "startTime": "",
-                "endTime": ""
+
             },
 
         // common rest request configuration
@@ -246,7 +238,7 @@ export default class App extends React.Component {
                         <TabPanel><Home/></TabPanel>
 
                         <TabPanel>
-                            {this.state.gameState.gameID != null ? <h1 style={{textAlign: 'left'}}>Jungle Game #{this.state.gameState.gameID} VS {this.state.username === this.state.gameState.playerOne ? this.state.gameState.playerTwo: this.state.gameState.playerOne } </h1>: <h1 style={{textAlign: 'left'}}>Select a Game</h1>}
+                            {this.state.gameState.gameID != null ? <h1 style={{textAlign: 'left'}}>#{this.state.gameState.gameID}: {this.state.username === this.state.gameState.playerOne ? <span className={"bluePlayer"}>{this.state.gameState.playerOne}</span>: <span className={"redPlayer"}>{this.state.gameState.playerTwo}</span> } VS {this.state.username === this.state.gameState.playerOne ? <span className={"redPlayer"}>{this.state.gameState.playerTwo}</span>: <span className={"bluePlayer"}>{this.state.gameState.playerOne}</span> } </h1>: <h1 style={{textAlign: 'left'}}>Select a Game</h1>}
                             <Games
                                 activeGames={this.state.activeGames}
                                 setSelectedGame={this.setSelectedGame}
