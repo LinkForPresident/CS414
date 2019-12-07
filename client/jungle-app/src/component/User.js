@@ -8,9 +8,10 @@ class User extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            show: true
+            show: true,
+            unregisterSuccess: null,
         };
-
+        this.handleUnregistrationSubmit = this.handleUnregistrationSubmit.bind(this);
     }
 
     setShow(bool) {
@@ -19,8 +20,27 @@ class User extends React.Component {
         });
     }
 
+    async handleUnregistrationSubmit(event, url, payload, headers) {
+        var self = this;
+        event.preventDefault();
+        this.props.handleGeneralRequest(event, url, payload, headers)
+            .then(response => this.props.updateLoginValue(false, "", "", "")
+            )
+    }
+
+
     render() {
         let alert;
+        let successMessage;
+        if (this.state.unregisterSuccess === false)
+        {
+            successMessage = <p style={{color:"red"}}>Registration was unsuccessful!</p>
+        }
+        else if (this.state.unregisterSuccess === true)
+        {
+            successMessage = <p style={{color:"green"}}>Registration was successful!</p>
+        }
+
         if (this.state.show) {
             alert =
                 <Alert variant="dark" onClose={() => this.setShow(false)} dismissible>
@@ -40,7 +60,9 @@ class User extends React.Component {
                         onClick={() => {
                             this.props.Logout()
                         }}>Logout</Button>
-                    <Button variant="secondary">Unregister (Unimplemented)</Button>
+                    <Button variant="secondary" onClick={(e) => this.handleUnregistrationSubmit(e, this.props.apiConfig.url,
+                        "action=Unregister&username=" + this.props.username + "&password=" + this.props.password + "&email=" + this.props.email,
+                        this.props.apiConfig.headers)}>Unregister</Button>
                 </ButtonGroup>
 
 
