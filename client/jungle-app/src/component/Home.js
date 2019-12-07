@@ -4,7 +4,8 @@ class Home extends React.Component {
     render() {
         return (
             <div className={'HomePage'}>
-                <p>Home Goes here</p>
+                <h1>Welcome to the Online Jungle Game!</h1>
+                <h2>Select a tab above to get started.</h2>
             </div>
         )
     }

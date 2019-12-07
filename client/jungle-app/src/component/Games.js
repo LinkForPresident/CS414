@@ -1,5 +1,5 @@
 import React from "react";
-import {Button} from "react-bootstrap";
+import {Button, DropdownItem, Dropdown, DropdownButton} from "react-bootstrap";
 
 class Games extends React.Component {
     constructor(props) {
@@ -30,14 +30,22 @@ class Games extends React.Component {
         // This is where active and inactive games can be chosen for either viewing or playing.
 
             const activeGamesList = this.props.activeGames.map((game) =>
-                    <button style={{margin:'.5em'}} onClick={this.props.setSelectedGame} value={game}>
-                        Game Id: {game}
-                    </button>);
+                    <Dropdown.Item as="button" onClick={this.props.setSelectedGame} value={game}>
+                        Game ID: {game}
+                    </Dropdown.Item>);
             return (
                 <div className={'GamesPage'}>
-                    <ul className={'list-group list-group-horizontal'}>
-                        {activeGamesList}
-                    </ul>
+                    {/*<ul className={'list-group list-group-horizontal'}>*/}
+                    {/*    {activeGamesList}*/}
+                    {/*</ul>*/}
+                    <Dropdown>
+                        <Dropdown.Toggle id="dropdown-basic">
+                            Games List
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                            {activeGamesList}
+                        </Dropdown.Menu>
+                    </Dropdown>
                     {/*<h2>Completed Games</h2>*/}
                     {/*<ul className={'list-group list-group-horizontal'}>*/}
                     {/*    {completedGamesList}*/}
