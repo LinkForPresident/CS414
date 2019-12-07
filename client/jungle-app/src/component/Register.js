@@ -6,13 +6,14 @@ class Register extends React.Component {
             username: '',
             password: '',
             email: '',
-            registerSuccess: null
+            registerSuccess: null,
+            unregisterSuccess: null
         };
 
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
         this.handleEmailChange = this.handleEmailChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleRegistrationSubmit = this.handleRegistrationSubmit.bind(this);
     }
 
     handleNameChange(event) {
@@ -27,7 +28,7 @@ class Register extends React.Component {
         this.setState({email: event.target.value});
     }
 
-    async handleSubmit(event, url, payload, headers) {
+    async handleRegistrationSubmit(event, url, payload, headers) {
         var self = this;
         event.preventDefault();
         this.props.handleGeneralRequest(event, url, payload, headers)
@@ -53,7 +54,7 @@ class Register extends React.Component {
 
         return (
             <div>
-                <form onSubmit={(e) => this.handleSubmit(e, this.props.apiConfig.url,
+                <form onSubmit={(e) => this.handleRegistrationSubmit(e, this.props.apiConfig.url,
                     "action=Register&username=" + this.state.username + "&password=" + this.state.password + "&email=" + this.state.email,
                     this.props.apiConfig.headers)}>
                     <label>

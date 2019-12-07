@@ -277,7 +277,17 @@ export default class App extends React.Component {
                                           password={this.state.password}
                                           handleDeclineInvite={this.handleDeclineInvite}
                                           updateInvites={this.updateInvites}/></TabPanel>
-                        <TabPanel><User Logout={this.Logout} username={this.state.username}/></TabPanel>
+                        <TabPanel>
+                            <User
+                                Logout={this.Logout}
+                                username={this.state.username}
+                                password={this.state.password}
+                                apiConfig={this.state.apiConfig}
+                                handleGeneralRequest={this.handleGeneralRequest}
+                                loggedIn={this.state.loggedIn}
+                                updateLoginValue={this.updateLoginValue}
+                            />
+                        </TabPanel>
                     </Tabs>
                 </div>
             )
