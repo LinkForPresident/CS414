@@ -19,17 +19,21 @@ public class SendInvite extends Action {
     private static String sendInvite(String playerOne, String playerTwo){
         Terminal.printInfo(String.format("Attempting to service the invite of %s to %s.", playerOne, playerTwo));
         String JSONResponse = "";
-        // TODO: Check if user exists in DB.
+
+        if(playerOne.equals(playerTwo)){
+            JSONResponse = String.format("{\"invitedPlayer\": \"%s\", \"wasSuccessful\": %b, \"description\": \"%s\"}", playerTwo, false, "Cannot invite youself.");
+            return JSONResponse;
+        }
 
         String checkUser = String.format("SELECT * FROM User WHERE username='%s';", playerTwo);
         try {
             ResultSet resultSet = Database.executeDatabaseQuery(checkUser);
             if(!resultSet.next()){
-                JSONResponse = String.format("{\"invitedPlayer\": \"%s\", \"wasSuccessful\": %b}", playerTwo, false);
+                JSONResponse = String.format("{\"invitedPlayer\": \"%s\", \"wasSuccessful\": %b, \"description\": \"%s\"}", playerTwo, false, "User does not exist.");
                 return JSONResponse;
             };
         }catch(SQLException e){
-            JSONResponse = String.format("{\"invitedPlayer\": \"%s\", \"wasSuccessful\": %b}", playerTwo, false);
+            JSONResponse = String.format("{\"invitedPlayer\": \"%s\", \"wasSuccessful\": %b, \"description\": \"%s\"}", playerTwo, false, "500 Internal Server Error.");
             return JSONResponse;
         }
 
