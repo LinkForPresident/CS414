@@ -26,14 +26,20 @@ public class Login extends Action{
         try {
             if (resultSet.next()) { // User exists and has been authenticated, place user_hash into loggedInUsers list.
                 Server.loggedInUsers.add(user_hash);
-                String playerInvites = "";
+                String incomingInvites = "";
                 for (String[] inv : Server.invites) {
                     if (inv[1].equals(username)) {
-                        playerInvites += inv[0] + ",";
+                        incomingInvites += inv[0] + ",";
                     }
                 }
-                JSONResponse = String.format("{\"loggedIn\": %b, \"username\": \"%s\", \"password\": \"%s\", \"invites\": \"%s\"}", true,
-                        username, password, playerInvites);
+                String outgoingInvites = "";
+                for (String[] inv : Server.invites) {
+                    if (inv[0].equals(username)) {
+                        outgoingInvites += inv[1] + ",";
+                    }
+                }
+                JSONResponse = String.format("{\"loggedIn\": %b, \"username\": \"%s\", \"password\": \"%s\", \"incomingInvites\": \"%s\", \"outgoingInvites\": \"%s\"}", true,
+                        username, password, incomingInvites, outgoingInvites);
                 Terminal.printSuccess(String.format("User '%s' has been logged in.", username));
             } else {   // User does not exist. Stop the request handling.
                 Terminal.printDebug(String.format("User '%s' does not exist.", username));
