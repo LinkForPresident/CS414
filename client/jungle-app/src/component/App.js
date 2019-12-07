@@ -304,8 +304,8 @@ export default class App extends React.Component {
                         /></TabPanel>
                         <TabPanel><Invite apiConfig={this.state.apiConfig} handleGeneralRequest={this.handleGeneralRequest}
                                           handleAcceptInvite={this.handleAcceptInvite}
-                                          incomingInvites={this.incomingInvites}
-                                          outgoingInvites={this.outgoingInvites}
+                                          incomingInvites={this.state.incomingInvites}
+                                          outgoingInvites={this.state.outgoingInvites}
                                           username={this.state.username}
                                           password={this.state.password}
                                           handleDeclineInvite={this.handleDeclineInvite}

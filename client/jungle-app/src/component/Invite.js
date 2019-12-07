@@ -67,15 +67,16 @@ class Invite extends React.Component {
     async handleGeneralRequest(event, url, payload, headers){
         var self = this;
         event.preventDefault();
-        this.props.handleGeneralRequest(event, url, payload, headers)
+        var resp = await this.props.handleGeneralRequest(event, url, payload, headers)
             .then(function(response) {
                     self.setState({
-                        inviteSuccess: response.wasSuccessful
+                        inviteSuccess: response.wasSuccessful,
                     });
                 self.props.updateIncomingInvites(response.incomingInvites);
                 self.props.updateOutgoingInvites(response.outgoingInvites);
                 }
-            )
+            );
+
     }
 
 
@@ -95,7 +96,7 @@ class Invite extends React.Component {
     async handleCancelInvite(playerTwo){
 
         this.props.handleAcceptInvite(this.state.apiConfig.url, "action=CancelInvite&playerOne=" + this.props.username + "&username=" + this.props.username + "&password=" + this.props.password + "&playerTwo=" + playerTwo, this.props.apiConfig.headers)
-            .then(response => this.props.updateIncomingInvites(response.incomingInvites));
+            .then(response => this.props.updateOutgoingInvites(response.outgoingInvites));
 
     }
 }
