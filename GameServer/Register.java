@@ -35,6 +35,14 @@ public class Register extends Action {
                 String JSONResponse = String.format("{\"loggedIn\": %b, \"wasSuccessful\": %b}", false, false);
                 return JSONResponse;
             }
+            String checkIfUsernameExists = String.format("SELECT * FROM User WHERE username='%s';", username);
+            resultSet = Database.executeDatabaseQuery(checkIfUsernameExists);
+            if (resultSet.next()) {
+                Terminal.printError(String.format("Encountered an error while attempting to register a new user with " +
+                        "username '%s': username '%s' has already been taken by different user.", username, username));
+                String JSONResponse = String.format("{\"loggedIn\": %b, \"wasSuccessful\": %b}", false, false);
+                return JSONResponse;
+            }
         }catch(SQLException sql){
             Terminal.printError(String.format("Encountered an error while attempting to register a new user with " +
                     "username '%s', when querying the database to check if the email is already taken.", username));
