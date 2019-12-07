@@ -45,7 +45,7 @@ class Board extends React.Component {
                     <ul className={"board-ul row"}>
                         {gameBoard}
                     </ul>
-                    <button onClick={() => this.handleForfeitGame()}>Forfeit</button>
+                    <button onClick={() => this.handleForfeitGame()}>Forfeit &#9872;</button>
                 </div>
             )
         }
