@@ -8,10 +8,23 @@ class Board extends React.Component {
         this.state = {
             selected_piece: null,
         };
+        this.handleForfeitGame = this.handleForfeitGame.bind(this);
     }
     componentDidMount() {
         // console.log
         this.props.ViewGameState(this.props.gameState.gameID);
+    }
+
+    handleForfeitGame(){
+        var self = this;
+        console.log("User" + this.props.username + "is forfeiting game.");
+        this.props.handleForfeitGame(this.props.apiConfig.url, "action=ForfeitGame&username=" + this.props.username + "&password=" + this.props.password + "&gameID=" + this.props.selectedGame, this.props.apiConfig.headers)
+        this.props.getGames(this.props.apiConfig.url, "action=ViewUserGames&username=" + this.props.username + "&password=" + this.props.password, this.props.apiConfig.headers)
+            .then(
+                function (response) {
+                    self.props.updateActiveGames(response.activeGames)
+                }
+            )
     }
 
     // Constructing the board involves mapping the 2 dimensional array into "Squares" where piece, and environment logic and display specifics exist.
@@ -32,6 +45,7 @@ class Board extends React.Component {
                     <ul className={"board-ul row"}>
                         {gameBoard}
                     </ul>
+                    <button onClick={() => this.handleForfeitGame()}>Forfeit</button>
                 </div>
             )
         }

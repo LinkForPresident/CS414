@@ -23,6 +23,7 @@ export default class App extends React.Component {
         this.updateActiveGames = this.updateActiveGames.bind(this);
         this.updateCompletedGames = this.updateCompletedGames.bind(this);
         this.setSelectedGame = this.setSelectedGame.bind(this);
+        this.handleForfeitGame = this.handleForfeitGame.bind(this);
         this.ViewGameState = this.ViewGameState.bind(this);
         this.postExample = this.postExample.bind(this);
         this.Logout = this.Logout.bind(this);
@@ -145,6 +146,24 @@ export default class App extends React.Component {
         return resp.data;
     }
 
+    // This is repeated code that needs to be refactored to use the "HandleGeneralRequest", which is functionally identical.
+    async handleForfeitGame(url, payload, headers) {
+        var self=this;
+        var resp = await axios.post(url,
+            payload,
+            headers,
+        )
+            .then(function (response) {
+                console.log(response.data);
+                    self.setState({
+                        // gameState: response.data
+                        gameState: {}
+                    });
+                }
+            )
+            .catch();
+    }
+
     updateLoginValue(loginVal, username, password, invites) {
         console.log(username);
         console.log(invites);
@@ -195,18 +214,16 @@ export default class App extends React.Component {
     }
 
     updateActiveGames(games) {
-    this.setState({
-        activeGames: games
-    });
-
-}
+        this.setState({
+            activeGames: games
+        });
+    }
 
     updateCompletedGames(games) {
-    this.setState({
-        completedGames: games
-    });
-
-}
+        this.setState({
+            completedGames: games
+        });
+    }
 
     setSelectedGame(e) {
         console.log("setSelectedGame: " + e.target.value);
@@ -257,6 +274,11 @@ export default class App extends React.Component {
                                    username={this.state.username}
                                    ViewGameState={this.ViewGameState}
                                    password={this.state.password}
+                                   handleForfeitGame={this.handleForfeitGame}
+                                   selectedGame={this.state.selectedGame}
+                                   updateActiveGames={this.updateActiveGames}
+                                   apiConfig={this.state.apiConfig}
+                                   getGames={this.getGames}
                             />
                         </TabPanel>
                         <TabPanel><GameRules/></TabPanel>

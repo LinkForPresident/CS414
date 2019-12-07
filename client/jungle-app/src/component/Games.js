@@ -22,7 +22,7 @@ class Games extends React.Component {
 
     componentDidMount() {
         // console.log
-        this.getGames(this.props.apiConfig.url, "action=ViewUserGames&username=" + this.props.username + "&password=" + this.props.password, this.props.apiConfig.headers)
+        this.getGames(this.props.apiConfig.url, "action=ViewUserGames&username=" + this.props.username + "&password=" + this.props.password, this.props.apiConfig.headers);
     }
 
 
