@@ -73,7 +73,7 @@ class Invite extends React.Component {
     }
 
 
-    async handleGeneralRequest(event=null, url, payload, headers){
+    async handleGeneralRequest(event, url, payload, headers){
         var self = this;
         event.preventDefault();
         var resp = await this.props.handleGeneralRequest(event, url, payload, headers)
