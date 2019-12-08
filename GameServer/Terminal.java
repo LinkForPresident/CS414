@@ -15,11 +15,11 @@ public class Terminal {
     private static final String GREEN_TEXT = "\u001B[38;5;82m";
     private static final String YELLOW_TEXT = "\u001B[38;5;11m";
 
-    private static final String INFO_TAG = BLUE_TEXT + "==INFO==:: " + RESET_TEXT_COLOR;
-    private static final String DEBUG_TAG = GRAY_TEXT + "==DEBUG==:: " + RESET_TEXT_COLOR;
-    private static final String WARNING_TAG = YELLOW_TEXT + "==WARNING==:: " + RESET_TEXT_COLOR;
-    private static final String ERROR_TAG = RED_TEXT + "==ERROR==:: " + RESET_TEXT_COLOR;
-    private static final String SUCCESS_TAG = GREEN_TEXT + "==SUCCESS==:: " + RESET_TEXT_COLOR;
+    private static final String INFO_TAG = BLUE_TEXT + "==INFO== " + RESET_TEXT_COLOR;
+    private static final String DEBUG_TAG = GRAY_TEXT + "==DEBUG== " + RESET_TEXT_COLOR;
+    private static final String WARNING_TAG = YELLOW_TEXT + "==WARNING== " + RESET_TEXT_COLOR;
+    private static final String ERROR_TAG = RED_TEXT + "==ERROR== " + RESET_TEXT_COLOR;
+    private static final String SUCCESS_TAG = GREEN_TEXT + "==SUCCESS== " + RESET_TEXT_COLOR;
 
     protected Terminal(){
 
