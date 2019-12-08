@@ -34,3 +34,16 @@ GameLogic backend
 #Running java tests for GameLogic backend
 
 Run the GameTest.java in your IDE
+
+#Selenium Automated Tests for Front-End
+
+First start the Client website by running the following commands from the jungle-app folder:
+    npm install
+    npm start
+
+Next, make sure Server is running by executing Server.java as shown above
+
+Make sure all .jar files in the /selenium folder are included in your Module Library settings to make sure they can be accessed!
+
+Now you are ready to run the Selenium tests via IntelliJ, by runnng the clientSeleniumTest.java JUnit test
+    - You should see 10 tests running and see the Firefox WebDriver startup
