@@ -27,7 +27,7 @@ public class clientSeleniumTest {
     public void test0LoginFailure() throws InterruptedException {
         //Test that you can Login and all text is properly displayed
         //Check that the title of the Application is correct
-        Assert.assertEquals(driver.getTitle(), "Jungle Game");
+        Assert.assertEquals(driver.getTitle(), "Jungle App");
 
         WebElement userText = driver.findElement(By.cssSelector("input:nth-child(1)"));
         WebElement passwordText = driver.findElement(By.cssSelector("input:nth-child(2)"));
@@ -47,7 +47,7 @@ public class clientSeleniumTest {
     public void test1LoginSuccess() throws InterruptedException {
         //Test that you can Login and all text is properly displayed
         //Check that the title of the Application is correct
-        Assert.assertEquals(driver.getTitle(), "Jungle Game");
+        Assert.assertEquals(driver.getTitle(), "Jungle App");
 
         WebElement userText = driver.findElement(By.cssSelector("input:nth-child(1)"));
         WebElement passwordText = driver.findElement(By.cssSelector("input:nth-child(2)"));
