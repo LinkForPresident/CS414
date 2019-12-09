@@ -186,13 +186,13 @@ export default class App extends React.Component {
     }
 
     updateLoginValue(loginVal, username, password, incomingInvites, outgoingInvites) {
-        this.setState({
-            loggedIn: loginVal,
-            username: username,
-            password: password,
-            incomingInvites: incomingInvites,
-            outgoingInvites: outgoingInvites,
-        });
+            this.setState({
+                loggedIn: loginVal,
+                username: username,
+                password: password,
+                incomingInvites: incomingInvites,
+                outgoingInvites: outgoingInvites,
+            });
     }
 
     updateIncomingInvites(incomingInvites) {
