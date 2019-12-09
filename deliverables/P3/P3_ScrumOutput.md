@@ -1,15 +1,29 @@
 ## Sprint 2 Review
-[TODO]
+Met with the Product Owner, discussed what was left to do. The sprint started a bit late, but since we had most of the features implemented, the Product Owner approved. We still need to:
+* use email for registration
+* the games tab should show who's turn it is
+* the game list should be a drop down menu
+* the game should display player colors
+* there should be a response for when invites are created, saying success/failure
+* invites should be visible, and cancellable
+* user unregistration should be fully implemented
+* forfeit game should be fully implemented
 
 ## Sprint 2 Retrospective
 ### Went well
-[TODO]
+* getting all the core features implemented
+* Selenium testing completed the test coverage
+* working together in the lab, pair programming
+* meeetings with product owner
 
 ### Room for improvement
-[TODO]
+* Communication on Slack
+* Timely reviews/merges of pull requests
+* Understanding the code of others
 
 ### What we plan to do
-[TODO]
+* Give a good presentation
+* Carry on the skills we learned here to our future jobs
 
 |MEETING SUMMARIES|
 |---|
