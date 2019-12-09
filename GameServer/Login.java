@@ -20,7 +20,7 @@ public class Login extends Action{
         // Login a client by checking if the client is registered and if so, adding client to list of logged in users.
         Terminal.printInfo(String.format("Attempting to log in user with username: '%s' and user_hash: '%s'.",
                 username, user_hash));
-        String selectUser = String.format("SELECT 1 FROM User WHERE hash_code='%s';", user_hash);
+        String selectUser = String.format("SELECT 1 FROM User WHERE username='%s' AND password='%s';", username, password);
         ResultSet resultSet = Database.executeDatabaseQuery(selectUser);
         String JSONResponse = String.format("{\"loggedIn\": %b}", false);
         try {

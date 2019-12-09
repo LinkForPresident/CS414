@@ -48,7 +48,7 @@ export default class App extends React.Component {
 
         // common rest request configuration
         apiConfig:{
-            url:'http://localhost:8080',
+            url:'http://129.82.44.124:8080',
             headers: {
                 'Content-Type': 'application/text',
                 'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
@@ -186,13 +186,13 @@ export default class App extends React.Component {
     }
 
     updateLoginValue(loginVal, username, password, incomingInvites, outgoingInvites) {
-        this.setState({
-            loggedIn: loginVal,
-            username: username,
-            password: password,
-            incomingInvites: incomingInvites,
-            outgoingInvites: outgoingInvites,
-        });
+            this.setState({
+                loggedIn: loginVal,
+                username: username,
+                password: password,
+                incomingInvites: incomingInvites,
+                outgoingInvites: outgoingInvites,
+            });
     }
 
     updateIncomingInvites(incomingInvites) {
