@@ -54,13 +54,13 @@ public class AcceptInvite extends Action {
         }
         String incomingInvites = "";
         for (String[] inv : Server.invites) {
-            if (inv[1].equals(playerOne)) {
+            if (inv[1].equals(playerTwo)) {
                 incomingInvites += inv[0] + ",";
             }
         }
         String outgoingInvites = "";
         for (String[] inv : Server.invites) {
-            if (inv[0].equals(playerOne)) {
+            if (inv[0].equals(playerTwo)) {
                 outgoingInvites += inv[1] + ",";
             }
         }
