@@ -48,7 +48,7 @@ export default class App extends React.Component {
 
         // common rest request configuration
         apiConfig:{
-            url:'http://129.82.44.124:8080',
+            url:'localhost:8080',
             headers: {
                 'Content-Type': 'application/text',
                 'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
