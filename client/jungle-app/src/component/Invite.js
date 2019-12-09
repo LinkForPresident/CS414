@@ -57,6 +57,15 @@ class Invite extends React.Component {
 
         )
     }
+    async componentDidMount(event) {
+        var self = this;
+        var resp = await this.props.handleUpdateInvites(this.state.apiConfig.url, "action=Login&username=" +
+        this.props.username + "&password=" + this.props.password, this.props.apiConfig.headers)
+        .then(function(response){
+            self.props.updateIncomingInvites(response.incomingInvites);
+            self.props.updateOutgoingInvites(response.outgoingInvites);
+        })
+    }
 
     handleInvitedPlayerChange(event) {
         event.preventDefault();

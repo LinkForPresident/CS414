@@ -117,6 +117,24 @@ export default class App extends React.Component {
     }
 
     // This is repeated code that needs to be refactored to use the "HandleGeneralRequest", which is functionally identical.
+        async handleUpdateInvites(url, payload, headers) {
+            console.log("URL: " +url);
+            console.log("Payload: " +payload);
+            console.log("header: " +headers);
+            var resp = await axios.post(url,
+                payload,
+                headers,
+            )
+                .then(function (response) {
+                        console.log(response);
+                        return response;
+                    }
+                )
+                .catch();
+            return resp.data;
+        }
+
+    // This is repeated code that needs to be refactored to use the "HandleGeneralRequest", which is functionally identical.
     async handleAcceptInvite(url, payload, headers) {
         console.log("URL: " +url);
         console.log("Payload: " +payload);
@@ -302,7 +320,10 @@ export default class App extends React.Component {
                                 getGames={this.getGames}
                                 updateCompletedGames={this.updateCompletedGames}
                         /></TabPanel>
-                        <TabPanel><Invite apiConfig={this.state.apiConfig} handleGeneralRequest={this.handleGeneralRequest}
+                        <TabPanel><Invite apiConfig={this.state.apiConfig}
+                                            handleGeneralRequest={this.handleGeneralRequest}
+                                            handleUpdateInvites={this.handleUpdateInvites}
+                                            updateLoginValue={this.updateLoginValue}
                                           handleAcceptInvite={this.handleAcceptInvite}
                                           incomingInvites={this.state.incomingInvites}
                                           outgoingInvites={this.state.outgoingInvites}
